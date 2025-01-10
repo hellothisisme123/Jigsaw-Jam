@@ -1,0 +1,24 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    color: #fff;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background-color: var(--lightBrown);
+}
+
+:root {
+    --darkBrown: #2F1E14;
+    --lightBrown: #A4734A;
+    --textColor: var(--darkBrown);
+    --lightTextColor: #462D1D;
+    --lightButtonTransparent: rgb(70, 45, 29, 0.4);
+    --lightButtonSolid: #7E5738;
+    --starColor: #E2AE1D;
+    --bookmarkColor: var(--darkBrown);
+}
