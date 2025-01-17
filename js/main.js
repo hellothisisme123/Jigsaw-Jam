@@ -15,3 +15,9 @@ const homeBtn = document.querySelector("nav .home")
 const settingsBtn = document.querySelector("nav .settings")
 homeBtn.addEventListener("click", () => {window.location = "./index.html"})
 settingsBtn.addEventListener("click", () => {window.location = "./settings.html"})
+
+// ----- force javascript -----
+const requireJavascript = document.querySelectorAll(".requireJavascript")
+requireJavascript.forEach(el => {
+    el.classList.add("javascriptEnabled") 
+})
