@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="./styles/main.css">
+    <link rel="stylesheet" href="./styles/settings.css">
+    <link rel="stylesheet" href="./styles/forceJs.css">
+    
+    <script src="./js/main.js" defer></script>
+
+    <link rel="shortcut icon" href="./production/images/logo.svg" type="image/x-icon">
+    <title>Jigsaw Jam</title>
+</head>
+<body>
+    <nav>
+        <div class="home">
+            <img src="./production/images/house-solid.svg" alt="home house icon">
+        </div>
+        <div class="dividerBar"></div>
+        <div class="title">
+            Jigsaw Jam
+        </div>
+        <div class="dividerBar"></div>
+        <div class="settings">
+            <img src="./production/images/gear-solid.svg" alt="settings gear icon">
+        </div>
+        <div class="leaf leaf1">
+            <img src="./production/images/leaf-1.png" alt="green leaf">
+        </div>
+        <div class="leaf leaf2">
+            <img src="./production/images/leaf-2.png" alt="orange leaf">
+        </div>
+    </nav>
+
+    <div class="floatingLeaves">
+        <div class="leaf leaf1">
+            <img src="./production/images/leaf-3.png" alt="green leaf">
+        </div>
+        <div class="leaf leaf2">
+            <img src="./production/images/leaf-4.png" alt="green leaf">
+        </div>
+        <div class="leaf leaf3">
+            <img src="./production/images/leaf-2.png" alt="green leaf">
+        </div>
+        <div class="leaf leaf4">
+            <img src="./production/images/leaf-1.png" alt="green leaf">
+        </div>
+    </div>
+
+    <noscript class="forceJavascript">
+        <div class="bgImage1">
+            <img src="./production/images/wood-panel-1.png" alt="wood plank background image">
+        </div>
+        <div class="bgImage2">
+            <img src="./production/images/wood-panel-1.png" alt="wood plank background image">
+        </div>
+        
+        <div class="wrapper">
+            <div class="title">You must enable javascript in the browser settings to use this app</div>
+            <div class="buttonWrapper">
+                <a class="refreshPage" href="./">
+                    Refresh Page
+                </a>
+            </div>
+        </div>
+    </noscript>
+    
+    <div class="container requireJavascript">
+        <div class="navigation">
+            <div class="searchbar">
+                <div class="searchIcon"></div>
+                <input type="text">
+                <div class="xIcon"></div>
+            </div>
+    
+            <div class="settingsTabWrapper">
+                <div class="tab account">Account</div>
+                <div class="tab game">Game</div>
+                <div class="tab audio">Audio</div>
+                <div class="tab video">Video</div>
+            </div>
+        </div>
+
+        <div class="main">
+            <div class="settingsTab">
+                <div class="title">Account</div>
+                
+                <div class="btnWrapper">
+                    <div class="replayTutorial">Replay Tutorial</div>
+                    <div class="deleteAccount">Delete Account</div>
+                </div>
+
+                <div class="textInputWrapper">
+                    <div class="label">Change Username:</div>
+                    <input type="text" placeholder="MyUsername">
+                </div>
+
+                <div class="textInputWrapper">
+                    <div class="label">Change Password:</div>
+                    <input type="text" placeholder="MyPassword">
+                </div>
+
+                <div class="btnWrapper">
+                    <div class="signOut">Sign Out</div>
+                    <div class="applyAccountChanges">Apply Account Changes</div>
+                </div>
+            </div>
+
+            <div class="settingsTab">
+                <div class="title">Game</div>
+
+                <div class="dropdownInputWrapper">
+                    <div class="label">Board Mode:</div>
+                    <select name="boardMode" id="boardMode">
+                        <option value="shuffle">Shuffle View</option>
+                        <option value="table">Table View</option>
+                    </select>
+                </div>
+
+                <div class="dropdownInputWrapper">
+                    <div class="label">Piece Density:</div>
+                    <select name="pieceDensity" id="pieceDensity">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="settingsTab">
+                <div class="title">Video</div>
+
+                <div class="dropdownInputWrapper">
+                    <div class="label">Font Size:</div>
+                    <select name="fontSize" id="fontSize">
+                        <option value="low">Small</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">Large</option>
+                    </select>
+                </div>
+
+                <div class="dropdownInputWrapper">
+                    <div class="label">Button Size:</div>
+                    <select name="buttonSize" id="buttonSize">
+                        <option value="low">Small</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">Large</option>
+                    </select>
+                </div>
+
+                <div class="toggleInputWrapper active">
+                    <div class="label">High Contrast:</div>
+                    <div class="input">
+                        <div class="on">
+                            <div>On</div>
+                            <img src="./production/images/toggle-on-solid.svg" alt="on toggle switch">
+                        </div>
+                        <div class="off">
+                            <div>Off</div>
+                            <img src="./production/images/toggle-off-solid.svg" alt="off toggle switch">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dropdownInputWrapper">
+                    <div class="label">Animations:</div>
+                    <select name="animations" id="animations">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="settingsTab">
+                <div class="title">Audio</div>
+
+                <div class="sliderInputWrapper">
+                    <div class="label">Volume:</div>
+                    <input type="range" name="volume" id="volume" min="0" max="11" step="5" value="50">
+                </div>
+
+                <div class="toggleableInputSettingsWrapper">
+                    <div class="toggleInputWrapper">
+                        <div class="label">Advanced Audio Settings:</div>
+                        <div class="input"> 
+                            <div class="on">
+                                <div>On</div>
+                                <img src="./production/images/toggle-on-solid.svg" alt="on toggle switch">
+                            </div>
+                            <div class="off">
+                                <div>Off</div>
+                                <img src="./production/images/toggle-off-solid.svg" alt="off toggle switch">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="toggleInputWrapper active">
+                        <div class="label">Win Sound:</div>
+                        <div class="input"> 
+                            <div class="on">
+                                <div>On</div>
+                                <img src="./production/images/toggle-on-solid.svg" alt="on toggle switch">
+                            </div>
+                            <div class="off">
+                                <div>Off</div>
+                                <img src="./production/images/toggle-off-solid.svg" alt="off toggle switch">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="toggleInputWrapper active">
+                        <div class="label">Place Piece Sound:</div>
+                        <div class="input"> 
+                            <div class="on">
+                                <div>On</div>
+                                <img src="./production/images/toggle-on-solid.svg" alt="on toggle switch">
+                            </div>
+                            <div class="off">
+                                <div>Off</div>
+                                <img src="./production/images/toggle-off-solid.svg" alt="off toggle switch">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

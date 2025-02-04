@@ -7,6 +7,7 @@
     
     <link rel="stylesheet" href="./styles/main.css">
     <link rel="stylesheet" href="./styles/signIn.css">
+    <link rel="stylesheet" href="./styles/forceJs.css">
     
     <script src="./js/main.js" defer></script>
     <script src="./js/signIn.js" defer></script>
@@ -51,7 +52,25 @@
         </div>
     </div>
 
-    <div class="container">
+    <noscript class="forceJavascript">
+        <div class="bgImage1">
+            <img src="./production/images/wood-panel-1.png" alt="wood plank background image">
+        </div>
+        <div class="bgImage2">
+            <img src="./production/images/wood-panel-1.png" alt="wood plank background image">
+        </div>
+        
+        <div class="wrapper">
+            <div class="title">You must enable javascript in the browser settings to use this app</div>
+            <div class="buttonWrapper">
+                <a class="refreshPage" href="./">
+                    Refresh Page
+                </a>
+            </div>
+        </div>
+    </noscript>
+
+    <div class="container requireJavascript">
         <div class="bgImage1">
             <img src="./production/images/wood-panel-1.png" alt="wood plank background image">
         </div>
@@ -59,7 +78,7 @@
             <img src="./production/images/wood-panel-1.png" alt="wood plank background image">
         </div>
 
-        <div class="signInPage requireJavascript">
+        <div class="signInPage">
             <div class="wrapper">
                 <div class="title">Sign In</div>
                 <div class="inputWrapperContainer">
@@ -79,17 +98,6 @@
                     <div class="signIn">
                         Sign In
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <noscript class="forceJavascript">
-            <div class="wrapper">
-                <div class="title">You must enable javascript in the browser settings to use this app</div>
-                <div class="buttonWrapper">
-                    <a class="refreshPage" href="./">
-                        Refresh Page
-                    </a>
                 </div>
             </div>
         </div>

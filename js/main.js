@@ -19,5 +19,5 @@ settingsBtn.addEventListener("click", () => {window.location = "./settings.html"
 // ----- force javascript -----
 const requireJavascript = document.querySelectorAll(".requireJavascript")
 requireJavascript.forEach(el => {
-    el.classList.add("javascriptEnabled") 
+    el.classList.remove("requireJavascript") 
 })

@@ -7,6 +7,7 @@
     
     <link rel="stylesheet" href="./styles/main.css">
     <link rel="stylesheet" href="./styles/home.css">
+    <link rel="stylesheet" href="./styles/forceJs.css">
     
     <script src="./js/main.js" defer></script>
     <script src="./js/redirectToProperPage.js" defer></script>
@@ -51,24 +52,26 @@
         </div>
     </div>
 
-    <div class="container">
+    <noscript class="forceJavascript">
         <div class="bgImage1">
             <img src="./production/images/wood-panel-1.png" alt="wood plank background image">
         </div>
         <div class="bgImage2">
             <img src="./production/images/wood-panel-1.png" alt="wood plank background image">
         </div>
-
-        <noscript class="forceJavascript">
-            <div class="wrapper">
-                <div class="title">You must enable javascript in the browser settings to use this app</div>
-                <div class="buttonWrapper">
-                    <a class="refreshPage" href="./">
-                        Refresh Page
-                    </a>
-                </div>
+        
+        <div class="wrapper">
+            <div class="title">You must enable javascript in the browser settings to use this app</div>
+            <div class="buttonWrapper">
+                <a class="refreshPage" href="./">
+                    Refresh Page
+                </a>
             </div>
-        </noscript>
+        </div>
+    </noscript>
+
+    <div class="container requireJavascript">
+        
     </div>
 </body>
 </html>

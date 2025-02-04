@@ -28,16 +28,12 @@ html, body {
     .bgImage2 {
         top: 52%;
     }
-    
-    .createAccountPage.javascriptEnabled  {
-        display: flex;
-    }
 
     .createAccountPage, .forceJavascript {
         height: 100%;
         width: 100%;
         overflow: hidden;
-        display: none;
+        display: flex;
         flex-direction: column;
         align-items: center;
         z-index: 100;
