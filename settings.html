@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="./styles/forceJs.css">
     
     <script src="./js/main.js" defer></script>
+    <script src="./js/settings.js" defer></script>
 
     <link rel="shortcut icon" href="./production/images/logo.svg" type="image/x-icon">
     <title>Jigsaw Jam</title>
@@ -70,151 +71,97 @@
     
     <div class="container requireJavascript">
         <div class="navigation">
-            <div class="searchbar">
-                <div class="searchIcon"></div>
-                <input type="text">
-                <div class="xIcon"></div>
-            </div>
-    
-            <div class="settingsTabWrapper">
-                <div class="tab account">Account</div>
-                <div class="tab game">Game</div>
-                <div class="tab audio">Audio</div>
-                <div class="tab video">Video</div>
+            <div class="navResponsive">
+                <div class="searchbar">
+                    <div class="searchIcon">
+                        <img src="./production/images/magnifying-glass-solid.svg" alt="magnifying glass icon">
+                    </div>
+                    <input type="text" placeholder="Search">
+                    <div class="xIcon">
+                        <img src="./production/images/xmark-solid.svg" alt="x button icon">
+                    </div>
+                </div>
+        
+                <div class="settingsTabWrapper">
+                    <div class="tab active account">Account</div>
+                    <div class="tab active game">Game</div>
+                    <div class="tab active audio">Audio</div>
+                    <div class="tab active video">Video</div>
+                </div>
             </div>
         </div>
 
         <div class="main">
-            <div class="settingsTab">
-                <div class="title">Account</div>
-                
-                <div class="btnWrapper">
-                    <div class="replayTutorial">Replay Tutorial</div>
-                    <div class="deleteAccount">Delete Account</div>
-                </div>
-
-                <div class="textInputWrapper">
-                    <div class="label">Change Username:</div>
-                    <input type="text" placeholder="MyUsername">
-                </div>
-
-                <div class="textInputWrapper">
-                    <div class="label">Change Password:</div>
-                    <input type="text" placeholder="MyPassword">
-                </div>
-
-                <div class="btnWrapper">
-                    <div class="signOut">Sign Out</div>
-                    <div class="applyAccountChanges">Apply Account Changes</div>
-                </div>
-            </div>
-
-            <div class="settingsTab">
-                <div class="title">Game</div>
-
-                <div class="dropdownInputWrapper">
-                    <div class="label">Board Mode:</div>
-                    <select name="boardMode" id="boardMode">
-                        <option value="shuffle">Shuffle View</option>
-                        <option value="table">Table View</option>
-                    </select>
-                </div>
-
-                <div class="dropdownInputWrapper">
-                    <div class="label">Piece Density:</div>
-                    <select name="pieceDensity" id="pieceDensity">
-                        <option value="low">Low</option>
-                        <option value="medium">Medium</option>
-                        <option value="high">High</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="settingsTab">
-                <div class="title">Video</div>
-
-                <div class="dropdownInputWrapper">
-                    <div class="label">Font Size:</div>
-                    <select name="fontSize" id="fontSize">
-                        <option value="low">Small</option>
-                        <option value="medium">Medium</option>
-                        <option value="high">Large</option>
-                    </select>
-                </div>
-
-                <div class="dropdownInputWrapper">
-                    <div class="label">Button Size:</div>
-                    <select name="buttonSize" id="buttonSize">
-                        <option value="low">Small</option>
-                        <option value="medium">Medium</option>
-                        <option value="high">Large</option>
-                    </select>
-                </div>
-
-                <div class="toggleInputWrapper active">
-                    <div class="label">High Contrast:</div>
-                    <div class="input">
-                        <div class="on">
-                            <div>On</div>
-                            <img src="./production/images/toggle-on-solid.svg" alt="on toggle switch">
-                        </div>
-                        <div class="off">
-                            <div>Off</div>
-                            <img src="./production/images/toggle-off-solid.svg" alt="off toggle switch">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="dropdownInputWrapper">
-                    <div class="label">Animations:</div>
-                    <select name="animations" id="animations">
-                        <option value="low">Low</option>
-                        <option value="medium">Medium</option>
-                        <option value="high">High</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="settingsTab">
-                <div class="title">Audio</div>
-
-                <div class="sliderInputWrapper">
-                    <div class="label">Volume:</div>
-                    <input type="range" name="volume" id="volume" min="0" max="11" step="5" value="50">
-                </div>
-
-                <div class="toggleableInputSettingsWrapper">
-                    <div class="toggleInputWrapper">
-                        <div class="label">Advanced Audio Settings:</div>
-                        <div class="input"> 
-                            <div class="on">
-                                <div>On</div>
-                                <img src="./production/images/toggle-on-solid.svg" alt="on toggle switch">
-                            </div>
-                            <div class="off">
-                                <div>Off</div>
-                                <img src="./production/images/toggle-off-solid.svg" alt="off toggle switch">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="toggleInputWrapper active">
-                        <div class="label">Win Sound:</div>
-                        <div class="input"> 
-                            <div class="on">
-                                <div>On</div>
-                                <img src="./production/images/toggle-on-solid.svg" alt="on toggle switch">
-                            </div>
-                            <div class="off">
-                                <div>Off</div>
-                                <img src="./production/images/toggle-off-solid.svg" alt="off toggle switch">
-                            </div>
-                        </div>
-                    </div>
+            <div class="mainResponsive">
+                <div class="settingsTab active account">
+                    <div class="title">Account</div>
                     
-                    <div class="toggleInputWrapper active">
-                        <div class="label">Place Piece Sound:</div>
-                        <div class="input"> 
+                    <div class="btn wrapper">
+                        <div class="replayTutorial">Replay Tutorial</div>
+                        <div class="deleteAccount">Delete Account</div>
+                    </div>
+    
+                    <div class="text wrapper">
+                        <div class="label">Change Username:</div>
+                        <input type="text" placeholder="MyUsername">
+                    </div>
+    
+                    <div class="text wrapper">
+                        <div class="label">Change Password:</div>
+                        <input type="text" placeholder="MyPassword">
+                    </div>
+    
+                    <div class="btn wrapper">
+                        <div class="signOut">Sign Out</div>
+                        <div class="applyAccountChanges">Apply Account Changes</div>
+                    </div>
+                </div>
+    
+                <div class="settingsTab active game">
+                    <div class="title">Game</div>
+    
+                    <div class="dropdown wrapper">
+                        <div class="label">Board Mode:</div>
+                        <select name="boardMode" id="boardMode">
+                            <option value="shuffle">Shuffle View</option>
+                            <option value="table">Table View</option>
+                        </select>
+                    </div>
+    
+                    <div class="dropdown wrapper">
+                        <div class="label">Piece Density:</div>
+                        <select name="pieceDensity" id="pieceDensity">
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                </div>
+    
+                <div class="settingsTab active video">
+                    <div class="title">Video</div>
+    
+                    <div class="dropdown wrapper">
+                        <div class="label">Font Size:</div>
+                        <select name="fontSize" id="fontSize">
+                            <option value="low">Small</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">Large</option>
+                        </select>
+                    </div>
+    
+                    <div class="dropdown wrapper">
+                        <div class="label">Button Size:</div>
+                        <select name="buttonSize" id="buttonSize">
+                            <option value="low">Small</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">Large</option>
+                        </select>
+                    </div>
+    
+                    <div class="toggle wrapper">
+                        <div class="label">High Contrast:</div>
+                        <div class="input">
                             <div class="on">
                                 <div>On</div>
                                 <img src="./production/images/toggle-on-solid.svg" alt="on toggle switch">
@@ -222,6 +169,77 @@
                             <div class="off">
                                 <div>Off</div>
                                 <img src="./production/images/toggle-off-solid.svg" alt="off toggle switch">
+                            </div>
+                        </div>
+                    </div>
+    
+                    <div class="dropdown wrapper">
+                        <div class="label">Animations:</div>
+                        <select name="animations" id="animations">
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="settingsTab active audio">
+                    <div class="title">Audio</div>
+    
+                    <div class="slider wrapper">
+                        <div class="label">Volume:</div>
+                        <div class="range" 
+                            data-min="0" 
+                            data-max="100" 
+                            data-step="0.00001" 
+                            data-value="50"
+                        >
+                            <div class="fill"></div>
+                        </div>
+                    </div>
+    
+                    <div class="toggleable wrapper">
+                        <div class="toggle wrapper flipper">
+                            <div class="label">Advanced Audio Settings:</div>
+                            <div class="input"> 
+                                <div class="on">
+                                    <div>On</div>
+                                    <img src="./production/images/toggle-on-solid.svg" alt="on toggle switch">
+                                </div>
+                                <div class="off">
+                                    <div>Off</div>
+                                    <img src="./production/images/toggle-off-solid.svg" alt="off toggle switch">
+                                </div>
+                            </div>
+                        </div>
+    
+                        <div class="subSettings">
+                            <div class="toggle wrapper active">
+                                <div class="label">Win Sound:</div>
+                                <div class="input"> 
+                                    <div class="on">
+                                        <div>On</div>
+                                        <img src="./production/images/toggle-on-solid.svg" alt="on toggle switch">
+                                    </div>
+                                    <div class="off">
+                                        <div>Off</div>
+                                        <img src="./production/images/toggle-off-solid.svg" alt="off toggle switch">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="toggle wrapper active">
+                                <div class="label">Place Piece Sound:</div>
+                                <div class="input"> 
+                                    <div class="on">
+                                        <div>On</div>
+                                        <img src="./production/images/toggle-on-solid.svg" alt="on toggle switch">
+                                    </div>
+                                    <div class="off">
+                                        <div>Off</div>
+                                        <img src="./production/images/toggle-off-solid.svg" alt="off toggle switch">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

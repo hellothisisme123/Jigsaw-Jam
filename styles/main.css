@@ -3,6 +3,7 @@
     padding: 0;
     box-sizing: border-box;
     color: var(--textColor);
+    font-family: Jua;
 }
 
 html, body {
@@ -18,7 +19,7 @@ html, body {
     --textColor: var(--darkBrown);
     --lightTextColor: #462D1D;
     --lightButtonTransparent: rgb(70, 45, 29, 0.4);
-    --lightButtonSolid: #7E5738;
+    --lightButtonSolid: #7e5738;
     --starColor: #E2AE1D;
     --bookmarkColor: var(--darkBrown);
 

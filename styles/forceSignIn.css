@@ -30,7 +30,7 @@ html, body {
         top: 52%;
     }
 
-    .forceSignIn, .forceJavascript {
+    .forceSignIn {
         height: 100%;
         width: 100%;
         overflow: hidden;
@@ -86,23 +86,6 @@ html, body {
         
                 .signIn {
                     width: 150px;
-                }
-            }
-        }
-    }
-
-    .forceJavascript {
-        display: flex;
-        
-        .wrapper {
-            padding: 32px 40px;
-
-            .buttonWrapper {
-                justify-content: center;
-
-                .refreshPage {
-                    text-decoration: none;
-                    padding: 0.25rem 1rem;
                 }
             }
         }

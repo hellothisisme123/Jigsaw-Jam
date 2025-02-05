@@ -1,4 +1,281 @@
 .container {
     display: flex;
-    
+    flex-direction: column;
+
+    .navigation {
+        .navResponsive {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 16px;
+            gap: 8px;
+            border-bottom: 4px solid var(--darkBrown);
+
+            .searchbar {
+                background-color: var(--lightBrown);
+                display: flex;
+                height: 32px;
+                border: 3px solid var(--darkBrown);
+                border-radius: 100px;
+                overflow: hidden;
+                padding: 0 16px;
+                gap: 8px;
+
+                .searchIcon, .xIcon {
+                    height: 100%;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+
+                    img {
+                        height: 75%;
+                    }
+                }
+
+                .xIcon img {
+                    height: 90%;
+                    cursor: pointer;
+                }
+
+                input {
+                    background-color: var(--lightBrown);
+                    font-size: 1.25rem;
+                    font-family: Jua;
+                    border: none;
+                }
+            }
+
+            .settingsTabWrapper {
+                display: flex;
+                gap: 8px;
+
+                .tab {
+                    border: 3px solid var(--darkBrown);
+                    background-color: var(--lightBrown);
+                    height: 32px;
+                    border-radius: 100px;
+                    padding: 2px 4px;
+                    font-size: 1.125rem;
+                    cursor: pointer;
+                }
+
+                .tab.active {
+                    background-color: var(--lightButtonTransparent);
+                }
+            }
+        }
+    }
+
+    .main {
+        /* padding: 0 128px; */
+        /* max-width: ; */
+        display: flex;
+        justify-content: center;
+
+        .mainResponsive {
+            overflow-y: scroll;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            @media screen and (width >= 1000px) {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+            }
+
+            /* .settingsTab:nth-child(even) {
+                @media screen and (width >= 1000px) {
+                    border-left: 2px solid var(--darkBrown);
+                }
+            }
+
+            .settingsTab:nth-child(odd) {
+                @media screen and (width >= 1000px) {
+                    border-right: 2px solid var(--darkBrown);
+                }
+            } */
+
+            .settingsTab:last-child {
+                border-bottom: none;
+                @media screen and (width >= 1000px) {
+                    border-bottom: 4px solid var(--darkBrown);
+                }
+            }
+
+            .settingsTab.active {
+                display: flex;
+            }
+
+            .settingsTab {
+                display: none;
+                flex-direction: column;
+                border-bottom: 4px solid var(--darkBrown);
+                padding: 16px 0;
+                gap: 8px;
+
+                .title {
+                    padding: 0 16px;
+                    font-size: 32px;
+                }
+
+                > div:not(.title) {
+                    padding: 0 56px;
+                }
+
+                .wrapper {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 8px;
+
+                    .label {
+                        text-wrap: nowrap;
+                        font-size: 1.25rem;
+                    }
+                }
+
+                .btn.wrapper {
+                    margin: 8px 0;
+                    
+                    div {
+                        font-size: 1.125rem;
+                        background-color: var(--lightButtonTransparent);
+                        border: 3px solid var(--darkBrown);
+                        border-radius: 100px;
+                        padding: 2px 8px;
+                        height: 32px;
+                        cursor: pointer;
+                    }
+                }
+
+                .text.wrapper {
+                    input {
+                        background-color: var(--lightBrown);
+                        border: 3px solid var(--darkBrown);
+                        border-radius: 100px;
+                        font-size: 1rem;
+                        padding: 2px 8px;
+                        height: 32px;
+                        width: 100%;
+                        overflow: hidden;
+                    }
+                }
+
+                .dropdown.wrapper {
+                    position: relative;
+                    
+                    select {
+                        appearance: none;
+                        background-color: var(--lightBrown);
+                        border: 3px solid var(--darkBrown);
+                        border-radius: 100px;
+                        font-size: 1rem;
+                        padding: 2px 8px;
+                        cursor: pointer;
+                        color: var(--darkBrown);
+                        height: 32px;
+                        width: 100%;
+                        position: relative;
+
+                        option {
+                            background-color: var(--lightBrown);
+                        }
+                    }
+                }
+
+                .dropdown.wrapper::after {
+                    content: "";
+                    display: flex;
+                    position: absolute;
+                    height: 80%;
+                    translate: 0 -50%;
+                    top: 50%;
+                    aspect-ratio: 1;
+                    background-image: url(../production/images/chevron-down-solid.svg);
+                    background-repeat: no-repeat;
+                    right: 67px; /* 64 + the border width */
+                    user-select: none;
+                    pointer-events: none;
+                }
+
+                .toggle.wrapper {
+                    .input {
+                        display: flex;
+                        width: 100%;
+                        justify-content: space-between;
+                        height: 100%;
+                        
+                        .on, .off {
+                            display: none;
+                            align-items: center;
+                            justify-content: space-between;
+                            border: 3px solid var(--darkBrown);
+                            padding: 2px 8px;
+                            border-radius: 100px;
+                            height: 32px;
+                            cursor: pointer;
+                            width: 100%;;
+
+                            img {
+                                height: 100%;
+                            }
+                        }
+
+                        .off {
+                            display: flex;
+                        }
+                    }
+                }
+
+                .toggle.wrapper.active {
+                    .input .off {
+                        display: none;
+                    }
+
+                    .input .on {
+                        display: flex;
+                    }
+                }
+
+                .slider.wrapper {
+                    .range {
+                        border: 3px solid var(--darkBrown);
+                        height: 32px;
+                        width: 100%;
+                        border-radius: 100px;
+                        overflow: hidden;
+                        --perc: 0%;
+
+                        .fill {
+                            background-color: var(--lightButtonTransparent);
+                            border-right: 3px solid var(--darkBrown);
+                            width: var(--perc);
+                            height: 100%;
+                        }
+                    }
+                }
+
+                .toggleable.wrapper {
+                    display: flex;
+                    flex-direction: column;
+                    width: 100%;
+
+                    .flipper {
+                        width: 100%;
+                    }
+
+                    .subSettings {
+                        display: none;
+                        flex-direction: column;
+                        gap: 8px;
+                        padding: 0 32px;
+                        width: 100%;
+                    }
+
+                    .subSettings.active {
+                        display: flex;
+                    }
+                }
+            }
+        }
+    }
 }
