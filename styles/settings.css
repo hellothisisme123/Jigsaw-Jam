@@ -1,6 +1,17 @@
 .container {
     display: flex;
     flex-direction: column;
+    --fontSizeMult: 1;
+
+    @media screen and (width <= 420px) {
+        --fontSizeMult: 0.8;
+    }
+
+    /* .main {
+            . */
+        /* } */
+    }
+
 
     .navigation {
         .navResponsive {
@@ -8,6 +19,9 @@
             flex-direction: column;
             align-items: center;
             padding: 8px 16px;
+            @media screen and (width <= 420px) {
+                padding: 8px 8px;
+            }
             gap: 8px;
             border-bottom: 4px solid var(--darkBrown);
 
@@ -19,6 +33,9 @@
                 border-radius: 100px;
                 overflow: hidden;
                 padding: 0 16px;
+                @media screen and (width <= 420px) {
+                    padding: 0 16px;
+                }
                 gap: 8px;
 
                 .searchIcon, .xIcon {
@@ -34,14 +51,17 @@
 
                 .xIcon img {
                     height: 90%;
+                    width: 100%;
+                    text-align: center;
                     cursor: pointer;
                 }
 
                 input {
                     background-color: var(--lightBrown);
-                    font-size: 1.25rem;
+                    font-size: calc(1.25rem * var(--fontSizeMult));
                     font-family: Jua;
                     border: none;
+                    width: 100%;
                 }
             }
 
@@ -55,8 +75,12 @@
                     height: 32px;
                     border-radius: 100px;
                     padding: 2px 4px;
-                    font-size: 1.125rem;
+                    font-size: calc(1.125rem * var(--fontSizeMult));
                     cursor: pointer;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    text-align: center;
                 }
 
                 .tab.active {
@@ -67,8 +91,6 @@
     }
 
     .main {
-        /* padding: 0 128px; */
-        /* max-width: ; */
         display: flex;
         justify-content: center;
 
@@ -77,22 +99,13 @@
             overflow-x: hidden;
             display: flex;
             flex-direction: column;
+            width: 100%;
+            max-width: 800px;
             @media screen and (width >= 1000px) {
                 display: grid;
+                max-width: unset;
                 grid-template-columns: 1fr 1fr;
             }
-
-            /* .settingsTab:nth-child(even) {
-                @media screen and (width >= 1000px) {
-                    border-left: 2px solid var(--darkBrown);
-                }
-            }
-
-            .settingsTab:nth-child(odd) {
-                @media screen and (width >= 1000px) {
-                    border-right: 2px solid var(--darkBrown);
-                }
-            } */
 
             .settingsTab:last-child {
                 border-bottom: none;
@@ -114,11 +127,17 @@
 
                 .title {
                     padding: 0 16px;
+                    @media screen and (width <= 420px) {
+                        padding: 0 8px;
+                    }
                     font-size: 32px;
                 }
 
                 > div:not(.title) {
                     padding: 0 56px;
+                    @media screen and (width <= 420px) {
+                        padding: 0 32px;
+                    }
                 }
 
                 .wrapper {
@@ -129,7 +148,7 @@
 
                     .label {
                         text-wrap: nowrap;
-                        font-size: 1.25rem;
+                        font-size: calc(1.25rem * var(--fontSizeMult));
                     }
                 }
 
@@ -137,13 +156,17 @@
                     margin: 8px 0;
                     
                     div {
-                        font-size: 1.125rem;
+                        font-size: calc(1.125rem * var(--fontSizeMult));
                         background-color: var(--lightButtonTransparent);
                         border: 3px solid var(--darkBrown);
                         border-radius: 100px;
                         padding: 2px 8px;
                         height: 32px;
                         cursor: pointer;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        text-align: center;
                     }
                 }
 
@@ -152,7 +175,7 @@
                         background-color: var(--lightBrown);
                         border: 3px solid var(--darkBrown);
                         border-radius: 100px;
-                        font-size: 1rem;
+                        font-size: calc(1rem * var(--fontSizeMult));
                         padding: 2px 8px;
                         height: 32px;
                         width: 100%;
@@ -168,7 +191,7 @@
                         background-color: var(--lightBrown);
                         border: 3px solid var(--darkBrown);
                         border-radius: 100px;
-                        font-size: 1rem;
+                        font-size: calc(1rem * var(--fontSizeMult));
                         padding: 2px 8px;
                         cursor: pointer;
                         color: var(--darkBrown);
@@ -193,6 +216,9 @@
                     background-image: url(../production/images/chevron-down-solid.svg);
                     background-repeat: no-repeat;
                     right: 67px; /* 64 + the border width */
+                    @media screen and (width <= 420px) {
+                        right: 38px;
+                    }
                     user-select: none;
                     pointer-events: none;
                 }
@@ -268,6 +294,9 @@
                         flex-direction: column;
                         gap: 8px;
                         padding: 0 32px;
+                        @media screen and (width <= 420px) {
+                            padding: 0 16px;
+                        }
                         width: 100%;
                     }
 
