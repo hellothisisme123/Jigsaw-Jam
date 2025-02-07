@@ -10,6 +10,18 @@ html, body {
     height: 100vh;
     width: 100%;
     overflow: hidden;
+    position: relative;
+
+    .bgImage {
+        top: 0;
+        left: 0;
+        position: absolute;
+        width: 100vw;
+        height: 100vh;
+        background-image: url(../production/images/wood-panel-3.png);
+        background-repeat: repeat;
+        background-size: 480px;
+    }
 
     .signInPage {
         height: 100%;
@@ -24,102 +36,107 @@ html, body {
         /* padding-top: 94px; */
 
         .wrapper {
+            width: 100%;
             display: flex;
-            /* margin-top: 5px; */
             flex-direction: column;
             justify-content: center;
             align-items: center;
             background-color: var(--lightButtonSolid);
             border-top: 4px solid var(--darkBrown);
             border-bottom: 4px solid var(--darkBrown);
-            padding: 32px 0;
-            z-index: 500;
-            gap: 16px;
-            width: 100%;
-        
-            .title {
-                font-family: Jua;
-                font-size: 2rem;
-                text-align: left;
-                width: 100%;
-                padding: 0 20px;
-            }
-
-            .inputWrapperContainer {
+            
+            .responsive {
                 display: flex;
                 flex-direction: column;
-                align-items: center;
                 justify-content: center;
-                padding: 0 40px;
-                width: 100%;
-                gap: 8px;
-
-                .inputWrapper {
-                    display: grid;
-                    grid-template-columns: 2fr 2.5fr;
-                    width: 100%;
-                    font-size: 1.25rem;
+                align-items: center;
+                padding: 32px 0;
+                z-index: 500;
+                gap: 16px;
+                max-width: 800px;
+            
+                .title {
                     font-family: Jua;
-                    gap: 8px;
-    
-                    .label {
-                        text-wrap: nowrap;
-                        display: flex;
-                        justify-content: left;
-                        align-items: center;
-                        text-align: left;
-                    }
-
-                    input {
-                        background-color: transparent;
-                        border: 3px solid var(--darkBrown);
-                        font-size: 1rem;
-                        flex-shrink: 1;
-                        width: 100%;
-                        color: var(--textColor);
-                        display: flex;
-                        padding: 4px 16px;
-                        font-family: Jua;
-                        border-radius: 15px;
-                    }
-
-                    input::placeholder {
-                        color: var(--lightTextColor);
-                    }
+                    font-size: calc(2rem * var(--fontSizeMult));
+                    text-align: left;
+                    width: 100%;
+                    padding: 0 20px;
                 }
-            }
-        
-            .buttonWrapper {
-                font-family: Jua;
-                display: flex;
-                justify-content: space-between;
-                padding: 0 40px;
-                width: 100%;
-                margin-top: 4px;
-                
-                .dontHaveAnAccount, .signIn, .refreshPage {
-                    background-color: var(--lightButtonTransparent);
-                    padding: 0.25rem;
-                    cursor: pointer;
-                    border: 3px solid var(--darkBrown);
-                    font-size: 1.5rem;
+
+                .inputWrapperContainer {
                     display: flex;
-                    justify-content: center;
+                    flex-direction: column;
                     align-items: center;
-                    text-align: center;
-                    border-radius: 15px;
+                    justify-content: center;
+                    padding: 0 40px;
+                    width: 100%;
+                    gap: 8px;
+
+                    .inputWrapper {
+                        display: grid;
+                        grid-template-columns: 2fr 2.5fr;
+                        width: 100%;
+                        font-size: calc(1.25rem * var(--fontSizeMult));
+                        font-family: Jua;
+                        gap: 8px;
+
+                        .label {
+                            text-wrap: nowrap;
+                            display: flex;
+                            justify-content: left;
+                            align-items: center;
+                            text-align: left;
+                        }
+
+                        input {
+                            background-color: transparent;
+                            border: 3px solid var(--darkBrown);
+                            font-size: calc(1rem * var(--fontSizeMult));
+                            flex-shrink: 1;
+                            width: 100%;
+                            color: var(--textColor);
+                            display: flex;
+                            padding: 4px 16px;
+                            font-family: Jua;
+                            border-radius: 15px;
+                        }
+
+                        input::placeholder {
+                            color: var(--lightTextColor);
+                        }
+                    }
                 }
-        
-                .dontHaveAnAccount {
-                    height: 2rem;
-                    font-size: 1rem;
-                    padding: 0 1rem;
-                }
-        
-                .signIn {
-                    padding: 0 1rem;
-                    height: 2rem;
-                    font-size: 1.125rem;
+            
+                .buttonWrapper {
+                    font-family: Jua;
+                    display: flex;
+                    justify-content: space-between;
+                    padding: 0 40px;
+                    width: 100%;
+                    margin: 8px 0;
+                    gap: 8px;
+                    
+                    .dontHaveAnAccount, .signIn {
+                        background-color: var(--lightButtonTransparent);
+                        padding: 4px;
+                        cursor: pointer;
+                        border: 3px solid var(--darkBrown);
+                        font-size: calc(1.5rem * var(--fontSizeMult));
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        text-align: center;
+                        border-radius: 15px;
+                        padding: 4px 16px;
+                    }
+            
+                    .dontHaveAnAccount {
+                        font-size: calc(1rem * var(--fontSizeMult));
+                    }
+            
+                    .signIn {
+                        font-size: calc(1.125rem * var(--fontSizeMult));
+                    }
                 }
             }
         }

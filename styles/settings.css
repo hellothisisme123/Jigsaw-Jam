@@ -1,17 +1,6 @@
 .container {
     display: flex;
     flex-direction: column;
-    --fontSizeMult: 1;
-
-    @media screen and (width <= 420px) {
-        --fontSizeMult: 0.8;
-    }
-
-    /* .main {
-            . */
-        /* } */
-    }
-
 
     .navigation {
         .navResponsive {
@@ -28,7 +17,7 @@
             .searchbar {
                 background-color: var(--lightBrown);
                 display: flex;
-                height: 32px;
+                min-height: 32px;
                 border: 3px solid var(--darkBrown);
                 border-radius: 100px;
                 overflow: hidden;
@@ -72,7 +61,7 @@
                 .tab {
                     border: 3px solid var(--darkBrown);
                     background-color: var(--lightBrown);
-                    height: 32px;
+                    min-height: 32px;
                     border-radius: 100px;
                     padding: 2px 4px;
                     font-size: calc(1.125rem * var(--fontSizeMult));
@@ -103,8 +92,16 @@
             max-width: 800px;
             @media screen and (width >= 1000px) {
                 display: grid;
-                max-width: unset;
+                max-width: 1280px;
                 grid-template-columns: 1fr 1fr;
+
+                .settingsTab.active:nth-child(even) {
+                    border-left: 2px solid var(--darkBrown);
+                }
+                
+                .settingsTab.active:nth-child(odd) {
+                    border-right: 2px solid var(--darkBrown);
+                }
             }
 
             .settingsTab:last-child {
@@ -161,7 +158,7 @@
                         border: 3px solid var(--darkBrown);
                         border-radius: 100px;
                         padding: 2px 8px;
-                        height: 32px;
+                        min-height: 32px;
                         cursor: pointer;
                         display: flex;
                         justify-content: center;
@@ -177,7 +174,7 @@
                         border-radius: 100px;
                         font-size: calc(1rem * var(--fontSizeMult));
                         padding: 2px 8px;
-                        height: 32px;
+                        min-height: 32px;
                         width: 100%;
                         overflow: hidden;
                     }
@@ -195,7 +192,7 @@
                         padding: 2px 8px;
                         cursor: pointer;
                         color: var(--darkBrown);
-                        height: 32px;
+                        min-height: 32px;
                         width: 100%;
                         position: relative;
 
@@ -237,7 +234,7 @@
                             border: 3px solid var(--darkBrown);
                             padding: 2px 8px;
                             border-radius: 100px;
-                            height: 32px;
+                            height: calc(2rem * var(--fontSizeMult));
                             cursor: pointer;
                             width: 100%;;
 
@@ -265,7 +262,7 @@
                 .slider.wrapper {
                     .range {
                         border: 3px solid var(--darkBrown);
-                        height: 32px;
+                        min-height: 32px;
                         width: 100%;
                         border-radius: 100px;
                         overflow: hidden;

@@ -1,113 +1,48 @@
-html, body {
-    overflow: hidden;
-}
-
 .container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding-top: 0;
+    display: grid;
     height: 100vh;
-    width: 100%;
-    overflow: hidden;
+    grid-template-rows: 1fr 100px;
 
-    .bgImage1, .bgImage2 {
-        position: absolute;
-        width: 100vw;
+    .quickPuzzles {
+        overflow: hidden;
 
-        img {
-            width: 100%;
-            height: 100%;
+        .mostRecentPuzzle {
+            height: 400px;
+            background-image: url(../production/images/wood-panel-3.png);
+            background-size: 400px;
+            border-bottom: 4px solid var(--darkBrown);
+
+            .puzzle {
+                max-height: 100%;
+                max-width: 100%;
+                width: 100%;
+                background-image: url(../production/images/puzzle-images/Space-1.jpg);
+            }
         }
     }
 
-    .bgImage1 {
-        top: 3%;
-    }
-
-    .bgImage2 {
-        top: 52%;
-    }
-    
-    .forceSignIn.javascriptEnabled  {
+    .exploreAllPuzzles {
+        background-image: url(../production/images/wood-panel-3.png);
+        background-size: 480px;
+        border-top: 4px solid var(--darkBrown);
         display: flex;
-    }
-
-    .forceSignIn, .forceJavascript {
-        height: 100%;
-        width: 100%;
-        overflow: hidden;
-        display: none;
-        flex-direction: column;
-        align-items: center;
-        z-index: 100;
         justify-content: center;
-        padding-bottom: 19.5%;
+        align-items: center;
+        padding-top: 50px;
+        background-position: 150px 0px;
 
-        .wrapper {
+        .exploreBtn {
+            font-size: 1.75rem;
+            background-image: url(../production/images/explore-new-puzzles-button.png);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position-x: 50%;
             display: flex;
-            margin-top: 5px;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            background-color: var(--lightButtonSolid);
-            border-top: 4px solid var(--darkBrown);
-            border-bottom: 4px solid var(--darkBrown);
-            padding: 50px 40px;
-            z-index: 500;
-            gap: 16px;
-        
-            .title {
-                font-family: Jua;
-                font-size: 2rem;
-                text-align: center;
-                padding: 0 1rem;
-            }
-        
-            .buttonWrapper {
-                font-family: Jua;
-                display: flex;
-                justify-content: space-between;
-                width: 100%;
-                
-                .createAccount, .signIn, .refreshPage {
-                    background-color: var(--lightButtonTransparent);
-                    padding: 0.25rem;
-                    cursor: pointer;
-                    border: 3px solid var(--darkBrown);
-                    font-size: 1.5rem;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    text-align: center;
-                    border-radius: 15px;
-                }
-        
-                .createAccount {
-                    width: 190px;
-                }
-        
-                .signIn {
-                    width: 150px;
-                }
-            }
-        }
-    }
-
-    .forceJavascript {
-        display: flex;
-        
-        .wrapper {
-            padding: 32px 40px;
-
-            .buttonWrapper {
-                justify-content: center;
-
-                .refreshPage {
-                    text-decoration: none;
-                    padding: 0.25rem 1rem;
-                }
-            }
+            padding-bottom: 2%;
+            width: 346px;
+            height: 120px;
         }
     }
 }

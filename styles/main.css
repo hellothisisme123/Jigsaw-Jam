@@ -24,6 +24,14 @@ html, body {
     --bookmarkColor: var(--darkBrown);
 
     --buttonDropShadow: -2px 2px 0px 2px rgb(3, 3, 2, .9);
+    
+    --fontSizeMult: 1;
+    @media screen and (width <= 420px) {
+        --fontSizeMult: 0.8;
+    }
+    @media screen and (width >= 1420px) {
+        --fontSizeMult: 1.2;
+    }
 }
 
 @font-face {
@@ -49,9 +57,11 @@ nav {
     .home, .settings{
         height: 60%;
         aspect-ratio: 1;
-        background-color: var(--darkBrown);
+        /* background-color: red; */
         border-radius: 50%;
-        box-shadow: var(--buttonDropShadow);
+        /* box-shadow: var(--buttonDropShadow); */
+        background-size: contain;
+        background-position: center;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -63,6 +73,14 @@ nav {
             width: 100%;
             height: 100%;
         }
+    }
+
+    .home {
+        background-image: url(../production/images/home-button.svg);
+    }
+
+    .settings {
+        background-image: url(../production/images/settings-button.svg);
     }
 
     .dividerBar {

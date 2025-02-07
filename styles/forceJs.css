@@ -1,19 +1,12 @@
-.bgImage1, .bgImage2 {
+.bgImage {
+    top: 0;
+    left: 0;
     position: absolute;
     width: 100vw;
-
-    img {
-        width: 100%;
-        height: 100%;
-    }
-}
-
-.bgImage1 {
-    top: 3%;
-}
-
-.bgImage2 {
-    top: 52%;
+    height: 100vh;
+    background-image: url(../production/images/wood-panel-3.png);
+    background-repeat: repeat;
+    background-size: 480px;
 }
 
 .forceJavascript {
@@ -47,7 +40,7 @@
     
         .title {
             font-family: Jua;
-            font-size: 2rem;
+            font-size: calc(2rem * var(--fontSizeMult));
             text-align: left;
             width: 100%;
             padding: 0 20px;
@@ -63,10 +56,10 @@
 
             .refreshPage {
                 background-color: var(--lightButtonTransparent);
-                padding: 0.25rem;
+                padding: 4px;
                 cursor: pointer;
                 border: 3px solid var(--darkBrown);
-                font-size: 1.5rem;
+                font-size: calc(1.5rem * var(--fontSizeMult));
                 display: flex;
                 justify-content: center;
                 align-items: center;
@@ -94,7 +87,7 @@
 
             .refreshPage {
                 text-decoration: none;
-                padding: 0.25rem 1rem;
+                padding: 4px 16px;
             }
         }
     }
