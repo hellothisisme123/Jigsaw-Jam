@@ -153,27 +153,4 @@ html, body {
             }
         }
     }
-
-    .forceJavascript {
-        display: flex;
-        padding-bottom: 15%;
-        padding-top: 0;        
-        .wrapper {
-            padding: 32px 40px;
-
-            .title {
-                text-align: center;
-                padding: 0 16px;
-            }
-
-            .buttonWrapper {
-                justify-content: center;
-
-                .refreshPage {
-                    text-decoration: none;
-                    padding: 4px 16px;
-                }
-            }
-        }
-    }
 }

@@ -1,3 +1,7 @@
+// just to be able to access the whole site without doing storage stuff
+localStorage.setItem("username", "username")
+localStorage.setItem("password", "password")
+
 // ----- get db connection -----
 let database
 fetch('http://192.168.240.9:3006/jigsawJam/data')
