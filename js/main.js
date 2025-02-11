@@ -3,16 +3,16 @@ localStorage.setItem("username", "username")
 localStorage.setItem("password", "password")
 
 // ----- get db connection -----
-let database
+let databaseEx
 fetch('http://192.168.240.9:3006/jigsawJam/data')
     .then(response => response.json())
     .then(data => {
         console.log(data);
-        database = data
+        databaseEx = data
     })
-    .catch(error => {
-        console.error('Error fetching data:', error);
-    });
+.catch(error => {
+    console.error('Error fetching data:', error);
+});
 
 // ----- nav -----
 const homeBtn = document.querySelector("nav .home")

@@ -1,6 +1,6 @@
 .container {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: auto 1fr;
 
     .navigation {
         .navResponsive {
@@ -29,20 +29,25 @@
 
                 .searchIcon, .xIcon {
                     height: 100%;
+                    max-height: 32px;
+                    aspect-ratio: 1;
+                    width: 32px;
                     display: flex;
-                    justify-content: center;
                     align-items: center;
-
-                    img {
-                        height: 75%;
-                    }
+                    justify-content: center;
+                    margin: auto;
                 }
 
-                .xIcon img {
-                    height: 90%;
-                    width: 100%;
-                    text-align: center;
+                .searchIcon.img {
+                    height: 60%;
+                }
+
+                .xIcon {
                     cursor: pointer;
+                }
+
+                .xIcon.img {
+                    height: 65%;
                 }
 
                 input {
@@ -81,11 +86,10 @@
 
     .main {
         display: flex;
+        overflow: scroll;
         justify-content: center;
 
         .mainResponsive {
-            overflow-y: scroll;
-            overflow-x: hidden;
             display: flex;
             flex-direction: column;
             width: 100%;

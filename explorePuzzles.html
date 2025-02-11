@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="./styles/main.css">
+    <link rel="stylesheet" href="./styles/explorePuzzles.css">
+    <link rel="stylesheet" href="./styles/forceJs.css">
+    <link rel="stylesheet" href="./styles/alertPopup.css">
+    
+    <script src="./js/main.js" defer></script>
+    <script src="./js/explorePuzzles.js" defer></script>
+    <script src="./js/redirectToProperPage.js" defer></script>
+
+    <link rel="shortcut icon" href="./production/images/logo.svg" type="image/x-icon">
+    <title>Jigsaw Jam</title>
+</head>
+<body>
+    <nav>
+        <div class="home"></div>
+        <div class="dividerBar"></div>
+        <div class="title">
+            Jigsaw Jam
+        </div>
+        <div class="dividerBar"></div>
+        <div class="settings"></div>
+        <div class="leaf leaf1">
+            <img src="./production/images/leaf-1.png" alt="green leaf">
+        </div>
+        <div class="leaf leaf2">
+            <img src="./production/images/leaf-2.png" alt="orange leaf">
+        </div>
+    </nav>
+
+    <div class="floatingLeaves">
+        <div class="leaf leaf1">
+            <img src="./production/images/leaf-3.png" alt="green leaf">
+        </div>
+        <div class="leaf leaf2">
+            <img src="./production/images/leaf-4.png" alt="green leaf">
+        </div>
+        <div class="leaf leaf3">
+            <img src="./production/images/leaf-2.png" alt="green leaf">
+        </div>
+        <div class="leaf leaf4">
+            <img src="./production/images/leaf-1.png" alt="green leaf">
+        </div>
+    </div>
+
+    <noscript class="forceJavascript">
+        <div class="bgImage"></div>
+        
+        <div class="wrapper">
+            <div class="title">You must enable javascript in the browser settings to use this app</div>
+            <div class="buttonWrapper">
+                <a class="refreshPage" href="./">
+                    Refresh Page
+                </a>
+            </div>
+        </div>
+    </noscript>
+    
+    <div class="container requireJavascript">        
+        <!-- <div class="focusPuzzlePopup">
+            <div class="responsive">
+                <div class="space"></div>
+                <div class="exitButton">
+                    <img src="./production/images/xmark-solid.svg" alt="exit button">
+                </div>
+                <div class="title">100% Complete</div>
+                <div class="buttonWrapper">
+                    <div class="dropdown wrapper">
+                        <select name="boardMode" id="boardMode">
+                            <option value="table">10x15 - 150 Pieces</option>
+                            <option value="shuffle">25x12 - 300 Pieces</option>
+                            <option value="table">20x20 - 400 Pieces</option>
+                        </select>
+                    </div>
+                    <div class="reset">
+                        Reset Puzzle
+                    </div>
+                </div>
+                <div class="puzzle">
+                    <div class="bookmark">
+                        <img src="./production/images/bookmark-hollow.svg" alt="hollow bookmark icon">
+                    </div>
+                    <div class="background"><img src="./production/images/puzzle-images/cat-3.jpg" alt="cat image"></div>
+                    <div class="star">
+                        <img src="./production/images/star-regular.svg" alt="hollow star icon">
+                    </div>
+                </div>
+                <div class="tagWrapper">
+                    <div class="label">Tags:</div>
+                    <div class="tag active account">Saved</div>
+                    <div class="tag active game">Animals</div>
+                </div>
+                <div class="openPuzzleButton">
+                    <div class="text">
+                        Open Puzzle
+                    </div>
+                    <div class="img">
+                        <img src="./production/images/keep-puzzling-button.png" alt="">
+                    </div>
+                </div>
+                <div class="space"></div>
+            </div>
+        </div> -->
+
+        <div class="navigation">
+            <div class="navResponsive">
+                <div class="searchbar">
+                    <div class="searchIcon">
+                        <img src="./production/images/magnifying-glass-solid.svg" alt="magnifying glass icon">
+                    </div>
+                    <input type="text" placeholder="Search">
+                    <div class="xIcon">
+                        <img src="./production/images/xmark-solid.svg" alt="x button icon">
+                    </div>
+                </div>
+        
+                <div class="settingsTabWrapper">
+                    <div class="tab active account">Account</div>
+                    <div class="tab active game">Game</div>
+                    <div class="tab active video">Video</div>
+                    <div class="tab active audio">Audio</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main">
+            <div class="mainResponsive">
+                <!-- <div class="puzzle" onclick="focusPuzzle(1)">
+                    <div class="star">
+                        <img src="./production/images/star-regular.svg" alt="hollow star icon">
+                    </div>
+                    <div class="background">
+                        <img src="./production/images/puzzle-images/cat-1.jpg" alt="cat image">
+                    </div>
+                    <div class="bookmark">
+                        <img src="./production/images/bookmark-solid.svg" alt="solid bookmark icon">
+                    </div>
+                </div>
+                <div class="puzzle" onclick="focusPuzzle(2)">
+                    <div class="star">
+                        <img src="./production/images/star-regular.svg" alt="hollow star icon">
+                    </div>
+                    <div class="background">
+                        <img src="./production/images/puzzle-images/cat-2.jpg" alt="cat image">
+                    </div>
+                    <div class="bookmark">
+                        <img src="./production/images/bookmark-solid.svg" alt="solid bookmark icon">
+                    </div>
+                </div>
+                <div class="puzzle" onclick="focusPuzzle(3)">
+                    <div class="star">
+                        <img src="./production/images/star-regular.svg" alt="hollow star icon">
+                    </div>
+                    <div class="background">
+                        <img src="./production/images/puzzle-images/Cat-3.jpg" alt="cat image">
+                    </div>
+                    <div class="bookmark">
+                        <img src="./production/images/bookmark-solid.svg" alt="solid bookmark icon">
+                    </div>
+                </div>
+                <div class="puzzle" onclick="focusPuzzle(3)">
+                    <div class="star">
+                        <img src="./production/images/star-regular.svg" alt="hollow star icon">
+                    </div>
+                    <div class="background">
+                        <img src="./production/images/puzzle-images/Cat-4.jpg" alt="cat image">
+                    </div>
+                    <div class="bookmark">
+                        <img src="./production/images/bookmark-solid.svg" alt="solid bookmark icon">
+                    </div>
+                </div>
+                <div class="puzzle" onclick="focusPuzzle(3)">
+                    <div class="star">
+                        <img src="./production/images/star-regular.svg" alt="hollow star icon">
+                    </div>
+                    <div class="background">
+                        <img src="./production/images/puzzle-images/food-1.jpg" alt="cat image">
+                    </div>
+                    <div class="bookmark">
+                        <img src="./production/images/bookmark-solid.svg" alt="solid bookmark icon">
+                    </div>
+                </div>
+                <div class="puzzle" onclick="focusPuzzle(3)">
+                    <div class="star">
+                        <img src="./production/images/star-regular.svg" alt="hollow star icon">
+                    </div>
+                    <div class="background">
+                        <img src="./production/images/puzzle-images/food-2.jpg" alt="cat image">
+                    </div>
+                    <div class="bookmark">
+                        <img src="./production/images/bookmark-solid.svg" alt="solid bookmark icon">
+                    </div>
+                </div>
+                <div class="puzzle" onclick="focusPuzzle(3)">
+                    <div class="star">
+                        <img src="./production/images/star-regular.svg" alt="hollow star icon">
+                    </div>
+                    <div class="background">
+                        <img src="./production/images/puzzle-images/food-3.jpg" alt="cat image">
+                    </div>
+                    <div class="bookmark">
+                        <img src="./production/images/bookmark-solid.svg" alt="solid bookmark icon">
+                    </div>
+                </div>
+                <div class="puzzle" onclick="focusPuzzle(3)">
+                    <div class="star">
+                        <img src="./production/images/star-regular.svg" alt="hollow star icon">
+                    </div>
+                    <div class="background">
+                        <img src="./production/images/puzzle-images/food-4.jpg" alt="cat image">
+                    </div>
+                    <div class="bookmark">
+                        <img src="./production/images/bookmark-solid.svg" alt="solid bookmark icon">
+                    </div>
+                </div>
+                <div class="puzzle" onclick="focusPuzzle(3)">
+                    <div class="star">
+                        <img src="./production/images/star-regular.svg" alt="hollow star icon">
+                    </div>
+                    <div class="background">
+                        <img src="./production/images/puzzle-images/food-5.jpg" alt="cat image">
+                    </div>
+                    <div class="bookmark">
+                        <img src="./production/images/bookmark-solid.svg" alt="solid bookmark icon">
+                    </div>
+                </div>
+                <div class="puzzle" onclick="focusPuzzle(3)">
+                    <div class="star">
+                        <img src="./production/images/star-regular.svg" alt="hollow star icon">
+                    </div>
+                    <div class="background">
+                        <img src="./production/images/puzzle-images/food-6.jpg" alt="cat image">
+                    </div>
+                    <div class="bookmark">
+                        <img src="./production/images/bookmark-solid.svg" alt="solid bookmark icon">
+                    </div>
+                </div>
+                <div class="puzzle" onclick="focusPuzzle(3)">
+                    <div class="star">
+                        <img src="./production/images/star-regular.svg" alt="hollow star icon">
+                    </div>
+                    <div class="background">
+                        <img src="./production/images/puzzle-images/food-7.jpg" alt="cat image">
+                    </div>
+                    <div class="bookmark">
+                        <img src="./production/images/bookmark-solid.svg" alt="solid bookmark icon">
+                    </div>
+                </div>
+                <div class="puzzle" onclick="focusPuzzle(3)">
+                    <div class="star">
+                        <img src="./production/images/star-regular.svg" alt="hollow star icon">
+                    </div>
+                    <div class="background">
+                        <img src="./production/images/puzzle-images/Mountain-1.jpg" alt="cat image">
+                    </div>
+                    <div class="bookmark">
+                        <img src="./production/images/bookmark-solid.svg" alt="solid bookmark icon">
+                    </div>
+                </div>
+                <div class="puzzle" onclick="focusPuzzle(3)">
+                    <div class="star">
+                        <img src="./production/images/star-regular.svg" alt="hollow star icon">
+                    </div>
+                    <div class="background">
+                        <img src="./production/images/puzzle-images/Mountain-2.jpg" alt="cat image">
+                    </div>
+                    <div class="bookmark">
+                        <img src="./production/images/bookmark-solid.svg" alt="solid bookmark icon">
+                    </div>
+                </div>
+                <div class="puzzle" onclick="focusPuzzle(3)">
+                    <div class="star">
+                        <img src="./production/images/star-regular.svg" alt="hollow star icon">
+                    </div>
+                    <div class="background">
+                        <img src="./production/images/puzzle-images/Mountain-3.jpg" alt="cat image">
+                    </div>
+                    <div class="bookmark">
+                        <img src="./production/images/bookmark-solid.svg" alt="solid bookmark icon">
+                    </div>
+                </div>
+                <div class="puzzle" onclick="focusPuzzle(3)">
+                    <div class="star">
+                        <img src="./production/images/star-regular.svg" alt="hollow star icon">
+                    </div>
+                    <div class="background">
+                        <img src="./production/images/puzzle-images/Mountain-4.jpg" alt="cat image">
+                    </div>
+                    <div class="bookmark">
+                        <img src="./production/images/bookmark-solid.svg" alt="solid bookmark icon">
+                    </div>
+                </div>
+                <div class="puzzle" onclick="focusPuzzle(3)">
+                    <div class="star">
+                        <img src="./production/images/star-regular.svg" alt="hollow star icon">
+                    </div>
+                    <div class="background">
+                        <img src="./production/images/puzzle-images/Space-1.jpg" alt="cat image">
+                    </div>
+                    <div class="bookmark">
+                        <img src="./production/images/bookmark-solid.svg" alt="solid bookmark icon">
+                    </div>
+                </div>
+                <div class="puzzle" onclick="focusPuzzle(3)">
+                    <div class="star">
+                        <img src="./production/images/star-regular.svg" alt="hollow star icon">
+                    </div>
+                    <div class="background">
+                        <img src="./production/images/puzzle-images/Space-2.jpg" alt="cat image">
+                    </div>
+                    <div class="bookmark">
+                        <img src="./production/images/bookmark-solid.svg" alt="solid bookmark icon">
+                    </div>
+                </div>
+                <div class="puzzle" onclick="focusPuzzle(3)">
+                    <div class="star">
+                        <img src="./production/images/star-regular.svg" alt="hollow star icon">
+                    </div>
+                    <div class="background">
+                        <img src="./production/images/puzzle-images/Space-3.jpg" alt="cat image">
+                    </div>
+                    <div class="bookmark">
+                        <img src="./production/images/bookmark-solid.svg" alt="solid bookmark icon">
+                    </div>
+                </div>
+                <div class="puzzle" onclick="focusPuzzle(3)">
+                    <div class="star">
+                        <img src="./production/images/star-regular.svg" alt="hollow star icon">
+                    </div>
+                    <div class="background">
+                        <img src="./production/images/puzzle-images/Space-4.jpg" alt="cat image">
+                    </div>
+                    <div class="bookmark">
+                        <img src="./production/images/bookmark-solid.svg" alt="solid bookmark icon">
+                    </div>
+                </div>
+                <div class="puzzle" onclick="focusPuzzle(3)">
+                    <div class="star">
+                        <img src="./production/images/star-regular.svg" alt="hollow star icon">
+                    </div>
+                    <div class="background">
+                        <img src="./production/images/puzzle-images/Space-5.jpg" alt="cat image">
+                    </div>
+                    <div class="bookmark">
+                        <img src="./production/images/bookmark-solid.svg" alt="solid bookmark icon">
+                    </div>
+                </div>
+                <div class="puzzle" onclick="focusPuzzle(3)">
+                    <div class="star">
+                        <img src="./production/images/star-regular.svg" alt="hollow star icon">
+                    </div>
+                    <div class="background">
+                        <img src="./production/images/puzzle-images/Space-6.jpg" alt="cat image">
+                    </div>
+                    <div class="bookmark">
+                        <img src="./production/images/bookmark-solid.svg" alt="solid bookmark icon">
+                    </div>
+                </div> -->
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -2,6 +2,7 @@
     display: grid;
     height: 100vh;
     grid-template-rows: 1fr 100px;
+    overflow: hidden;
 
     .quickPuzzles {
         overflow: hidden;
@@ -22,27 +23,34 @@
     }
 
     .exploreAllPuzzles {
-        background-image: url(../production/images/wood-panel-3.png);
-        background-size: 480px;
-        border-top: 4px solid var(--darkBrown);
         display: flex;
-        justify-content: center;
-        align-items: center;
-        padding-top: 50px;
-        background-position: 150px 0px;
+        position: relative;
+        width: 100%;
+        top: 25%;
 
-        .exploreBtn {
-            font-size: 1.75rem;
-            background-image: url(../production/images/explore-new-puzzles-button.png);
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position-x: 50%;
+        .img {
+            width: 100%;
             display: flex;
-            justify-content: center;
             align-items: center;
-            padding-bottom: 2%;
-            width: 346px;
-            height: 120px;
+            justify-content: center;
+            
+            img {
+                max-width: 330px;
+                cursor: pointer;
+                width: 100%;
+            }
+        }
+
+        .text {
+            position: absolute;
+            left: 50%;
+            user-select: none;
+            pointer-events: none;
+            top: 45%;
+            translate: -50% -50%;
+            font-size: calc(1.75rem * var(--fontSizeMult));
+            text-align: center;
+            text-wrap: nowrap;
         }
     }
 }
