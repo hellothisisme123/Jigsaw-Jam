@@ -121,6 +121,9 @@ body:has(.focusPuzzlePopup) {
                 height: 88px;
                 @media screen and (width >= 800px) {
                     height: 150px;
+                    .star, .bookmark {
+                        height: 32px !important;
+                    }
                 }
                 position: relative;
                 cursor: pointer;

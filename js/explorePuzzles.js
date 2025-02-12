@@ -1,96 +1,81 @@
+// getStar | requires "data" variable
+function getStar(puzz, alt) {
+    // returns the value accordingly
+    if (alt) {
+        if (!puzz) {
+            return "hollow star icon"
+        }
+        
+        if (puzz.completed) {
+            return "solid star icon"
+        } else {
+            return "half solid star icon"
+        }
+    } else {
+        if (!puzz) {
+            return "star-regular.svg"
+        }
+
+        if (puzz.completed) {
+            return "star-solid.svg"
+        } else {
+            return "star-half-stroke-regular.svg"
+        }
+    }
+}
+
+// getBookmark | requires "data" variable
+function getBookmark(puzz, alt) {
+    // returns the value accordingly
+    if (alt) {
+        if (puzz && puzz.completed) {
+            return "solid bookmark icon"
+        } else {
+            return "hollow bookmark icon"
+        }
+    } else {
+        if (puzz && puzz.completed) {
+            return "bookmark-solid.svg"
+        } else {
+            return "bookmark-hollow.svg"
+        }
+    }
+}
+
 // fill puzzles
 let database
 fetch('http://192.168.240.9:3006/jigsawJam/data')
 .then(response => response.json())
 .then(data => {
     const puzzleContainer = document.querySelector(".container .main .mainResponsive")
+
     data.Puzzles.forEach(puzzle => {
-        // getStar | requires "data" variable
-        function getStar(puzz, alt) {
-            // gets the current user data
-            const thisUserData = data.Users.filter((user) => {
-                if (user.Username == localStorage.getItem('username') &&
-                user.Password == localStorage.getItem('password')) {
-                    return user
-                }
-            })
-            
-            // gets the user data for the puzzle the user pressed
-            let focusedPuzzle = JSON.parse(thisUserData[0].SaveData).filter(filterData => {
-                if (filterData.id == puzz.ID) {
-                    return filterData
-                }
-            })[0]
-
-            // returns the value accordingly
-            if (alt) {
-                if (!focusedPuzzle) {
-                    return "hollow star icon"
-                }
-                
-                if (focusedPuzzle.completed) {
-                    return "solid star icon"
-                } else {
-                    return "half solid star icon"
-                }
-            } else {
-                if (!focusedPuzzle) {
-                    return "star-regular.svg"
-                }
-
-                if (focusedPuzzle.completed) {
-                    return "star-solid.svg"
-                } else {
-                    return "star-half-stroke-regular.svg"
-                }
+        // gets the current user data
+        const thisUserData = data.Users.filter((user) => {
+            if (user.Username == localStorage.getItem('username') &&
+            user.Password == localStorage.getItem('password')) {
+                return user
             }
-            focusDatabase = data
-        }
-
-        // getBookmark | requires "data" variable
-        function getBookmark(puzz, alt) {
-            // gets the current user data
-            const thisUserData = data.Users.filter((user) => {
-                if (user.Username == localStorage.getItem('username') &&
-                user.Password == localStorage.getItem('password')) {
-                    return user
-                }
-            })
-            
-            // gets the user data for the puzzle the user pressed
-            let focusedPuzzle = JSON.parse(thisUserData[0].SaveData).filter(filterData => {
-                if (filterData.id == puzz.ID) {
-                    return filterData
-                }
-            })[0]
-
-            // returns the value accordingly
-            if (alt) {
-                if (focusedPuzzle && focusedPuzzle.completed) {
-                    return "solid bookmark icon"
-                } else {
-                    return "hollow bookmark icon"
-                }
-            } else {
-                if (focusedPuzzle && focusedPuzzle.completed) {
-                    return "bookmark-solid.svg"
-                } else {
-                    return "bookmark-hollow.svg"
-                }
+        })
+        
+        // gets the user data for the puzzle the user pressed
+        let puzzleDataUser = JSON.parse(thisUserData[0].SaveData).filter(filterData => {
+            if (filterData.id == puzzle.ID) {
+                return filterData
             }
-            focusDatabase = data
-        }
+        })[0]
+    
         
         puzzleContainer.innerHTML += `
             <div class="puzzle" onclick="focusPuzzle(${puzzle.ID})">
                 <div class="star">
-                    <img src="./production/images/${getStar(puzzle, false)}" alt="${getStar(puzzle, true)}">
+                    <img src="./production/images/${getStar(puzzleDataUser, false)}" alt="${getStar(puzzle, true)}">
                 </div>
                 <div class="background">
                     <img src="./production/images/puzzle-images/${puzzle.Src}" alt="${puzzle.Alt}">
                 </div>
                 <div class="bookmark">
-                    <img src="./production/images/${getBookmark(puzzle, false)}" alt="${getBookmark(puzzle, true)}">
+                    <img src="./production/images/${getBookmark(puzzleDataUser, false)}" alt="${getBookmark(puzzle, true)}">
                 </div>
             </div>
         `
@@ -102,8 +87,67 @@ fetch('http://192.168.240.9:3006/jigsawJam/data')
     console.error('Error fetching data:', error);
 });
 
+function resetPuzzle(id) {
+    alertPopup(
+        "Are you sure?", 
+        "You would like to reset this puzzle to it's default state. This will permanently remove all progress on the puzzle. The process is non-reversible.", 
+        "Yes, Reset Puzzle", 
+        "No, Cancel", 
+        () => { // yesFunc
+            fetch('http://192.168.240.9:3006/jigsawJam/data')
+            .then(response => response.json())
+            .then(async data => {
+                // gets all of the current users data
+                const thisUserData = data.Users.filter((user) => {
+                    if (user.Username == localStorage.getItem('username') &&
+                    user.Password == localStorage.getItem('password')) {
+                        return user
+                    }
+                })
+                // console.log(thisUserData[0], data);
+
+                let newSaveDataValue = JSON.parse(thisUserData[0].SaveData)
+                console.log(newSaveDataValue);
+                newSaveDataValue = JSON.stringify(newSaveDataValue.filter(puzzleSave => {
+                    if (puzzleSave.id == id) return
+                    else return puzzleSave 
+                }))
+                console.log(JSON.parse(newSaveDataValue));
+
+                // update row
+                const response = fetch('/jigsawJam/updateRowByIDFilter', {
+                    method: 'POST', // or 'PUT' if your API supports it
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id: id,
+                        value: newSaveDataValue,
+                        table: "Users",
+                        column: "SaveData"
+                    })
+                }); 
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            })
+        },
+        () => { // noFunc
+
+        }
+    )
+}
+
+function unFocusPuzzle() {
+    document.querySelectorAll('.container .focusPuzzlePopup').forEach(popup => {
+        popup.remove()
+    })
+}
+
 // focusPuzzle
 function focusPuzzle(id) {
+    unFocusPuzzle()
+    
     let focusDatabase
     fetch('http://192.168.240.9:3006/jigsawJam/data')
     .then(response => response.json())
@@ -134,49 +178,76 @@ function focusPuzzle(id) {
         // focusedPuzzlePuzzle.sizes = JSON.parse(focusedPuzzlePuzzle.sizes)
         console.log(focusedPuzzlePuzzle);
 
-        getSizeOptions(focusedPuzzleUser, focusedPuzzlePuzzle)
-        function getSizeOptions(puzz, userPuzz) {
-            console.log(puzz, userPuzz);
+        function getSizeOptions(userPuzz, puzz) {
+            function getSelected(size) {
+                if (userPuzz && userPuzz.width == size[0] && userPuzz.height == size[1]) return "selected"
+                else return ""
+            }
+            
             let res = ""
+            let sizes = JSON.parse(puzz.Sizes)
+            sizes.forEach(size => {
+                size = size.split("x")
+                res += `<option ${getSelected(size)} value="table">${parseInt(size[0])}x${parseInt(size[1])} - ${parseInt(size[0]) * parseInt(size[1])} Pieces</option>`
+            })
 
-            res += `<option value="table">10x15 - 150 Pieces</option>`
-            // <option value="table">10x15 - 150 Pieces</option>
-            // <option value="shuffle">25x12 - 300 Pieces</option>
-            // <option value="table">20x20 - 400 Pieces</option>
+            return res
+        }
+
+        function getPercentComplete(userPuzz, puzz) {
+            console.log(focusedPuzzleUser, focusedPuzzlePuzzle);
+            if (!userPuzz) return "0"
+            return Math.round(userPuzz.completionData.length / userPuzz.height * userPuzz.width)
+        }
+
+        // https://stackoverflow.com/questions/1026069/how-do-i-make-the-first-letter-of-a-string-uppercase-in-javascript
+        function capitalizeFirstLetter(val) {
+            return String(val).charAt(0).toUpperCase() + String(val).slice(1);
+        }
+
+        function getTags(userPuzz, puzz) {
+            let res = ""
+            let tags = JSON.parse(puzz.Tags)
+            if (userPuzz && userPuzz.saved) res += `<div class="tag active">Saved</div>`
+            tags.forEach(tag => {
+                res += `<div class="tag active">${capitalizeFirstLetter(tag)}</div>`
+            })
+
+            return res
         }
 
         // brings up the focus puzzle section   
+        console.log(focusedPuzzlePuzzle)
         document.querySelector(".container").innerHTML += `
-            <div class="focusPuzzlePopup">
+            <div class="focusPuzzlePopup" data-id="${focusedPuzzlePuzzle.ID}">
                 <div class="responsive">
                     <div class="space"></div>
-                    <div class="exitButton">
+                    <div class="exitButton" onclick="unFocusPuzzle()">
                         <img src="./production/images/xmark-solid.svg" alt="exit button">
                     </div>
-                    <div class="title">100% Complete</div>
+                    <div class="title">${getPercentComplete(focusedPuzzleUser, focusedPuzzlePuzzle)}% Complete</div>
                     <div class="buttonWrapper">
                         <div class="dropdown wrapper">
                             <select name="boardMode" id="boardMode">
-                                
+                                ${getSizeOptions(focusedPuzzleUser, focusedPuzzlePuzzle)}
                             </select>
                         </div>
-                        <div class="reset">
+                        <div class="reset" onclick="resetPuzzle(${focusedPuzzlePuzzle.ID})">
                             Reset Puzzle
                         </div>
                     </div>
                     <div class="puzzle">
                         <div class="bookmark">
-                            <img src="./production/images/bookmark-hollow.svg" alt="hollow bookmark icon">
+                            <img src="./production/images/${getBookmark(focusedPuzzleUser, false)}" alt="${getBookmark(focusedPuzzleUser, true)}">
                         </div>
-                        <div class="background"><img src="./production/images/puzzle-images/cat-3.jpg" alt="cat image"></div>
+                        <div class="background"><img src="./production/images/puzzle-images/${focusedPuzzlePuzzle.Src}" alt="${focusedPuzzlePuzzle.Alt}"></div>
                         <div class="star">
-                            <img src="./production/images/star-regular.svg" alt="hollow star icon">
+                            <img src="./production/images/${getStar(focusedPuzzleUser, false)}" alt="${getStar(focusedPuzzleUser, true)}">
                         </div>
                     </div>
                     <div class="tagWrapper">
                         <div class="label">Tags:</div>
-                        <div class="tag active account">Saved</div>
-                        <div class="tag active game">Animals</div>
+                        ${getTags(focusedPuzzleUser, focusedPuzzlePuzzle)}
                     </div>
                     <div class="openPuzzleButton">
                         <div class="text">
