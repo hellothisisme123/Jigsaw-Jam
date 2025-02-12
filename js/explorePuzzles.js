@@ -115,7 +115,7 @@ function resetPuzzle(id) {
                 console.log(JSON.parse(newSaveDataValue));
 
                 // update row
-                const response = fetch('/jigsawJam/updateRowByIDFilter', {
+                const response = fetch('http://192.168.240.9:3006/jigsawJam/updateRowByIDFilter', {
                     method: 'POST', // or 'PUT' if your API supports it
                     headers: {
                         'Content-Type': 'application/json'

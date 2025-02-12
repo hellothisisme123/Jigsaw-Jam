@@ -64,6 +64,7 @@ function alertPopup(title, text, yesText, noText, yesFunc, noFunc) {
         yesFunc()
         alertPopup.remove()
     })
+    
     noBtn.addEventListener("click", (e) => {
         noFunc()
         alertPopup.remove()
