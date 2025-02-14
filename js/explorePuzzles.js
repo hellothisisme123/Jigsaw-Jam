@@ -26,6 +26,7 @@ function getStar(puzz, alt) {
 
 // getBookmark | requires "data" variable
 function getBookmark(puzz, alt) {
+    console.log(puzz);
     // returns the value accordingly
     if (alt) {
         if (puzz && puzz.completed) {
@@ -46,23 +47,11 @@ function getBookmark(puzz, alt) {
     const puzzleContainer = document.querySelector(".container .main .mainResponsive")
     try {
         const data = await getDBData()
-
-        data.Puzzles.forEach(puzzle => {
-            // gets the current user data
-            const thisUserData = data.Users.filter((user) => {
-                if (user.Username == localStorage.getItem('username') &&
-                user.Password == localStorage.getItem('password')) {
-                    return user
-                }
-            })
-            
+        data.Puzzles.forEach(async puzzle => {
             // gets the user data for the puzzle the user pressed
-            let puzzleDataUser = JSON.parse(thisUserData[0].SaveData).filter(filterData => {
-                if (filterData.id == puzzle.ID) {
-                    return filterData
-                }
-            })[0]
-        
+            let puzzleDataUser = await getPuzzleDataUser(puzzle.ID)
+            console.log("---------------------");
+            console.log(puzzle.ID, puzzleDataUser);
             
             puzzleContainer.innerHTML += `
                 <div class="puzzle" onclick="focusPuzzle(${puzzle.ID})" data-id="${puzzle.ID}">
@@ -78,7 +67,6 @@ function getBookmark(puzz, alt) {
                 </div>
             `
         })
-        database = data
     } catch (error) {
         console.error('Error:', error);
         const failedToLoad = document.querySelector(".container .main .mainResponsive .failedToLoad")
@@ -162,8 +150,6 @@ async function reloadPuzzleThumbnail(id) {
     
     star.src = `./production/images/${getStar(focusedPuzzleUser, false)}`
     star.alt = getStar(focusedPuzzleUser, true)
-
-    // thumbnail
 }
 
 function focusPuzzle(id) {
@@ -200,7 +186,7 @@ function focusPuzzle(id) {
                         </div>
                     </div>
                     <div class="puzzle">
-                        <div class="bookmark">
+                        <div class="bookmark" onclick="bookmarkBtn(${focusedPuzzlePuzzle.ID})">
                             <img src="./production/images/${getBookmark(focusedPuzzleUser, false)}" alt="${getBookmark(focusedPuzzleUser, true)}">
                         </div>
                         <div class="background"><img src="./production/images/puzzle-images/${focusedPuzzlePuzzle.Src}" alt="${focusedPuzzlePuzzle.Alt}"></div>
@@ -230,6 +216,62 @@ function focusPuzzle(id) {
     .catch(error => {
         console.error('Error fetching data:', error);
     });
+}
+
+async function bookmarkBtn(id) {
+    let newUserData = JSON.parse((await getUserData()).SaveData)
+    
+    const puzzleData_Puzzles = await getPuzzleDataPuzzle(id)
+    const puzzleData_Users = await getPuzzleDataUser(id)
+    
+    if (puzzleData_Users == undefined) {
+        newUserData.push({
+            "id": id,
+            "width": parseInt(JSON.parse(puzzleData_Puzzles.Sizes)[0].split("x")[0]),
+            "height": parseInt(JSON.parse(puzzleData_Puzzles.Sizes)[0].split("x")[1]),
+            "saved": true,
+            "completed": false,
+            "completionData": []
+        })
+    } else {
+        console.log(newUserData);
+        
+        let tmp
+        newUserData = newUserData.filter(data => {
+            if (data.id == id) {
+                tmp = data
+                return
+            }
+            else return data
+        })
+        tmp.saved = !tmp.saved
+        newUserData.push(tmp)
+
+        console.log(newUserData);
+        console.log(puzzleData_Puzzles);
+        console.log(puzzleData_Users);
+    }
+
+
+
+    // console.log(thisPuzzleDataUsers)
+
+    // update row
+    // const response = fetch('http://192.168.240.9:3006/jigsawJam/updateRowByIDFilter', {
+    //     method: 'POST', // or 'PUT' if your API supports it
+    //     headers: {
+    //         'Content-Type': 'application/json'
+    //     },
+    //     body: JSON.stringify({
+    //         id: (await getUserData()).ID,
+    //         value: newSaveDataValue,
+    //         table: "Users",
+    //         column: "SaveData"
+    //     })
+    // }); 
+    // console.log((await response).json());
+
+    // console.log(userSaveData);
 }
 
 function getSizeOptions(userPuzz, puzz) {
