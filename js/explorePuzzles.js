@@ -74,9 +74,9 @@ function getBookmark(puzz, alt) {
 
 
         console.log(navigator.userAgent);
-        if (navigator.userAgent.includes("Opera")) {
+        if (navigator.userAgent.includes("OPR")) { // opera
             failedToLoad.querySelector('li:nth-child(2)').innerHTML = "Click on \"Help me understand\""
-        } else if (navigator.userAgent.includes("Firefox")) {
+        } else if (navigator.userAgent.includes("Firefox")) { // firefox
             failedToLoad.querySelector('li:nth-child(3)').innerHTML = "Click on \"Accept the Risk and Continue\""
         }
     }
