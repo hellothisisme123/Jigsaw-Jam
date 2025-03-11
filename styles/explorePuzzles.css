@@ -138,6 +138,12 @@ body:has(.focusPuzzlePopup) {
                     text-decoration: none;
                     width: fit-content;
                 }
+
+                ol {
+                    font-size: calc(1.5rem * var(--fontSizeMult));
+                    padding: 0 48px;
+                    width: 100%;
+                }
             }
 
             .failedToLoad.active {
