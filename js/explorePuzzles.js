@@ -78,6 +78,7 @@ function getBookmark(puzz, alt) {
             failedToLoad.querySelector('li:nth-child(2)').innerHTML = "Click on \"Help me understand\""
         } else if (navigator.userAgent.includes("Firefox")) { // firefox
             failedToLoad.querySelector('li:nth-child(3)').innerHTML = "Click on \"Accept the Risk and Continue\""
+            failedToLoad.querySelector('li:nth-child(2)').innerHTML = "Click on \"Advanced...\""
         }
     }
 })()
