@@ -71,6 +71,13 @@ function getBookmark(puzz, alt) {
         console.error('Error:', error);
         const failedToLoad = document.querySelector(".container .main .mainResponsive .failedToLoad")
         failedToLoad.classList.add("active")
+
+
+        if (navigator.userAgent.includes("Opera")) {
+            failedToLoad.querySelector('li:nth-child(2)').innerHTML = "Click on \"Help me understand\""
+        } else if (navigator.userAgent.includes("Firefox")) {
+            failedToLoad.querySelector('li:nth-child(3)').innerHTML = "Click on \"Accept the Risk and Continue\""
+        }
     }
 })()
 
