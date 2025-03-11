@@ -73,6 +73,7 @@ function getBookmark(puzz, alt) {
         failedToLoad.classList.add("active")
 
 
+        console.log(navigator.userAgent);
         if (navigator.userAgent.includes("Opera")) {
             failedToLoad.querySelector('li:nth-child(2)').innerHTML = "Click on \"Help me understand\""
         } else if (navigator.userAgent.includes("Firefox")) {
