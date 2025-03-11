@@ -1,5 +1,7 @@
 // getStar | requires "data" variable
 function getStar(puzz, alt) {
+    // console.log(puzz);
+    
     // returns the value accordingly
     if (alt) {
         if (!puzz) {
@@ -26,7 +28,7 @@ function getStar(puzz, alt) {
 
 // getBookmark | requires "data" variable
 function getBookmark(puzz, alt) {
-    console.log(puzz);
+    // console.log(puzz);
     // returns the value accordingly
     if (alt) {
         if (puzz && puzz.completed) {
@@ -43,45 +45,76 @@ function getBookmark(puzz, alt) {
     }
 }
 
-(async function fillPuzzles() {
-    const puzzleContainer = document.querySelector(".container .main .mainResponsive")
+async function fillPuzzles() {
     try {
-        const data = await getDBData()
-        data.Puzzles.forEach(async puzzle => {
-            // gets the user data for the puzzle the user pressed
-            let puzzleDataUser = await getPuzzleDataUser(puzzle.ID)
-            console.log("---------------------");
-            console.log(puzzle.ID, puzzleDataUser);
-            
-            puzzleContainer.innerHTML += `
-                <div class="puzzle" onclick="focusPuzzle(${puzzle.ID})" data-id="${puzzle.ID}">
-                    <div class="star">
-                        <img src="./production/images/${getStar(puzzleDataUser, false)}" alt="${getStar(puzzle, true)}">
-                    </div>
-                    <div class="background">
-                        <img src="./production/images/puzzle-images/${puzzle.Src}" alt="${puzzle.Alt}">
-                    </div>
-                    <div class="bookmark">
-                        <img src="./production/images/${getBookmark(puzzleDataUser, false)}" alt="${getBookmark(puzzle, true)}">
-                    </div>
-                </div>
-            `
-        })
+        const data = await getDBData();
+        const totalPuzzles = data.Puzzles.length;
+
+        // Set the batch size (static size of 10)
+        const batchSize = 10;
+        const batches = [];
+
+        // Create batches of puzzles
+        for (let i = 0; i < totalPuzzles; i += batchSize) {
+            batches.push(data.Puzzles.slice(i, i + batchSize));
+        }
+
+        // Process each batch one by one
+        for (const batch of batches) {
+            await processBatch(batch);
+        }
+
+        console.log("Loaded all puzzles!");
     } catch (error) {
         console.error('Error:', error);
-        const failedToLoad = document.querySelector(".container .main .mainResponsive .failedToLoad")
-        failedToLoad.classList.add("active")
-
-
-        console.log(navigator.userAgent);
-        if (navigator.userAgent.includes("OPR")) { // opera
-            failedToLoad.querySelector('li:nth-child(2)').innerHTML = "Click on \"Help me understand\""
-        } else if (navigator.userAgent.includes("Firefox")) { // firefox
-            failedToLoad.querySelector('li:nth-child(3)').innerHTML = "Click on \"Accept the Risk and Continue\""
-            failedToLoad.querySelector('li:nth-child(2)').innerHTML = "Click on \"Advanced...\""
-        }
+        const failedToLoad = document.querySelector(".container .main .mainResponsive .failedToLoad");
+        failedToLoad.classList.add("active");
     }
-})()
+}
+
+async function processBatch(batch) {
+    const batchPromises = batch.map((puzzle, index) => {
+        return asyncTask(puzzle, index);
+    });
+
+    // Wait for all promises in the batch to resolve
+    const results = await Promise.all(batchPromises);
+
+    // Sort results by the index to preserve order
+    results.sort((a, b) => a.index - b.index);
+
+    // Add each result to the container in the correct order
+    results.forEach(result => {
+        const puzzleContainer = document.querySelector(".container .main .mainResponsive");
+        puzzleContainer.innerHTML += result.html;
+    });
+}
+
+async function asyncTask(puzzle, index) {
+    // Get the puzzle data
+    let puzzleData_Users = await getPuzzleDataUser(puzzle.ID);
+    let puzzleData_Puzzles = await getPuzzleDataPuzzle(puzzle.ID);
+
+    // Build the puzzle HTML
+    const html = `
+        <div class="puzzle active ${getTags(puzzleData_Users, puzzleData_Puzzles, true)}" onclick="focusPuzzle(${puzzle.ID})" data-id="${puzzle.ID}">
+            <div class="star">
+                <img src="./production/images/${getStar(puzzleData_Users, false)}" alt="${getStar(puzzleData_Users, true)}">
+            </div>
+            <div class="background">
+                <img src="./production/images/puzzle-images/${puzzle.Src}" alt="${puzzle.Alt}">
+            </div>
+            <div class="bookmark">
+                <img src="./production/images/${getBookmark(puzzleData_Users, false)}" alt="${getBookmark(puzzleData_Users, true)}">
+            </div>
+        </div>
+    `;
+
+    // Return an object with the HTML and index to maintain the order
+    return { html, index };
+}
+
+fillPuzzles()
 
 function resetPuzzle(id) {
     alertPopup(
@@ -205,7 +238,7 @@ function focusPuzzle(id) {
                     </div>
                     <div class="tagWrapper">
                         <div class="label">Tags:</div>
-                        ${getTags(focusedPuzzleUser, focusedPuzzlePuzzle)}
+                        ${getTags(focusedPuzzleUser, focusedPuzzlePuzzle, false)}
                     </div>
                     <div class="openPuzzleButton">
                         <div class="text">
@@ -309,15 +342,24 @@ function capitalizeFirstLetter(val) {
     return String(val).charAt(0).toUpperCase() + String(val).slice(1);
 }
 
-function getTags(userPuzz, puzz) {
-    let res = ""
-    let tags = JSON.parse(puzz.Tags)
-    if (userPuzz && userPuzz.saved) res += `<div class="tag active">Saved</div>`
-    tags.forEach(tag => {
-        res += `<div class="tag active">${capitalizeFirstLetter(tag)}</div>`
-    })
-
-    return res
+function getTags(userPuzz, puzz, list) {
+    if (!list) {
+        let res = ""
+        let tags = JSON.parse(puzz.Tags)
+        if (userPuzz && userPuzz.saved) res += `<div class="tag active">Saved</div>`
+        tags.forEach(tag => {
+            res += `<div class="tag active">${capitalizeFirstLetter(tag)}</div>`
+        })
+        
+        return res
+    } else {
+        let res = ""
+        let tags = JSON.parse(puzz.Tags)
+        tags.forEach(tag => {
+            res += ` ${tag}`
+        })
+        return res.trim()
+    }
 }
 
 async function getDBData() {
@@ -341,6 +383,8 @@ async function getUserData() {
 
 async function getPuzzleDataUser(id) {
     const thisUserData = await getUserData(id)
+
+    // console.log(thisUserData);
     
     // gets the user table data for the clicked puzzle 
     let focusedPuzzleUser = JSON.parse(thisUserData.SaveData).filter(filterData => {
@@ -371,40 +415,71 @@ document.querySelector('.container .navigation .navResponsive .searchbar .xIcon 
 })
 
 // search bar tabs
-const tabs = document.querySelectorAll('.container .navigation .navResponsive .settingsTabWrapper .tab'),
-account = document.querySelector('.container .main .mainResponsive .settingsTab.account'),
-game = document.querySelector('.container .main .mainResponsive .settingsTab.game'),
-audio = document.querySelector('.container .main .mainResponsive .settingsTab.audio'),
-video = document.querySelector('.container .main .mainResponsive .settingsTab.video'),
-maintabs = [account, game, audio, video]
-tabs.forEach(tab => {
-    let active = true
+async function fillSearchTabs() {
+    const tabWrapper = document.querySelector(".container .navigation .navResponsive .settingsTabWrapper")
+    tabWrapper.innerHTML = ""
     
-    tab.addEventListener("click", (e) => {
-        active = !active
+    let dbData = await getDBData()
+    let tags = []
+    dbData.Puzzles.forEach(puzzle => {
+        let localTags = JSON.parse(puzzle.Tags)
+        localTags.forEach(tag => tags.push(tag))
+    });
+    function removeDuplicates(array) {
+        return [...new Set(array)];
+    }
+    
+    tags = removeDuplicates(tags)
 
-        if (active) {
-            tab.classList.add("active")
-            if (tab.classList.contains("account")) {
-                account.classList.add("active")
-            } else if (tab.classList.contains("game")) {
-                game.classList.add("active")
-            } else if (tab.classList.contains("audio")) {
-                audio.classList.add("active")
-            } else if (tab.classList.contains("video")) {
-                video.classList.add("active")
+    tags.forEach(tag => {
+        tabWrapper.innerHTML += `<div class="tab active">${tag}</div>`
+    })
+    console.log(tags);
+
+}
+fillSearchTabs().then(() => {
+    const tabs = document.querySelectorAll('.container .navigation .navResponsive .settingsTabWrapper .tab'),
+    puzzlesWrapper = document.querySelector('.container .main .mainResponsive')
+    tabs.forEach(tab => {
+        let active = true
+        // console.log(tab);
+        
+        tab.addEventListener("click", (e) => {
+            active = !active
+    
+            if (active) {
+                tab.classList.add("active")
+
+                const puzzles = puzzlesWrapper.querySelectorAll(`.puzzle.${tab.innerHTML}`)
+                puzzles.forEach(element => {
+                    element.classList.add("active")
+                });
+            } else {
+                tab.classList.remove("active")
+             
+                const puzzles = puzzlesWrapper.querySelectorAll(`.puzzle.${tab.innerHTML}`)
+                puzzles.forEach(element => {
+                    element.classList.remove("active")
+                });
             }
-        } else {
-            tab.classList.remove("active")
-            if (tab.classList.contains("account")) {
-                account.classList.remove("active")
-            } else if (tab.classList.contains("game")) {
-                game.classList.remove("active")
-            } else if (tab.classList.contains("audio")) {
-                audio.classList.remove("active")
-            } else if (tab.classList.contains("video")) {
-                video.classList.remove("active")
+
+            const visiblePuzzles = [...puzzlesWrapper.children].filter(child => {
+                if (child.classList.contains("puzzle")) return child
+                else return
+            }).filter(child => 
+                getComputedStyle(child).display !== "none"
+            );
+
+
+            console.log(document.querySelector('.container .main .mainResponsive .noPuzzlesWithCurrentFilters'));
+
+
+            noPuzzlesWithCurrentFilters = document.querySelector('.container .main .mainResponsive .noPuzzlesWithCurrentFilters')
+            if (visiblePuzzles.length === 0) {
+                noPuzzlesWithCurrentFilters.classList.add("active")
+            } else {
+                noPuzzlesWithCurrentFilters.classList.remove("active")
             }
-        }
+        })
     })
 })
