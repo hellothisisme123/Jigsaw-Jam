@@ -82,7 +82,7 @@ function resetPuzzle(id) {
         "No, Cancel", 
         async () => { // yesFunc
             try {
-                /*const getResponse = await */fetch('http://192.168.240.9:3006/jigsawJam/data')
+                /*const getResponse = await */fetch('https://192.168.240.9:3006/jigsawJam/data')
                 .then(response => response.json())
                 .then(async data => {
                     // gets all of the current users data
@@ -98,7 +98,7 @@ function resetPuzzle(id) {
                     // console.log(JSON.parse(newSaveDataValue));
 
                     // update row
-                    const response = fetch('http://192.168.240.9:3006/jigsawJam/updateRowByIDFilter', {
+                    const response = fetch('https://192.168.240.9:3006/jigsawJam/updateRowByIDFilter', {
                         method: 'POST', // or 'PUT' if your API supports it
                         headers: {
                             'Content-Type': 'application/json'
@@ -156,7 +156,7 @@ function focusPuzzle(id) {
     unFocusPuzzle()
     
     let focusDatabase
-    fetch('http://192.168.240.9:3006/jigsawJam/data')
+    fetch('https://192.168.240.9:3006/jigsawJam/data')
     .then(response => response.json())
     .then(async data => {
         let focusedPuzzleUser = await getPuzzleDataUser(id)
@@ -257,7 +257,7 @@ async function bookmarkBtn(id) {
     // console.log(thisPuzzleDataUsers)
 
     // update row
-    // const response = fetch('http://192.168.240.9:3006/jigsawJam/updateRowByIDFilter', {
+    // const response = fetch('https://192.168.240.9:3006/jigsawJam/updateRowByIDFilter', {
     //     method: 'POST', // or 'PUT' if your API supports it
     //     headers: {
     //         'Content-Type': 'application/json'
@@ -312,7 +312,7 @@ function getTags(userPuzz, puzz) {
 }
 
 async function getDBData() {
-    const response = await fetch('http://192.168.240.9:3006/jigsawJam/data')
+    const response = await fetch('https://192.168.240.9:3006/jigsawJam/data')
     const data = await response.json()
     return data
 }

@@ -4,7 +4,7 @@ localStorage.setItem("password", "password")
 
 // ----- get db connection -----
 let databaseEx
-fetch('http://192.168.240.9:3006/jigsawJam/data')
+fetch('https://192.168.240.9:3006/jigsawJam/data')
     .then(response => response.json())
     .then(data => {
         console.log(data);
