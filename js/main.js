@@ -17,8 +17,20 @@ fetch('https://192.168.240.9:3006/jigsawJam/data')
 // ----- nav -----
 const homeBtn = document.querySelector("nav .home")
 const settingsBtn = document.querySelector("nav .settings")
-homeBtn.addEventListener("click", () => {window.location = "./index.html"})
-settingsBtn.addEventListener("click", () => {window.location = "./settings.html"})
+homeBtn.addEventListener("click", () => {
+    if (window.location.toString().split("/")[window.location.toString().split("/").length-1] == "addPuzzles.html") {
+        window.location = "../index.html"
+        return
+    }
+    window.location = "./index.html"
+})
+settingsBtn.addEventListener("click", () => {
+    if (window.location.toString().split("/")[window.location.toString().split("/").length-1] == "addPuzzles.html") {
+        window.location = "../settings.html"
+        return
+    }
+    window.location = "./settings.html"
+})
 
 // ----- force javascript -----
 const requireJavascript = document.querySelectorAll(".requireJavascript")
@@ -34,41 +46,39 @@ requireJavascript.forEach(el => {
 // yesFunc | a function that runs when the user presses yes
 // noFunc  | a function that runs when the user presses no
 function alertPopup(title, text, yesText, noText, yesFunc, noFunc) {
-    let html = 
-    `<div class="alertPopup">
+    const alertPopup = document.createElement("div");
+    alertPopup.classList.add("alertPopup");
+
+    alertPopup.innerHTML = `
         <div class="bgWrapper">
             <div class="responsive">
                 <div class="title">${title}</div>
-                <div class="text">
-                    ${text} 
-                </div>
+                <div class="text">${text}</div>
                 <div class="buttonWrapper">
-                    <div class="yes">
-                        ${yesText}
-                    </div>
-                    <div class="no">
-                        ${noText}                    
-                    </div>
+                    <div class="yes">${yesText}</div>
+                    <div class="no">${noText}</div>
                 </div>
             </div>
         </div>
-    </div>`
-    const container = document.querySelector(".container")
-    container.innerHTML += html
-    const alertPopup = container.querySelector(".alertPopup")
-    const yesBtn = alertPopup.querySelector(".yes")
-    const noBtn = alertPopup.querySelector(".no")
-    console.log(alertPopup);
+    `;
 
-    yesBtn.addEventListener("click", (e) => {
-        yesFunc()
-        alertPopup.remove()
-    })
-    
-    noBtn.addEventListener("click", (e) => {
-        noFunc()
-        alertPopup.remove()
-    })
+    const container = document.querySelector(".container");
+    container.appendChild(alertPopup);
+
+    const yesBtn = alertPopup.querySelector(".yes");
+    const noBtn = alertPopup.querySelector(".no");
+
+    yesBtn.addEventListener("click", () => {
+        yesFunc();
+        alertPopup.remove();
+    });
+
+    noBtn.addEventListener("click", () => {
+        noFunc();
+        alertPopup.remove();
+    });
+
+    console.log(alertPopup);
 }
 
 // alertPopup(

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/addPuzzles.css">
+    <link rel="stylesheet" href="../styles/forceJs.css">
+    <link rel="stylesheet" href="../styles/alertPopup.css">
+    
+    
+    <script src="../js/main.js" defer></script>
+    <script src="../js/addPuzzles.js" defer></script>
+
+    <link rel="shortcut icon" href="../production/images/logo.svg" type="image/x-icon">
+    <title>Jigsaw Jam</title>
+</head>
+<body>
+    <nav>
+        <div class="home"></div>
+        <div class="dividerBar"></div>
+        <div class="title">
+            Jigsaw Jam
+        </div>
+        <div class="dividerBar"></div>
+        <div class="settings"></div>
+        <div class="leaf leaf1">
+            <img src="../production/images/leaf-1.png" alt="green leaf">
+        </div>
+        <div class="leaf leaf2">
+            <img src="../production/images/leaf-2.png" alt="orange leaf">
+        </div>
+    </nav>
+
+    <div class="floatingLeaves">
+        <div class="leaf leaf1">
+            <img src="../production/images/leaf-3.png" alt="green leaf">
+        </div>
+        <div class="leaf leaf2">
+            <img src="../production/images/leaf-4.png" alt="green leaf">
+        </div>
+        <div class="leaf leaf3">
+            <img src="../production/images/leaf-2.png" alt="green leaf">
+        </div>
+        <div class="leaf leaf4">
+            <img src="../production/images/leaf-1.png" alt="green leaf">
+        </div>
+    </div>
+
+    <noscript class="forceJavascript">
+        <div class="bgImage"></div>
+        
+        <div class="wrapper">
+            <div class="title">You must enable javascript in the browser settings to use this app</div>
+            <div class="buttonWrapper">
+                <a class="refreshPage" href="./">
+                    Refresh Page
+                </a>
+            </div>
+        </div>
+    </noscript>
+
+    <div class="container requireJavascript">
+        <div class="responsive">
+            <div class="label">1 / X</div>
+            
+            <input type="file" multiple class="imgInput">
+            
+            <div class="img">
+                <img src="" class="imgOutput">
+            </div>
+    
+            <div class="tagWrapper">
+                <div class="tag">Misc</div>
+                <div class="tag">Animals</div>
+                <div class="tag">Dog</div>
+                <div class="tag">Cat</div>
+                <div class="tag">Bird</div>
+                <div class="tag">Turtle</div>
+                <div class="tag">Fish</div>
+                <div class="tag">Lizard</div>
+                <div class="tag">Space</div>
+                <div class="tag">Art</div>
+                <div class="tag">Abstract</div>
+                <div class="tag">Poster</div>
+                <div class="tag">Digital</div>
+                <div class="tag">Physical</div>
+                <div class="tag">Food</div>
+                <div class="tag">Travel</div>
+                <div class="tag">People</div>
+                <div class="tag">Nature</div>
+                <div class="tag">Mountain</div>
+                <div class="tag">River</div>
+                <div class="tag">Plain</div>
+                <div class="tag">Forest</div>
+                <div class="tag">Dessert</div>
+                <div class="tag">Ice</div>
+            </div>
+    
+            <div class="sizes">
+                <div class="size1">
+                    <input type="text" placeholder="Size 1">
+                </div>
+                <div class="size2">
+                    <input type="text" placeholder="Size 2">
+                </div>
+                <div class="size3">
+                    <input type="text" placeholder="Size 3">
+                </div>
+            </div>
+
+            <div class="altText">
+                <textarea placeholder="Alt Text"></textarea>
+            </div>
+
+            <div class="updateDatabase">
+                <button>Update Database</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
