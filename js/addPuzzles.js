@@ -138,7 +138,7 @@ function setupUploader(inputFile, tagWrapper, sizeWrapper, altText, button) {
                         let newWidth = Math.round(size.width * 2 / 3);  
                         let newHeight = Math.round(size.height * 2 / 3);
                 
-                        return `${newWidth}x${newHeight}`;
+                        return `"${newWidth}x${newHeight}"`;
                     });
                 }
                 // console.log(formatSizes(scaledProportions));
