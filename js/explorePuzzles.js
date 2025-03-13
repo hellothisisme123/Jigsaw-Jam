@@ -197,7 +197,6 @@ async function reloadPuzzleThumbnail(id) {
 function focusPuzzle(id) {
     unFocusPuzzle()
     
-    let focusDatabase
     fetch('https://192.168.240.9:3006/jigsawJam/data')
     .then(response => response.json())
     .then(async data => {
@@ -252,8 +251,6 @@ function focusPuzzle(id) {
                 </div>
             </div>
         `
-
-        focusDatabase = data
     })
     .catch(error => {
         console.error('Error fetching data:', error);
