@@ -16,17 +16,35 @@
         position: relative;
 
         .label {
-            font-size: 1.25rem;
+            font-size: calc(1.25rem * var(--fontSizeMult));
             margin: 0;
             padding: 0;
             position: absolute;
             right: 10%;
             top: 16px;
+            text-align: center;
+            padding: 4px 8px;
+            background-color: var(--lightButtonSolid);
+            border: 3px solid var(--darkBrown);
+            border-radius: 8px;
+
         }
         
-        input {
-            font-size: calc(1.5rem * var(--fontSizeMult));
-            width: 100%;
+        .custom-file-upload {
+            display: inline-block;
+            font-size: calc(1.25rem * var(--fontSizeMult));
+            background-color: var(--lightButtonSolid);
+            border: 3px solid var(--darkBrown);
+            padding: 4px 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            margin: -8px;
+        }
+        
+        /* Hide the default file input */
+        input[type="file"] {
+            display: none;
         }
 
         img {
@@ -85,7 +103,7 @@
         }
 
         .sizes {
-            display: grid;
+            display: none;
             grid-template-columns: 1fr 1fr 1fr;
             width: 100%;
             gap: 8px;

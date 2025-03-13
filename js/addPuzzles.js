@@ -1,17 +1,78 @@
+function generateScaledProportions(width, height) {
+    function getRandomBetween(a, b) {
+        // Generate a random number between a and b with decimals
+        return (Math.random() * (b - a)) + a;
+    }
+    let scaleFactor = getRandomBetween(1.1, 1.5)
+    
+    function getAdjustedDimensions(width, height, maxSize) {
+        // Calculate the aspect ratio
+        const aspectRatio = width / height;
+    
+        // Start with initial values close to the input width and height
+        let newWidth = width;
+        let newHeight = height;
+    
+        // Adjust the values until both are below 20
+        while (newWidth >= maxSize || newHeight >= maxSize) {
+            // Reduce dimensions proportionally
+            newWidth *= 0.9; // scale down width by 10%
+            newHeight *= 0.9; // scale down height by 10%
+        }
+    
+        newWidth = Math.round(newWidth);
+        newHeight = Math.round(newHeight);
+    
+        // Ensure both dimensions are under 20 and return the new dimensions
+        if (newWidth >= maxSize || newHeight >= maxSize) {
+            newWidth = Math.min(newWidth, maxSize-1);
+            newHeight = Math.min(newHeight, maxSize-1);
+        }
+    
+        return { width: newWidth, height: newHeight };
+    }
+    
+    let newDimensions = getAdjustedDimensions(width, height, 7)
+    let res = []
+    for (let i = 0; i < 3; i++) {
+        res.push({"width": Math.round(newDimensions.width*scaleFactor*(i+1)), "height": Math.round(newDimensions.height*scaleFactor*(i+1))})
+    }
 
+    return res
+}
 
 function displayImage(input, i, img) {
+    
     const file = input.files[i];
     if (file) {
+        // console.log(file);
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = () => {
-            console.log(reader);
             img.src = reader.result; // Set the image source
             img.style.display = "block"; // Show the image
+
+            function getImageDimensions(base64String) {
+                return new Promise((resolve, reject) => {
+                    const img2 = new Image();
+                    img2.src = base64String;
+                    img2.onload = function() {
+                        resolve({ width: img2.width, height: img2.height });
+                    };
+                    img2.onerror = reject;
+                });
+            }
+            // console.log(img.src);
+            getImageDimensions(img.src).then(dimensions => {
+                const totalFiles = inputFile.files.length
+                label.innerHTML = `${i+1} / ${totalFiles} <br> (${img.width},${img.height})`
+            }).catch(error => {
+                console.error("Error loading image:", error);
+            });
         };
         reader.onerror = () => console.error("Error loading image");
     }
+    
 }
 
 function setupUploader(inputFile, tagWrapper, sizeWrapper, altText, button) {
@@ -35,36 +96,21 @@ function setupUploader(inputFile, tagWrapper, sizeWrapper, altText, button) {
         function handleInput(file) {            
             // Get all active tags
             const activeTags = [...tagWrapper.querySelectorAll(".tag.active")].map(tag => tag.textContent.toLowerCase());
-            console.log(JSON.stringify(activeTags));
+            // console.log(JSON.stringify(activeTags));
 
             // Get image file name
             const fileName = file.name;
-            console.log(fileName);
+            // console.log(fileName);
 
-            // Get sizes from input fields
-            const sizes = [...sizeWrapper.querySelectorAll("input")].map(input => input.value.trim());
-            console.log(JSON.stringify(sizes));
+            // // Get sizes from input fields
+            // const sizes = [...sizeWrapper.querySelectorAll("input")].map(input => input.value.trim());
+            // console.log(JSON.stringify(sizes));
 
             // check for each values existence validity
             let text = "" 
             let missingInputBool = false
             if (!inputFile.value) {
                 text += "You need to input an image. <br>"
-                missingInputBool = true
-            }
-
-            if (sizeWrapper.querySelector(".size1 input").value == "") {
-                text += "You need to input size 1. <br>"
-                missingInputBool = true
-            }
-
-            if (sizeWrapper.querySelector(".size2 input").value == "") {
-                text += "You need to input size 2. <br>"
-                missingInputBool = true
-            }
-
-            if (sizeWrapper.querySelector(".size3 input").value == "") {
-                text += "You need to input size 3. <br>"
                 missingInputBool = true
             }
 
@@ -84,24 +130,53 @@ function setupUploader(inputFile, tagWrapper, sizeWrapper, altText, button) {
                 )
             } else {
                 // push to database
-                console.log({
-                    tags: JSON.stringify(activeTags),
-                    filePath: fileName,
-                    sizes: JSON.stringify(sizes),
-                    altText: altText.value
+                let scaledProportions = generateScaledProportions(img.width, img.height)
+
+                function formatSizes(sizes) {
+                    return sizes.map(size => {
+                        // Scale width and height to the nearest simple whole numbers
+                        let newWidth = Math.round(size.width * 2 / 3);  
+                        let newHeight = Math.round(size.height * 2 / 3);
+                
+                        return `${newWidth}x${newHeight}`;
+                    });
+                }
+                // console.log(formatSizes(scaledProportions));
+                
+                const data = {
+                    Tags: JSON.stringify(activeTags), // Convert activeTags array into a JSON string
+                    Src: fileName,                    // File name as the Src
+                    Sizes: JSON.stringify(formatSizes(scaledProportions)), // Convert scaledProportions array into a JSON string
+                    Alt: altText.value.toLowerCase().trim() // Convert altText to lowercase and trim any whitespace
+                };
+                console.log(data);
+                
+                // Now send this data using a fetch request (already set up)
+                fetch('https://192.168.240.9:3006/jigsawJam/addRowToPuzzles', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)  // Send the data object as JSON
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // console.log('Success:', data);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
                 });
     
-                // set up next row
+                // move on to next image
                 if (index < totalFiles) {
-                    index++
-                    label.innerHTML = `${index} / ${totalFiles}`
                     displayImage(inputFile, index, img)
                     clearInputs(false, inputFile, sizeWrapper, tagWrapper, altText)
+                    index++
                 } else {
                     clearInputs(true, inputFile, sizeWrapper, tagWrapper, altText)
                     img.src = ""
                     index = 1
-                    label.innerHTML = "1 / X"
+                    label.innerHTML = `1 / X <br> (0x0)`
                 }
             }
             
@@ -129,7 +204,6 @@ img = document.querySelector(".imgOutput")
 
 inputFile.addEventListener("change", function (event) {
     displayImage(inputFile, 0, img)
-    label.innerHTML = `1 / ${inputFile.files.length}`
 });
 
 setupUploader(inputFile, tagWrapper, sizeWrapper, altText, button)
