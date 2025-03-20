@@ -88,9 +88,6 @@ function setupUploader(inputFile, tagWrapper, sizeWrapper, altText, button) {
     button.addEventListener("click", function () {
         let totalFiles = inputFile.files.length
 
-        // for (let i = 0; i < totalFiles; i++) {
-        //     handleInput(inputFile.files[i])
-        // }
         handleInput(inputFile.files[index-1])
 
         function handleInput(file) {            
@@ -100,12 +97,7 @@ function setupUploader(inputFile, tagWrapper, sizeWrapper, altText, button) {
 
             // Get image file name
             const fileName = file.name;
-            // console.log(fileName);
-
-            // // Get sizes from input fields
-            // const sizes = [...sizeWrapper.querySelectorAll("input")].map(input => input.value.trim());
-            // console.log(JSON.stringify(sizes));
-
+            
             // check for each values existence validity
             let text = "" 
             let missingInputBool = false
