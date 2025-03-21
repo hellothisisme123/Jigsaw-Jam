@@ -11,6 +11,9 @@ function getStar(puzz, alt) {
         if (puzz.completed) {
             return "solid star icon"
         } else {
+            if (puzz.completionData.length < 1) {
+                return "hollow star icon"
+            }
             return "half solid star icon"
         }
     } else {
@@ -21,6 +24,9 @@ function getStar(puzz, alt) {
         if (puzz.completed) {
             return "star-solid.svg"
         } else {
+            if (puzz.completionData.length < 1) {
+                return "star-regular.svg"
+            }
             return "star-half-stroke-regular.svg"
         }
     }
@@ -31,13 +37,13 @@ function getBookmark(puzz, alt) {
     // console.log(puzz);
     // returns the value accordingly
     if (alt) {
-        if (puzz && puzz.completed) {
+        if (puzz && puzz.saved) {
             return "solid bookmark icon"
         } else {
             return "hollow bookmark icon"
         }
     } else {
-        if (puzz && puzz.completed) {
+        if (puzz && puzz.saved) {
             return "bookmark-solid.svg"
         } else {
             return "bookmark-hollow.svg"
@@ -47,21 +53,20 @@ function getBookmark(puzz, alt) {
 
 async function fillPuzzles() {
     try {
-        console.log("red");
         const data = await getDBData();
         console.log(data);
         const totalPuzzles = data.Puzzles.length;
         const batchSize = 10;
         const batches = [];
-
+        
         for (let i = 0; i < totalPuzzles; i += batchSize) {
             batches.push(data.Puzzles.slice(i, i + batchSize));
         }
-
+        
         for (const batch of batches) {
             await processBatch(batch);
         }
-
+        
         console.log("Loaded all puzzles!");
         observeLazyImages();
     } catch (error) {
@@ -73,7 +78,7 @@ async function fillPuzzles() {
 async function processBatch(batch) {
     const puzzleContainer = document.querySelector(".container .main .mainResponsive");
     const fragment = document.createDocumentFragment();
-
+    
     const batchPromises = batch.map((puzzle, index) => asyncTask(puzzle, index));
     const results = await Promise.all(batchPromises);
     results.sort((a, b) => a.index - b.index);
@@ -93,7 +98,6 @@ async function processBatch(batch) {
 async function asyncTask(puzzle, index) {
     let puzzleData_Users = await getPuzzleDataUser(puzzle.ID);
     let puzzleData_Puzzles = await getPuzzleDataPuzzle(puzzle.ID);
-
     const html = `
         <div class="puzzle active ${getTags(puzzleData_Users, puzzleData_Puzzles, true)}" onclick="focusPuzzle(${puzzle.ID})" data-id="${puzzle.ID}">
             <div class="star">
@@ -147,10 +151,10 @@ function resetPuzzle(id) {
     
                     let newSaveDataValue = JSON.parse(thisUserData.SaveData)
                     // console.log(newSaveDataValue);
-                    newSaveDataValue = JSON.stringify(newSaveDataValue.filter(puzzleSave => {
+                    newSaveDataValue = newSaveDataValue.filter(puzzleSave => {
                         if (puzzleSave.id == id) return
                         else return puzzleSave 
-                    }))
+                    })
                     // console.log(JSON.parse(newSaveDataValue));
 
                     // update row
@@ -161,7 +165,7 @@ function resetPuzzle(id) {
                         },
                         body: JSON.stringify({
                             id: thisUserData.ID,
-                            value: newSaveDataValue,
+                            value: JSON.stringify(newSaveDataValue),
                             table: "Users",
                             column: "SaveData"
                         })
@@ -185,6 +189,10 @@ function resetPuzzle(id) {
     )
 }
 
+function bookmarkPuzzle(id) {
+
+}
+
 function unFocusPuzzle() {
     document.querySelectorAll('.container .focusPuzzlePopup').forEach(popup => {
         popup.remove()
@@ -193,14 +201,14 @@ function unFocusPuzzle() {
 
 async function reloadPuzzleThumbnail(id) {
     const thumbnail = document.querySelector(`.container .main .mainResponsive .puzzle[data-id="${id}"]`)
-    console.log(thumbnail);
     
     const bookmark = thumbnail.querySelector(".bookmark img")
     const star = thumbnail.querySelector(".star img")
-
+    
     const focusedPuzzleUser = await getPuzzleDataUser(id)
     const focusedPuzzlePuzzle = await getPuzzleDataPuzzle(id)
-
+    
+    console.log(bookmark);
     bookmark.src = `./production/images/${getBookmark(focusedPuzzleUser, false)}`
     bookmark.alt = getBookmark(focusedPuzzleUser, true)
     
@@ -217,12 +225,12 @@ function focusPuzzle(id) {
         let focusedPuzzleUser = await getPuzzleDataUser(id)
         let focusedPuzzlePuzzle = await getPuzzleDataPuzzle(id)
 
-        console.log(focusedPuzzleUser);
-        console.log(focusedPuzzlePuzzle);
+        // console.log(focusedPuzzleUser);
+        // console.log(focusedPuzzlePuzzle)
 
         // brings up the focus puzzle section   
-        console.log(focusedPuzzlePuzzle)
-        document.querySelector(".container").innerHTML += `
+        let html = document.createElement("div")
+        html.innerHTML = `
             <div class="focusPuzzlePopup" data-id="${focusedPuzzlePuzzle.ID}">
                 <div class="responsive">
                     <div class="space"></div>
@@ -265,6 +273,7 @@ function focusPuzzle(id) {
                 </div>
             </div>
         `
+        document.querySelector(".container").appendChild(html)
     })
     .catch(error => {
         console.error('Error fetching data:', error);
@@ -273,58 +282,52 @@ function focusPuzzle(id) {
 
 async function bookmarkBtn(id) {
     let newUserData = JSON.parse((await getUserData()).SaveData)
-    
+    if (!newUserData) newUserData = []
+    console.log(newUserData);
+
+
+
     const puzzleData_Puzzles = await getPuzzleDataPuzzle(id)
     const puzzleData_Users = await getPuzzleDataUser(id)
     
     if (puzzleData_Users == undefined) {
         newUserData.push({
             "id": id,
-            "width": parseInt(JSON.parse(puzzleData_Puzzles.Sizes)[0].split("x")[0]),
-            "height": parseInt(JSON.parse(puzzleData_Puzzles.Sizes)[0].split("x")[1]),
+            "width": parseInt(JSON.parse(puzzleData_Puzzles.Sizes)[document.querySelector(".focusPuzzlePopup select#boardMode").value].split("x")[0]),
+            "height": parseInt(JSON.parse(puzzleData_Puzzles.Sizes)[document.querySelector(".focusPuzzlePopup select#boardMode").value].split("x")[1]),
             "saved": true,
             "completed": false,
             "completionData": []
         })
     } else {
-        console.log(newUserData);
-        
-        let tmp
         newUserData = newUserData.filter(data => {
             if (data.id == id) {
-                tmp = data
-                return
+                data.saved = !data.saved
             }
-            else return data
+            return data
         })
-        tmp.saved = !tmp.saved
-        newUserData.push(tmp)
-
-        console.log(newUserData);
-        console.log(puzzleData_Puzzles);
-        console.log(puzzleData_Users);
     }
-
-
-
-    // console.log(thisPuzzleDataUsers)
-
+    
+    // push to database
     // update row
-    // const response = fetch('https://192.168.240.9:3006/jigsawJam/updateRowByIDFilter', {
-    //     method: 'POST', // or 'PUT' if your API supports it
-    //     headers: {
-    //         'Content-Type': 'application/json'
-    //     },
-    //     body: JSON.stringify({
-    //         id: (await getUserData()).ID,
-    //         value: newSaveDataValue,
-    //         table: "Users",
-    //         column: "SaveData"
-    //     })
-    // }); 
-    // console.log((await response).json());
-
-    // console.log(userSaveData);
+    console.log(newUserData);
+    const response = fetch('https://192.168.240.9:3006/jigsawJam/updateRowByIDFilter', {
+        method: 'POST', // or 'PUT' if your API supports it
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            id: (await getUserData()).ID,
+            value: JSON.stringify(newUserData),
+            table: "Users",
+            column: "SaveData"
+        })
+    }); 
+    (await response).json().then(() => {
+        unFocusPuzzle()
+        focusPuzzle(id)
+        reloadPuzzleThumbnail(id)
+    })
 }
 
 function getSizeOptions(userPuzz, puzz) {
@@ -335,9 +338,9 @@ function getSizeOptions(userPuzz, puzz) {
     
     let res = ""
     let sizes = JSON.parse(puzz.Sizes)
-    sizes.forEach(size => {
+    sizes.forEach((size, i) => {
         size = size.split("x")
-        res += `<option ${getSelected(size)} value="table">${parseInt(size[0])}x${parseInt(size[1])} - ${parseInt(size[0]) * parseInt(size[1])} Pieces</option>`
+        res += `<option ${getSelected(size)} value="${i}">${parseInt(size[0])}x${parseInt(size[1])} - ${parseInt(size[0]) * parseInt(size[1])} Pieces</option>`
     })
 
     return res
@@ -395,6 +398,7 @@ async function fillSearchTabs() {
     
     tags = removeDuplicates(tags)
 
+    tabWrapper.innerHTML += `<div class="tab active">all</div>`
     tags.forEach(tag => {
         tabWrapper.innerHTML += `<div class="tab active">${tag}</div>`
     })
@@ -408,6 +412,15 @@ fillSearchTabs().then(() => {
 
     fillPuzzles().then(() => {
         tabs.forEach(tab => {
+            if (tab.innerHTML == "all") {
+                tab.addEventListener("click", () => {
+                    tabs.forEach(tab => {
+                        tab.click()
+                    })
+                })
+                return
+            }
+            
             let active = true
     
             tab.addEventListener("click", () => {

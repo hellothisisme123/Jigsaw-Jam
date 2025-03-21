@@ -101,8 +101,6 @@ async function getUserData() {
 async function getPuzzleDataUser(id) {
     const thisUserData = await getUserData(id)
 
-    // console.log(thisUserData);
-    
     // gets the user table data for the clicked puzzle 
     let focusedPuzzleUser = JSON.parse(thisUserData.SaveData).filter(filterData => {
         if (filterData.id == id) {
