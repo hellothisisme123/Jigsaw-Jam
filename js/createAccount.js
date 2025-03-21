@@ -27,7 +27,6 @@ createAccountBtn.addEventListener("click", () => {
         const hasTwoSpecialChars = (password.match(/[!@#$%^&*(),.?":{}|<>]/g) || []).length >= 2;
         const hasTwoUppercase = (password.match(/[A-Z]/g) || []).length >= 2;
         const hasTwoLowercase = (password.match(/[a-z]/g) || []).length >= 2;
-        const usernameContainsNoSpaces = noSpacesRegex.test(username) === false;
         const passwordContainsNoSpaces = noSpacesRegex.test(password) === false;
         const usernameContainsNoSpecialChars = usernameNoSpecialCharsRegex.test(username) && username !== ""; // Check if username has special characters
         
@@ -40,7 +39,6 @@ createAccountBtn.addEventListener("click", () => {
         else if (!hasTwoNumbers) alertPopupBool = true;
         else if (!hasTwoSpecialChars) alertPopupBool = true;
         else if (!hasTwoUppercase) alertPopupBool = true;
-        else if (!usernameContainsNoSpaces) alertPopupBool = true;
         else if (!passwordContainsNoSpaces) alertPopupBool = true;
         else if (!hasTwoLowercase) alertPopupBool = true;
         else if (!usernameContainsNoSpecialChars) alertPopupBool = true; // Check if username has special characters
@@ -57,7 +55,6 @@ createAccountBtn.addEventListener("click", () => {
                 <ul>
                     ${(() => { if (!isUsernameValid) {return "<li>The \"username\" and \"confirm username\" boxes are not the same</li>"} else return "" })()}
                     ${(() => { if (!isPasswordValid) {return "<li>The \"password\" and \"confirm password\" boxes are not the same</li>"} else return "" })()}
-                    ${(() => { if (!usernameContainsNoSpaces) {return "<li>Username cannot contain spaces</li>"} else return "" })()}
                     ${(() => { if (!passwordContainsNoSpaces) {return "<li>Password cannot contain spaces</li>"} else return "" })()}
                     ${(() => { if (!hasTwoNumbers) {return "<li>Password should have at least 2 numbers</li>"} else return "" })()}
                     ${(() => { if (!hasTwoSpecialChars) {return "<li>Password should have at least 2 special characters</li>"} else return "" })()}
