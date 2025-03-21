@@ -1,36 +1,23 @@
-// just to be able to access the whole site without doing storage stuff
-localStorage.setItem("username", "username")
-localStorage.setItem("password", "password")
-
-// ----- get db connection -----
-let databaseEx
-fetch('https://192.168.240.9:3006/jigsawJam/data')
-    .then(response => response.json())
-    .then(data => {
-        console.log(data);
-        databaseEx = data
-    })
-.catch(error => {
-    console.error('Error fetching data:', error);
-});
-
 // ----- nav -----
-const homeBtn = document.querySelector("nav .home")
-const settingsBtn = document.querySelector("nav .settings")
-homeBtn.addEventListener("click", () => {
-    if (window.location.toString().split("/")[window.location.toString().split("/").length-1] == "addPuzzles.html") {
-        window.location = "../index.html"
-        return
-    }
-    window.location = "./index.html"
-})
-settingsBtn.addEventListener("click", () => {
-    if (window.location.toString().split("/")[window.location.toString().split("/").length-1] == "addPuzzles.html") {
-        window.location = "../settings.html"
-        return
-    }
-    window.location = "./settings.html"
-})
+function enableNavbar() {
+    const homeBtn = document.querySelector("nav .home")
+    const settingsBtn = document.querySelector("nav .settings")
+    homeBtn.addEventListener("click", () => {
+        if (window.location.toString().split("/")[window.location.toString().split("/").length-1] == "addPuzzles.html") {
+            window.location = "../index.html"
+            return
+        }
+        window.location = "./index.html"
+    })
+    settingsBtn.addEventListener("click", () => {
+        if (window.location.toString().split("/")[window.location.toString().split("/").length-1] == "addPuzzles.html") {
+            window.location = "../settings.html"
+            return
+        }
+        window.location = "./settings.html"
+    })
+}
+enableNavbar()
 
 // ----- force javascript -----
 const requireJavascript = document.querySelectorAll(".requireJavascript")
@@ -89,3 +76,52 @@ function alertPopup(title, text, yesText, noText, yesFunc, noFunc) {
 //     () => {console.log("yes")},
 //     () => {console.log("no")}
 // )
+
+// ----- get db data -----
+async function getDBData() {
+    const response = await fetch('https://192.168.240.9:3006/jigsawJam/data')
+    const data = await response.json()
+    return data
+}
+(async () => {console.log(await getDBData()); console.log(await getUserData())})()
+
+async function getUserData() {
+    const data = await getDBData()
+    
+    const thisUserData = data.Users.filter((user) => {
+        if (user.Username == localStorage.getItem('username') &&
+        user.Password == localStorage.getItem('password')) {
+            return user
+        }
+    })[0]
+    
+    return thisUserData
+}
+
+async function getPuzzleDataUser(id) {
+    const thisUserData = await getUserData(id)
+
+    // console.log(thisUserData);
+    
+    // gets the user table data for the clicked puzzle 
+    let focusedPuzzleUser = JSON.parse(thisUserData.SaveData).filter(filterData => {
+        if (filterData.id == id) {
+            return filterData
+        }
+    })[0]
+
+    return focusedPuzzleUser
+}
+
+async function getPuzzleDataPuzzle(id) {
+    const data = await getDBData()
+    
+    // gets the puzzle table data for the clicked puzzle 
+    let focusedPuzzlePuzzle = data.Puzzles.filter(filterData => {
+        if (filterData.ID == id) {
+            return filterData
+        }
+    })[0]
+
+    return focusedPuzzlePuzzle
+}

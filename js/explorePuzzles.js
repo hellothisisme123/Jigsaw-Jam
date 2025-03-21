@@ -47,7 +47,9 @@ function getBookmark(puzz, alt) {
 
 async function fillPuzzles() {
     try {
+        console.log("red");
         const data = await getDBData();
+        console.log(data);
         const totalPuzzles = data.Puzzles.length;
         const batchSize = 10;
         const batches = [];
@@ -370,56 +372,6 @@ function getTags(userPuzz, puzz, list) {
         return res.trim()
     }
 }
-
-async function getDBData() {
-    const response = await fetch('https://192.168.240.9:3006/jigsawJam/data')
-    const data = await response.json()
-    return data
-}
-
-async function getUserData() {
-    const data = await getDBData()
-    
-    const thisUserData = data.Users.filter((user) => {
-        if (user.Username == localStorage.getItem('username') &&
-        user.Password == localStorage.getItem('password')) {
-            return user
-        }
-    })[0]
-
-    return thisUserData
-}
-
-async function getPuzzleDataUser(id) {
-    const thisUserData = await getUserData(id)
-
-    // console.log(thisUserData);
-    
-    // gets the user table data for the clicked puzzle 
-    let focusedPuzzleUser = JSON.parse(thisUserData.SaveData).filter(filterData => {
-        if (filterData.id == id) {
-            return filterData
-        }
-    })[0]
-
-    return focusedPuzzleUser
-}
-
-async function getPuzzleDataPuzzle(id) {
-    const data = await getDBData()
-    
-    // gets the puzzle table data for the clicked puzzle 
-    let focusedPuzzlePuzzle = data.Puzzles.filter(filterData => {
-        if (filterData.ID == id) {
-            return filterData
-        }
-    })[0]
-
-    return focusedPuzzlePuzzle
-}
-
-
-
 
 // search bar x button
 document.querySelector('.container .navigation .navResponsive .searchbar .xIcon img').addEventListener("click", (e) => {

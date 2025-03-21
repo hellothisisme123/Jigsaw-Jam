@@ -62,6 +62,21 @@
                 .text {
                     font-size: calc(1.25rem * var(--fontSizeMult));
                     padding: 0 16px;
+
+                }
+                
+                .text:has(ul) {
+                    /* padding: 0 48px; */
+                    
+                    ul {
+                        margin: -4px 16px;
+                        width: 100%;
+
+                        li {
+                            width: 100%;
+                            font-size: calc(1.25rem * var(--fontSizeMult));
+                        }
+                    }
                 }
     
                 .buttonWrapper {
