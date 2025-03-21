@@ -49,72 +49,84 @@ async function fillPuzzles() {
     try {
         const data = await getDBData();
         const totalPuzzles = data.Puzzles.length;
-
-        // Set the batch size (static size of 10)
         const batchSize = 10;
         const batches = [];
 
-        // Create batches of puzzles
         for (let i = 0; i < totalPuzzles; i += batchSize) {
             batches.push(data.Puzzles.slice(i, i + batchSize));
         }
 
-        // Process each batch one by one
         for (const batch of batches) {
             await processBatch(batch);
         }
 
         console.log("Loaded all puzzles!");
+        observeLazyImages();
     } catch (error) {
         console.error('Error:', error);
-        const failedToLoad = document.querySelector(".container .main .mainResponsive .failedToLoad");
-        failedToLoad.classList.add("active");
+        document.querySelector(".container .main .mainResponsive .failedToLoad").classList.add("active");
     }
 }
 
 async function processBatch(batch) {
-    const batchPromises = batch.map((puzzle, index) => {
-        return asyncTask(puzzle, index);
-    });
+    const puzzleContainer = document.querySelector(".container .main .mainResponsive");
+    const fragment = document.createDocumentFragment();
 
-    // Wait for all promises in the batch to resolve
+    const batchPromises = batch.map((puzzle, index) => asyncTask(puzzle, index));
     const results = await Promise.all(batchPromises);
-
-    // Sort results by the index to preserve order
     results.sort((a, b) => a.index - b.index);
 
-    // Add each result to the container in the correct order
     results.forEach(result => {
-        const puzzleContainer = document.querySelector(".container .main .mainResponsive");
-        puzzleContainer.innerHTML += result.html;
+        if (!document.querySelector(`[data-id='${result.id}']`)) {
+            const div = document.createElement("div");
+            div.innerHTML = result.html;
+            fragment.appendChild(div.firstElementChild);
+        }
     });
+
+    puzzleContainer.appendChild(fragment);
+    observeLazyImages();
 }
 
 async function asyncTask(puzzle, index) {
-    // Get the puzzle data
     let puzzleData_Users = await getPuzzleDataUser(puzzle.ID);
     let puzzleData_Puzzles = await getPuzzleDataPuzzle(puzzle.ID);
 
-    // Build the puzzle HTML
     const html = `
         <div class="puzzle active ${getTags(puzzleData_Users, puzzleData_Puzzles, true)}" onclick="focusPuzzle(${puzzle.ID})" data-id="${puzzle.ID}">
             <div class="star">
-                <img src="./production/images/${getStar(puzzleData_Users, false)}" alt="${getStar(puzzleData_Users, true)}">
+                <img class="lazy" data-src="./production/images/${getStar(puzzleData_Users, false)}" alt="${getStar(puzzleData_Users, true)}">
             </div>
             <div class="background">
-                <img src="./production/images/puzzle-images/${puzzle.Src}" alt="${puzzle.Alt}">
+                <img class="lazy" data-src="./production/images/puzzle-images/${puzzle.Src}" alt="${puzzle.Alt}">
             </div>
             <div class="bookmark">
-                <img src="./production/images/${getBookmark(puzzleData_Users, false)}" alt="${getBookmark(puzzleData_Users, true)}">
+                <img class="lazy" data-src="./production/images/${getBookmark(puzzleData_Users, false)}" alt="${getBookmark(puzzleData_Users, true)}">
             </div>
         </div>
     `;
 
-    // Return an object with the HTML and index to maintain the order
-    return { html, index };
+    return { html, index, id: puzzle.ID };
 }
 
-fillPuzzles()
+function observeLazyImages() {
+    const lazyImages = document.querySelectorAll("img.lazy");
+    const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                if (img.dataset.src) {
+                    img.src = img.dataset.src;
+                    img.removeAttribute("data-src");
+                    img.classList.remove("lazy");
+                }
+                observer.unobserve(img);
+            }
+        });
+    }, { rootMargin: "100px" });
+
+    lazyImages.forEach(img => observer.observe(img));
+}
 
 function resetPuzzle(id) {
     alertPopup(
@@ -406,6 +418,9 @@ async function getPuzzleDataPuzzle(id) {
     return focusedPuzzlePuzzle
 }
 
+
+
+
 // search bar x button
 document.querySelector('.container .navigation .navResponsive .searchbar .xIcon img').addEventListener("click", (e) => {
     document.querySelector('.container .navigation .navResponsive .searchbar input').value = ""
@@ -434,49 +449,52 @@ async function fillSearchTabs() {
     console.log(tags);
 
 }
+
 fillSearchTabs().then(() => {
     const tabs = document.querySelectorAll('.container .navigation .navResponsive .settingsTabWrapper .tab'),
     puzzlesWrapper = document.querySelector('.container .main .mainResponsive')
-    tabs.forEach(tab => {
-        let active = true
-        // console.log(tab);
-        
-        tab.addEventListener("click", (e) => {
-            active = !active
+
+    fillPuzzles().then(() => {
+        tabs.forEach(tab => {
+            let active = true
     
-            if (active) {
-                tab.classList.add("active")
-
-                const puzzles = puzzlesWrapper.querySelectorAll(`.puzzle.${tab.innerHTML}`)
-                puzzles.forEach(element => {
-                    element.classList.add("active")
-                });
-            } else {
-                tab.classList.remove("active")
-             
-                const puzzles = puzzlesWrapper.querySelectorAll(`.puzzle.${tab.innerHTML}`)
-                puzzles.forEach(element => {
-                    element.classList.remove("active")
-                });
-            }
-
-            const visiblePuzzles = [...puzzlesWrapper.children].filter(child => {
-                if (child.classList.contains("puzzle")) return child
-                else return
-            }).filter(child => 
-                getComputedStyle(child).display !== "none"
-            );
-
-
-            console.log(document.querySelector('.container .main .mainResponsive .noPuzzlesWithCurrentFilters'));
-
-
-            noPuzzlesWithCurrentFilters = document.querySelector('.container .main .mainResponsive .noPuzzlesWithCurrentFilters')
-            if (visiblePuzzles.length === 0) {
-                noPuzzlesWithCurrentFilters.classList.add("active")
-            } else {
-                noPuzzlesWithCurrentFilters.classList.remove("active")
-            }
+            tab.addEventListener("click", () => {
+                active = !active
+        
+                if (active) {
+                    tab.classList.add("active")
+    
+                    const puzzles = puzzlesWrapper.querySelectorAll(`.puzzle.${tab.innerHTML}`)
+                    puzzles.forEach(element => {
+                        element.classList.add("active")
+                    });
+                } else {
+                    tab.classList.remove("active")
+                    
+                    const puzzles = puzzlesWrapper.querySelectorAll(`.puzzle.${tab.innerHTML}`)
+                    puzzles.forEach(element => {
+                        element.classList.remove("active")
+                    });
+                }
+    
+                const visiblePuzzles = [...puzzlesWrapper.children].filter(child => {
+                    if (child.classList.contains("puzzle")) return child
+                    else return
+                }).filter(child => 
+                    getComputedStyle(child).display !== "none"
+                );
+    
+    
+                console.log(document.querySelector('.container .main .mainResponsive .noPuzzlesWithCurrentFilters'));
+    
+    
+                noPuzzlesWithCurrentFilters = document.querySelector('.container .main .mainResponsive .noPuzzlesWithCurrentFilters')
+                if (visiblePuzzles.length === 0) {
+                    noPuzzlesWithCurrentFilters.classList.add("active")
+                } else {
+                    noPuzzlesWithCurrentFilters.classList.remove("active")
+                }
+            })
         })
     })
 })

@@ -18,6 +18,8 @@ body:has(.focusPuzzlePopup) {
     overflow: hidden;
 
     .navigation {
+        width: 100%;
+
         .navResponsive {
             display: flex;
             flex-direction: column;
@@ -76,6 +78,10 @@ body:has(.focusPuzzlePopup) {
             .settingsTabWrapper {
                 display: flex;
                 gap: 8px;
+                flex-wrap: wrap;
+                justify-content: center;
+                max-width: 1280px;
+                padding: 0 16px;
 
                 .tab {
                     border: 3px solid var(--darkBrown);
@@ -100,19 +106,20 @@ body:has(.focusPuzzlePopup) {
 
     .main {
         overflow: scroll;
+        width: 100%;
 
         .mainResponsive {
             display: flex;
             width: 100%;
             margin: 0 auto;
             max-width: 800px;
-            @media screen and (width >= 1000px) {
-                max-width: 1280px;
-            }
             padding: 8px 16px;
             gap: 8px 4px;
             justify-content: space-between;
             flex-wrap: wrap;
+            @media screen and (width >= 1000px) {
+                max-width: 1280px;
+            }
 
             .failedToLoad {
                 display: none;
