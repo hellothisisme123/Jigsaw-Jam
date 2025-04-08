@@ -8,6 +8,75 @@
     --gridRows: 4;
     --gridCols: 4;
 
+    .alertPopup {
+        .imgWrapper {
+            border: 3px solid var(--darkBrown);
+            border-radius: 3px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            max-width: 80%;
+            max-height: 320px;
+            /* width: 100%; */
+            margin: 0 auto 0;
+            /* max-width: 80%; */
+            /* max-height: 320px; */
+
+            img {
+                display: block;    
+                height: 100%;
+                width: 100%;
+            }
+        }
+
+        .horizontalWrapper {
+            display: flex;
+            justify-content: space-between;
+
+            .dropdown.wrapper {
+                display: flex;
+                align-items: center;
+                position: relative;
+                /* margin: 0; */
+                
+                select {
+                    appearance: none;
+                    background-color: var(--lightButtonSolid);
+                    border: 3px solid var(--darkBrown);
+                    border-radius: 12px;
+                    height: 100%;
+                    font-size: calc(1rem * var(--fontSizeMult));
+                    padding: 2px 8px;
+                    cursor: pointer;
+                    color: var(--darkBrown);
+                    min-height: 32px;
+                    width: 100%;
+                    position: relative;
+                    padding-right: 40px;
+    
+                    option {
+                        background-color: var(--lightBrown);
+                    }
+                }
+            }
+    
+            .dropdown.wrapper::after {
+                content: "";
+                display: flex;
+                position: absolute;
+                height: 80%;
+                translate: 0 -50%;
+                top: 50%;
+                aspect-ratio: 1;
+                background-image: url(../production/images/chevron-down-solid.svg);
+                background-repeat: no-repeat;
+                right: 4px; /* 64 + the border width */
+                user-select: none;
+                pointer-events: none;
+            }
+        }
+    }
+
     .board {
         width: 100%;
         height: 100%;
@@ -61,8 +130,9 @@
                 div {
                     width: 100%;
                     height: 100%;
-                    border: 2px solid var(--darkBrown);
-                
+                    /* border: 2px solid var(--darkBrown); */
+                    box-shadow: inset 0 0 0 2px var(--darkBrown);
+
                     img {
                         width: 100%;
                         display: block;
@@ -143,15 +213,23 @@
             }
         } */
         
-        .piece {
+        .pieceSlot {
             width: 100%;
+            height: 100%;
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
 
-            img {
-                display: block;
-                width: 80%;
+            .piece {
+                width: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+    
+                img {
+                    display: block;
+                    width: 80%;
+                }
             }
         }
     }

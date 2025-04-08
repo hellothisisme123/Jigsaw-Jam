@@ -86,6 +86,7 @@ async function getDBData() {
 (async () => {
     console.log(await getDBData());
     console.log(await getUserData())
+    console.log("----------------------------")
 })()
 
 async function getUserData() {
