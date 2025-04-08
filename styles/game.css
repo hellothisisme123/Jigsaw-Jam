@@ -84,11 +84,45 @@
         position: relative;
         cursor: grab;
 
+        .title {
+            font-size: calc(2rem * var(--fontSizeMult));
+            text-align: center;
+            padding: 1rem;
+            display: flex;
+            height: 100%;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            width: 100%;
+            gap: 8px;
+            z-index: 4;
+
+            .horizontalWrapper {
+                display: flex;
+                gap: 16px;
+                justify-content: space-between;
+                padding: 8px 32px;
+                width: 100%;
+                
+                a {
+                    text-decoration: none;
+                    font-size: calc(1.5rem * var(--fontSizeMult));
+                    background-color: var(--lightButtonSolid);
+                    border: 3px solid var(--darkBrown);
+                    border-radius: 15px;
+                    padding: 4px 16px;
+                    width: fit-content;
+                    cursor: pointer;
+                }
+            }
+        }
+
         .canvas {
             position: absolute;
             width: 10000px;
             height: 10000px;
             background-size: 50px 50px;
+            z-index: 3;
             transform-origin: 0 0;
 
             .grid {

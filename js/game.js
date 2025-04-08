@@ -258,12 +258,90 @@ const puzzleMaxHeight = 0.8;
                 scale = newScale;
                 updateTransform();
             }, { passive: false });
+
+            // --- Touch Zoom and Pan Support ---
+            let lastTouchDistance = null;
+            let lastTouchMidpoint = null;
+            let lastTouchTranslate = { ...translate };
+
+            wrapper.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) {
+                    isPanning = true;
+                    start = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                    wrapper.style.cursor = 'grabbing';
+                } else if (e.touches.length === 2) {
+                    isPanning = false;
+                    const dx = e.touches[0].clientX - e.touches[1].clientX;
+                    const dy = e.touches[0].clientY - e.touches[1].clientY;
+                    lastTouchDistance = Math.hypot(dx, dy);
+                    lastTouchMidpoint = {
+                        x: (e.touches[0].clientX + e.touches[1].clientX) / 2,
+                        y: (e.touches[0].clientY + e.touches[1].clientY) / 2
+                    };
+                    lastTouchTranslate = { ...translate };
+                }
+            });
+
+            wrapper.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 1 && isPanning) {
+                    const dx = e.touches[0].clientX - start.x;
+                    const dy = e.touches[0].clientY - start.y;
+                    translate.x += dx;
+                    translate.y += dy;
+                    start = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                    updateTransform();
+                } else if (e.touches.length === 2) {
+                    const dx = e.touches[0].clientX - e.touches[1].clientX;
+                    const dy = e.touches[0].clientY - e.touches[1].clientY;
+                    const currentDistance = Math.hypot(dx, dy);
+                    const midpoint = {
+                        x: (e.touches[0].clientX + e.touches[1].clientX) / 2,
+                        y: (e.touches[0].clientY + e.touches[1].clientY) / 2
+                    };
+
+                    if (lastTouchDistance) {
+                        const zoomFactor = currentDistance / lastTouchDistance;
+                        let newScale = scale * zoomFactor;
+                        newScale = Math.min(Math.max(newScale, minZoom), maxZoom);
+
+                        const rect = wrapper.getBoundingClientRect();
+                        const mx = midpoint.x - rect.left;
+                        const my = midpoint.y - rect.top;
+                        const dx = mx - lastTouchTranslate.x;
+                        const dy = my - lastTouchTranslate.y;
+
+                        translate.x = lastTouchTranslate.x - dx * (newScale / scale - 1);
+                        translate.y = lastTouchTranslate.y - dy * (newScale / scale - 1);
+
+                        scale = newScale;
+                        updateTransform();
+                    }
+
+                    lastTouchDistance = currentDistance;
+                }
+
+                e.preventDefault();
+            }, { passive: false });
+
+            wrapper.addEventListener('touchend', () => {
+                isPanning = false;
+                lastTouchDistance = null;
+                lastTouchMidpoint = null;
+                wrapper.style.cursor = 'grab';
+            });
     
             wrapper.addEventListener('mousedown', (e) => {
                 if (!e.target.closest('.piece')) {
                     isPanning = true;
                     start = { x: e.clientX, y: e.clientY };
                     wrapper.style.cursor = 'grabbing';
+                } else {
+                    console.log(e);
+                    if (e.button == 1 || e.ctrlKey || e.altKey) {
+                        isPanning = true;
+                        start = { x: e.clientX, y: e.clientY };
+                        wrapper.style.cursor = 'grabbing';
+                    }
                 }
             });
     
@@ -287,7 +365,7 @@ const puzzleMaxHeight = 0.8;
     
             function setupDragAndDrop() {
                 document.querySelectorAll('.piece').forEach(piece => {
-                    piece.addEventListener('dragstart', () => {
+                    piece.addEventListener('dragstart', (e) => {
                         draggedPiece = piece;
                         setTimeout(() => {
                             piece.style.display = 'none';
@@ -381,6 +459,20 @@ const puzzleMaxHeight = 0.8;
         
 
     } catch (error) {
+        document.querySelector(".container .board").innerHTML += `
+            <div class='title'>
+                <p>The puzzle with id ${id} does not exist. Please find another puzzle with a valid id.</p>
+                <div class="horizontalWrapper">
+                <a href="./index.html">Home</a>
+                    <a href="./explorePuzzles.html">Explore Puzzles</a>
+                </div>
+            </div>
+
+        `
+        document.querySelector(".container .board .canvas").style.display = "none"
+        document.querySelector(".container .board").style.setProperty("cursor", "unset")
+
         console.error("Error setting up puzzle canvas:", error);
+        console.error("Error Code:", error.message);
     }
 })();
