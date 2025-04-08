@@ -79,9 +79,16 @@ function alertPopup(title, text, yesText, noText, yesFunc, noFunc) {
 
 // ----- get db data -----
 async function getDBData() {
-    const response = await fetch('https://192.168.240.9:3006/jigsawJam/data')
-    const data = await response.json()
-    return data
+    try {
+        const response = await fetch('https://192.168.240.9:3006/jigsawJam/data')
+        const data = await response.json()
+        return data       
+    } catch (error) {
+        const currentPage = window.location.href.split("/")[window.location.href.split("/").length-1]
+        if (currentPage != "failedToConnect.html") {
+            window.location = "./failedToConnect.html"
+        }
+    }
 }
 (async () => {
     console.log(await getDBData());

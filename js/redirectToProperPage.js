@@ -6,7 +6,8 @@ const currentPage = window.location.href.split("/")[window.location.href.split("
 if ((!username || !password) &&
     currentPage != "forceSignIn.html" &&
     currentPage != "createAccount.html" &&
-    currentPage != "signIn.html"
+    currentPage != "signIn.html" && 
+    currentPage != "failedToConnect.html"
 ) {
     window.location = "./forceSignIn.html"
 }

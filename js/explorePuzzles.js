@@ -71,7 +71,6 @@ async function fillPuzzles() {
         observeLazyImages();
     } catch (error) {
         console.error('Error:', error);
-        document.querySelector(".container .main .mainResponsive .failedToLoad").classList.add("active");
     }
 }
 

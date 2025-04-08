@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="./styles/main.css">
+    <link rel="stylesheet" href="./styles/failedToConnect.css">
+    <link rel="stylesheet" href="./styles/forceJs.css">
+    
+    <script src="./js/main.js" defer></script>
+    <script src="./js/failedToConnect.js" defer></script>
+    <script src="./js/redirectToProperPage.js" defer></script>
+
+    <link rel="shortcut icon" href="./production/images/logo.svg" type="image/x-icon">
+    <title>Jigsaw Jam</title>
+</head>
+<body>
+    <nav>
+        <div class="home"></div>
+        <div class="dividerBar"></div>
+        <div class="title">
+            Jigsaw Jam
+        </div>
+        <div class="dividerBar"></div>
+        <div class="settings"></div>
+        <div class="leaf leaf1">
+            <img src="./production/images/leaf-1.png" alt="green leaf">
+        </div>
+        <div class="leaf leaf2">
+            <img src="./production/images/leaf-2.png" alt="orange leaf">
+        </div>
+    </nav>
+
+    <div class="floatingLeaves">
+        <div class="leaf leaf1">
+            <img src="./production/images/leaf-3.png" alt="green leaf">
+        </div>
+        <div class="leaf leaf2">
+            <img src="./production/images/leaf-4.png" alt="green leaf">
+        </div>
+        <div class="leaf leaf3">
+            <img src="./production/images/leaf-2.png" alt="green leaf">
+        </div>
+        <div class="leaf leaf4">
+            <img src="./production/images/leaf-1.png" alt="green leaf">
+        </div>
+    </div>
+
+    <noscript class="forceJavascript">
+        <div class="bgImage"></div>
+        
+        <div class="wrapper">
+            <div class="title">You must enable javascript in the browser settings to use this app</div>
+            <div class="buttonWrapper">
+                <a class="refreshPage" href="./">
+                    Refresh Page
+                </a>
+            </div>
+        </div>
+    </noscript>
+
+    <div class="container requireJavascript">
+        <div class="failedToLoad">
+            <div class="title">Failed to load data. Follow these steps to fix the issue.</div>
+            <ol>
+                <li>
+                    Go to this
+                    <a href="https://192.168.240.9:3006/jigsawJam/" target="_blank">Link</a>
+                </li>
+                <li>
+                    Click on "Advanced"
+                </li>
+                <li>
+                    Click on the "Proceed to 192.168.240.9 (unsafe)" link
+                </li>
+                <li>Close the created tab</li>
+                <li>
+                    Refresh the page or click this
+                    <a href="./explorePuzzles.html">Link</a>
+                </li>
+            </ol>
+        </div>
+    </div>
+</body>
+</html>
