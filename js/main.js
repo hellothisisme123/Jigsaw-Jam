@@ -83,7 +83,10 @@ async function getDBData() {
     const data = await response.json()
     return data
 }
-(async () => {console.log(await getDBData()); console.log(await getUserData())})()
+(async () => {
+    console.log(await getDBData());
+    console.log(await getUserData())
+})()
 
 async function getUserData() {
     const data = await getDBData()

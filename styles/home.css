@@ -1,56 +1,230 @@
 .container {
-    display: grid;
     height: 100vh;
-    grid-template-rows: 1fr 100px;
-    overflow: hidden;
+    width: 100%;
+    
+    .responsive {
+        margin: 0 auto;
+        height: 100%;
+        max-width: 800px;
 
-    .quickPuzzles {
+        display: grid;
+        grid-template-rows: auto 1fr 100px;
         overflow: hidden;
 
         .mostRecentPuzzle {
-            height: 400px;
+            /* max-width: 600px;
+            margin: 0 auto; */
+
+            height: 100%;
+            max-height: 340px;
             background-image: url(../production/images/wood-panel-3.png);
             background-size: 400px;
             border-bottom: 4px solid var(--darkBrown);
+            position: relative;
 
             .puzzle {
-                max-height: 100%;
-                max-width: 100%;
-                width: 100%;
-                background-image: url(../production/images/puzzle-images/Space-1.jpg);
+                height: 100%;
+                overflow: hidden;
+                margin: 0 auto;
+                padding: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                img {
+                    max-width: 100%;
+                    max-height: 100%;
+                    width: auto;
+                    height: auto;
+                    display: block;
+                    margin: 0 auto;
+                    object-fit: contain;
+
+                }
             }
-        }
-    }
 
-    .exploreAllPuzzles {
-        display: flex;
-        position: relative;
-        width: 100%;
-        top: 25%;
+            .completionLevel {
+                position: absolute;
+                right: 0;
+                top: 0;
+                width: 90px;
+                height: 90px;
+                background-color: var(--lightBrown);
+                border-bottom: 4px solid var(--darkBrown);
+                border-left: 4px solid var(--darkBrown);
+                border-radius: 0 0 0 8px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                font-size: calc(2rem * var(--fontSizeMult));
+                
+                
+                .percentage, .done {
+                    text-align: center;
+                    display: flex;
+                    justify-content: center;
+                    height: 100%;
+                    align-items: center;
+                }
+            }
 
-        .img {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            
-            img {
-                max-width: 330px;
+            .keepPuzzlingBtn {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                translate: -50% -50%;
+                
+                width: 60%;
+                max-width: calc(300px * var(--fontSizeMult));
+                aspect-ratio: 2.73076923;
+                
+                background-image: url(../production/images/keep-puzzling-button.png);
+                background-size: cover;
+                background-position: center;
+                
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+                font-size: calc(2.25rem * var(--fontSizeMult));
+                text-wrap: nowrap;
+                
+                text-decoration: none;
                 cursor: pointer;
-                width: 100%;
+                
+                p {
+                    user-select: none;
+                    pointer-events: none;
+                    margin-top: -10px;
+                }
+            }
+        }
+        
+        .quickPuzzles {
+            /* max-width: 800px; */
+            /* margin: 0 auto; */
+
+            background-color: var(--lightBrown);
+            overflow: scroll;
+            height: 100%;
+
+            .shelf {
+                display: flex;
+                flex-direction: column;
+                padding: 4px 8px 8px;
+                border-bottom: 4px solid var(--darkBrown);
+
+                .title {
+                    font-size: calc(1.5rem * var(--fontSizeMult));
+                }
+
+                .sidescroll {
+                    display: flex;
+                    gap: 8px;
+                    overflow-x: auto; 
+                    width: 100%;
+                    padding-bottom: 4px; 
+                
+                    .puzzle {
+                        border: 3px solid var(--darkBrown);
+                        border-radius: 3px;
+                        height: 88px;
+                        flex: 0 0 auto; 
+                        position: relative;
+                        cursor: pointer;
+                
+                        @media screen and (width >= 800px) {
+                            height: 150px;
+                
+                            .star, .bookmark {
+                                height: 32px !important;
+                            }
+                        }
+                
+                        .star, .bookmark {
+                            position: absolute;
+                            height: 16px;
+                
+                            img {
+                                height: 100%;
+                            }
+                        }
+                
+                        .star {
+                            right: 4px;
+                            top: 4px;
+                        }
+                
+                        .bookmark {
+                            left: 4px;
+                            top: 0;
+                            cursor: pointer;
+                        }
+                
+                        .background {
+                            height: 100%;
+                            z-index: 3;
+                
+                            img {
+                                height: 100%;
+                                width: auto; 
+                                display: block;
+                                object-fit: contain; 
+                            }
+                        }
+                    }
+                }
+            }
+
+            .shelf:nth-last-child(1) {
+                border-bottom: none;
             }
         }
 
-        .text {
-            position: absolute;
-            left: 50%;
-            user-select: none;
-            pointer-events: none;
-            top: 45%;
-            translate: -50% -50%;
-            font-size: calc(1.75rem * var(--fontSizeMult));
-            text-align: center;
-            text-wrap: nowrap;
+        .exploreAllPuzzles {
+            /* margin: 0 auto;
+            max-width: 800px; */
+
+            display: flex;
+            width: 100%;
+            height: 100px;
+            bottom: 0%;
+            background-image: url(../production/images/wood-panel-2.png);
+            background-repeat: repeat;
+            background-size: 100%;
+            background-position: -80px -32px;
+            padding: 8px 0 0;
+            border-top: 4px solid var(--darkBrown);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            
+            .img {
+                /* padding: 0 0 8px; */
+                position: absolute;
+                top: 8px;
+                width: 350px;
+                aspect-ratio: 2.74603175;
+                background-image: url(../production/images/explore-new-puzzles-button.png);
+                background-size: cover;
+                font-size: calc(1.75rem * var(--fontSizeMult));
+                background-position: center;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+                text-wrap: nowrap;
+                cursor: pointer;
+
+                p {
+                    top: -8px;
+                    position: relative;
+                    user-select: none;
+                    pointer-events: none;
+                }
+            }
         }
     }
 }

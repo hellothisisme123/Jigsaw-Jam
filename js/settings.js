@@ -102,3 +102,20 @@ ranges.forEach((child) => {
         mouseHeld = true
     })
 })
+
+// sign out button
+const signOutBtn = document.querySelector(".account .btn .signOut") 
+signOutBtn.addEventListener("click", (e) => {
+    alertPopup(
+        "Are you Sure?",
+        "You would like to sign out of your account. You will be able to sign back in using the username and password. All settings, saved puzzles, and saved data will be saved.",
+        "Yes, Sign Out",
+        "No, Cancel",
+        () => {
+            localStorage.setItem("username", "")
+            localStorage.setItem("password", "")
+            window.location = "./"
+        },
+        () => {}
+    )
+})

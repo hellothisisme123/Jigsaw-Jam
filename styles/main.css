@@ -105,6 +105,8 @@ nav {
         display: flex;
         justify-content: center;
         align-items: center;
+        user-select: none;
+        pointer-events: none;
 
         img {
             width: 100%;

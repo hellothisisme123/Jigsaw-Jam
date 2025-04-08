@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="./styles/main.css">
+    <link rel="stylesheet" href="./styles/game.css">
+    <link rel="stylesheet" href="./styles/forceJs.css">
+    
+    <script src="./js/main.js" defer></script>
+    <script src="./js/game.js" defer></script>
+
+    <link rel="shortcut icon" href="./production/images/logo.svg" type="image/x-icon">
+    <title>Jigsaw Jam</title>
+</head>
+<body>
+    <nav>
+        <div class="home"></div>
+        <div class="dividerBar"></div>
+        <div class="title">
+            Jigsaw Jam
+        </div>
+        <div class="dividerBar"></div>
+        <div class="settings"></div>
+        <div class="leaf leaf1">
+            <img src="./production/images/leaf-1.png" alt="green leaf">
+        </div>
+        <div class="leaf leaf2">
+            <img src="./production/images/leaf-2.png" alt="orange leaf">
+        </div>
+    </nav>
+
+    <div class="floatingLeaves">
+        <div class="leaf leaf1">
+            <img src="./production/images/leaf-3.png" alt="green leaf">
+        </div>
+        <div class="leaf leaf2">
+            <img src="./production/images/leaf-4.png" alt="green leaf">
+        </div>
+        <div class="leaf leaf3">
+            <img src="./production/images/leaf-2.png" alt="green leaf">
+        </div>
+    </div>
+
+    <noscript class="forceJavascript">
+        <div class="bgImage"></div>
+        
+        <div class="wrapper">
+            <div class="title">You must enable javascript in the browser settings to use this app</div>
+            <div class="buttonWrapper">
+                <a class="refreshPage" href="./">
+                    Refresh Page
+                </a>
+            </div>
+        </div>
+    </noscript>
+
+    <div class="container requireJavascript">
+        <div class="board">
+            <div class="canvas">
+                <!-- <div class="cube node" style="left: 600px; top: 400px;"> -->
+                <div class="grid node" style="left: 600px; top: 400px;">
+                    <div class="bg">
+                        <img src="./production/images/puzzle-images/space-6.jpg">
+                    </div>
+    
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table">
+            <div class="leftBtn">
+                <img src="./production/images/caret-left-solid.png" alt="left arrow button">
+            </div>
+            <div class="rightBtn">
+                <img src="./production/images/caret-right-solid.png" alt="right arrow button">
+            </div>
+            <div class="switchView">
+                <img src="./production/images/shuffle-view-button.png" alt="">
+            </div>
+            <!-- <div class="dotDisplay">
+                <div class="dot fill"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div> -->
+
+            <div class="piece" data-index="1">
+                <img src="./production/images/split puzzle pieces/image1x1.jpg">
+            </div>
+            <div class="piece" data-index="2">
+                <img src="./production/images/split puzzle pieces/image1x2.jpg">
+            </div>
+            <div class="piece" data-index="3">
+                <img src="./production/images/split puzzle pieces/image1x3.jpg">
+            </div>
+            <div class="piece" data-index="4">
+                <img src="./production/images/split puzzle pieces/image1x4.jpg">
+            </div>
+            <div class="piece" data-index="5">
+                <img src="./production/images/split puzzle pieces/image2x1.jpg">
+            </div>
+            <div class="piece" data-index="6">
+                <img src="./production/images/split puzzle pieces/image2x2.jpg">
+            </div>
+            <div class="piece" data-index="7">
+                <img src="./production/images/split puzzle pieces/image2x3.jpg">
+            </div>
+            <div class="piece" data-index="8">
+                <img src="./production/images/split puzzle pieces/image2x4.jpg">
+            </div>
+            <div class="piece" data-index="9">
+                <img src="./production/images/split puzzle pieces/image3x1.jpg">
+            </div>
+            <div class="piece" data-index="10">
+                <img src="./production/images/split puzzle pieces/image3x2.jpg">
+            </div>
+            <div class="piece" data-index="11">
+                <img src="./production/images/split puzzle pieces/image3x3.jpg">
+            </div>
+            <div class="piece" data-index="12">
+                <img src="./production/images/split puzzle pieces/image3x4.jpg">
+            </div>
+            <div class="piece" data-index="13">
+                <img src="./production/images/split puzzle pieces/image4x1.jpg">
+            </div>
+            <div class="piece" data-index="14">
+                <img src="./production/images/split puzzle pieces/image4x2.jpg">
+            </div>
+            <div class="piece" data-index="15">
+                <img src="./production/images/split puzzle pieces/image4x3.jpg">
+            </div>
+            <div class="piece" data-index="16">
+                <img src="./production/images/split puzzle pieces/image4x4.jpg">
+            </div>
+        </div>
+    </div>
+</body>
+</html>
