@@ -7,15 +7,22 @@ if (navigator.userAgent.includes("OPR")) { // opera
 }
 
 async function checkDBConnection() {
-    let red
+    let dbConnCheck
     try {
-        red = await getDBData()
+        let red = await getDBData()
+        if (red.length != 0) {
+            console.log(red);
+            dbConnCheck = "-------Database Connected-------"
+        }
     } catch (error) {
-    }
-    
-    if (red) {
-        window.location = "index.html"
+        dbConnCheck = "---Database Connection Failed---"
+        console.error(error);
+    } finally {
+        if (dbConnCheck == "-------Database Connected-------") {
+            window.location = "index.html"
+        }
+        console.log(dbConnCheck);
     }
 }
 
-setInterval(checkDBConnection, 500);
+// setInterval(checkDBConnection, 1500);

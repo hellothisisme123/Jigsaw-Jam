@@ -86,16 +86,24 @@ async function getDBData() {
     } catch (error) {
         const currentPage = window.location.href.split("/")[window.location.href.split("/").length-1]
         if (currentPage != "failedToConnect.html") {
-            window.location = "./failedToConnect.html"
+            // window.location = "./failedToConnect.html"
         }
     }
 }
 (async () => {
-    let dbConnCheck = "----------------------------"
-    if (await getDBData()) {
-        dbConnCheck = "-----Database Connected-----"
-    }
-    console.log(dbConnCheck);
+    // let dbConnCheck
+    // try {
+    //     let red = await getDBData()
+    //     if (red.length != 0) {
+    //         console.log(red);
+    //         dbConnCheck = "-------Database Connected-------"
+    //     }
+    // } catch (error) {
+    //     dbConnCheck = "---Database Connection Failed---"
+    //     console.error(error);
+    // } finally {
+    //     console.log(dbConnCheck);
+    // }
 })()
 
 async function getUserData() {
