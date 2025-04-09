@@ -1,0 +1,247 @@
+.focusPuzzlePopup {
+    z-index: 1500;
+    position: fixed;
+    top: 94px;
+    left: 0;
+    width: 100vw;
+    height: calc(100vh - 94px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    .responsive {
+        padding: 0 16px;
+        overflow: scroll;
+        max-width: 1200px;
+        width: fit-content;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        position: relative;
+        align-items: center;
+
+        .space {
+            flex-grow: 1;
+        }
+
+        .exitButton {
+            position: absolute;
+            width: 32px;
+            height: fit-content;
+            left: 16px;
+            top: 16px;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            
+            img {
+                width: 100%;
+                display: block;
+            }
+        }
+
+        .title {
+            font-size: calc(2.25rem * var(--fontSizeMult));
+            text-align: center;
+        }
+
+        .puzzle {
+            border: 3px solid var(--darkBrown);
+            border-radius: 3px;
+            position: relative;
+            overflow: hidden;
+            margin: 0 auto;
+            width: fit-content;
+            flex-shrink: 0;
+            
+            .background {
+                z-index: 3;
+
+                img {
+                    display: block;
+                    max-height: 400px;
+                    width: 100%;
+                }
+            }
+
+            .star, .bookmark {
+                position: absolute;
+                height: 48px;
+
+                img {
+                    height: 100%;
+                }
+            }
+
+            .star {
+                right: 8px;
+                top: 8px;
+            }
+
+            .bookmark {
+                left: 8px;
+                top: 0;
+                cursor: pointer;
+            }
+        }
+
+        .buttonWrapper {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            margin: 4px 0;
+            max-width: 600px;
+            @media screen and (width <= 360px) {
+                flex-wrap: wrap;
+                justify-content: center;
+
+                .reset {
+                    width: 100%;
+                    padding: 8px 16px;
+                }
+
+                .dropdown.wrapper {
+                    width: 100%;
+
+                    select {
+                        font-size: calc(1.5rem * var(--fontSizeMult)) !important;
+                        padding: 8px 16px;
+                    }
+                }
+            }
+
+            .reset {
+                background-color: var(--lightButtonSolid);
+                font-size: calc(1.5rem * var(--fontSizeMult));
+                border-radius: 12px;
+                border: 3px solid var(--darkBrown);
+                padding: 4px 16px;
+                cursor: pointer;
+                text-align: center;
+            }
+            
+            .dropdown.wrapper {
+                display: flex;
+                align-items: center;
+                position: relative;
+                
+                select {
+                    appearance: none;
+                    background-color: var(--lightButtonSolid);
+                    border: 3px solid var(--darkBrown);
+                    border-radius: 12px;
+                    height: 100%;
+                    font-size: calc(1rem * var(--fontSizeMult));
+                    padding: 2px 8px;
+                    cursor: pointer;
+                    color: var(--darkBrown);
+                    min-height: 32px;
+                    width: 100%;
+                    position: relative;
+                    padding-right: 40px;
+
+                    option {
+                        background-color: var(--lightBrown);
+                    }
+                }
+            }
+
+            .dropdown.wrapper::after {
+                content: "";
+                display: flex;
+                position: absolute;
+                height: 80%;
+                translate: 0 -50%;
+                top: 50%;
+                aspect-ratio: 1;
+                background-image: url(../production/images/chevron-down-solid.svg);
+                background-repeat: no-repeat;
+                right: 4px; /* 64 + the border width */
+                user-select: none;
+                pointer-events: none;
+            }
+        }
+
+        .tagWrapper {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+
+            .label {
+                height: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-size: calc(2rem * var(--fontSizeMult));
+            }
+
+            .tag {
+                border: 3px solid var(--darkBrown);
+                background-color: var(--lightBrown);
+                min-height: 32px;
+                border-radius: 100px;
+                padding: 2px 8px;
+                font-size: calc(1.125rem * var(--fontSizeMult));
+                cursor: pointer;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+            }
+
+            .tag.active {
+                background-color: var(--lightButtonSolid);
+            }
+        }
+
+        .openPuzzleButton {
+            display: flex;
+            position: relative;
+            width: 100%;
+            margin-bottom: 16px;
+
+            .img {
+                width: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                
+                img {
+                    max-width: 330px;
+                    cursor: pointer;
+                    width: 100%;
+                }
+            }
+
+            .text {
+                position: absolute;
+                left: 50%;
+                user-select: none;
+                pointer-events: none;
+                top: 45%;
+                translate: -50% -50%;
+                font-size: calc(2.25rem * var(--fontSizeMult));
+                text-align: center;
+                text-wrap: nowrap;
+            }
+        }
+    }
+}
+
+.focusPuzzlePopup::before {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    content: "";
+    background-color: var(--lightBrown);
+    opacity: 0.85;
+    backdrop-filter: blur(3px);
+    z-index: -110;
+}
