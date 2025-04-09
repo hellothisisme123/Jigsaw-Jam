@@ -79,7 +79,7 @@ async function createSidescrollers() {
         setupLazyPuzzleLoader(sidescroll, puzzlesWithTag)
     })
 
-    async function getTopTags(saveData, topN = 3) {
+    async function getTopTags(saveData, topN = 5) {
         const tagCounts = {};
     
         // Wait for all puzzle data to be fetched

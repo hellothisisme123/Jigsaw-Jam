@@ -91,9 +91,11 @@ async function getDBData() {
     }
 }
 (async () => {
-    console.log(await getDBData());
-    console.log(await getUserData())
-    console.log("----------------------------")
+    let dbConnCheck = "----------------------------"
+    if (await getDBData()) {
+        dbConnCheck = "-----Database Connected-----"
+    }
+    console.log(dbConnCheck);
 })()
 
 async function getUserData() {
@@ -133,4 +135,29 @@ async function getPuzzleDataPuzzle(id) {
     })[0]
 
     return focusedPuzzlePuzzle
+}
+
+// shuffles array accordingly to the seed
+function seededShuffle(array, seed) {
+    const result = array.slice(); // make a copy
+
+    // Seeded pseudorandom number generator (mulberry32)
+    function mulberry32(a) {
+        return function() {
+            a |= 0; a = a + 0x6D2B79F5 | 0;
+            var t = Math.imul(a ^ a >>> 15, 1 | a);
+            t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+            return ((t ^ t >>> 14) >>> 0) / 4294967296;
+        };
+    }
+
+    const random = mulberry32(seed);
+
+    // Fisher-Yates shuffle using the seeded PRNG
+    for (let i = result.length - 1; i > 0; i--) {
+        const j = Math.floor(random() * (i + 1));
+        [result[i], result[j]] = [result[j], result[i]];
+    }
+
+    return result;
 }

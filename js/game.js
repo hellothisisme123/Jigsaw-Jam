@@ -170,9 +170,11 @@ const puzzleMaxHeight = 0.8;
         }
         
         cutImageIntoCells(gridBgImg, puzzleData.height, puzzleData.width).then((imageCells) => {
-            // console.log(imageCells);
             let i = 0
-            imageCells.forEach(cell => {
+            console.log(puzzleData);
+            console.log()
+
+            seededShuffle(imageCells, puzzleData.id).forEach(cell => {
                 i++
                 let pieceSlot = document.createElement("div")
                 pieceSlot.classList.add("pieceSlot")
