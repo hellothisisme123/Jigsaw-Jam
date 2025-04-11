@@ -24,14 +24,15 @@ async function setupMostRecentPuzzle() {
     const keepPuzzlingBtn = document.querySelector(".container .mostRecentPuzzle .keepPuzzlingBtn ")
     const completionPerc = document.querySelector(".container .mostRecentPuzzle .completionLevel .percentage")
     
-    let mostRecentPuzzle = await getPuzzleDataPuzzle(recentPuzzles[0].id)
-
-    // const timeInt = Date.now()
-    // console.log(timeInt);
-    // const recentPuzzleSrc = 
-    keepPuzzlingBtn.href = `./game.html?id=${mostRecentPuzzle.ID}`
-    recentPuzzleImg.src = `./production/images/puzzle-images/${mostRecentPuzzle.Src}`
-    completionPerc.innerHTML = `${Math.floor(recentPuzzles[0].completionData.length / (recentPuzzles[0].width * recentPuzzles[0].height))}%`
+    if (recentPuzzles.length > 0) {
+        let mostRecentPuzzle = await getPuzzleDataPuzzle(recentPuzzles[0].id)
+        keepPuzzlingBtn.href = `./game.html?id=${mostRecentPuzzle.ID}`
+        recentPuzzleImg.src = `./production/images/puzzle-images/${mostRecentPuzzle.Src}`
+        completionPerc.innerHTML = `${Math.floor(recentPuzzles[0].completionData.length / (recentPuzzles[0].width * recentPuzzles[0].height))}%`
+    } else {
+        const recentPuzzleWrapper = document.querySelector(".container .mostRecentPuzzle")
+        recentPuzzleWrapper.innerHTML = ""
+    }
 }
 setupMostRecentPuzzle().then(() => 
     createSidescrollers())
@@ -42,50 +43,22 @@ async function createSidescrollers() {
     saveData = JSON.parse(saveData.SaveData) 
     console.log(saveData);
 
-    topTags = await getTopTags(saveData)
-    console.log(topTags);
-
-    // make the recent puzzles sidescroller appear first
-    const recentSidescroller = document.querySelector(".container .quickPuzzles .recent .sidescroll")
-    const recentPuzzles = await getRecentPuzzles()
-    setupLazyPuzzleLoader(recentSidescroller, recentPuzzles)
-    
-    // create the rest of the sidescrollers
-    topTags.forEach(async tag => {
-        let html = document.createElement("div")
-        html.classList.add("shelf")
-        html.classList.add(tag.tag)
-        html.innerHTML = `<div class="title">${capitalizeFirstLetter(tag.tag)} Puzzles</div>`
-
-        let sidescroll = document.createElement("div")
-        sidescroll.classList.add("sidescroll")
-        html.appendChild(sidescroll)
-        quickPuzzles.appendChild(html)
-
-        let puzzles = await getDBData()
-        console.log(puzzles);
-
-        // Now filter the puzzles that include the specific tag
-        let puzzlesWithTag = puzzles.Puzzles.filter(puzzle => {
-            return JSON.parse(puzzle.Tags).includes(tag.tag)
-        })
-        console.log(puzzlesWithTag);
-
-        // setupLazyPuzzleLoader reads .id, but puzzlesWithTag has .ID
-        puzzlesWithTag.map(async x => {
-            x.id = x.ID
-            return x
-        })
-        setupLazyPuzzleLoader(sidescroll, puzzlesWithTag)
-    })
-
     async function getTopTags(saveData, topN = 5) {
         const tagCounts = {};
     
-        // Wait for all puzzle data to be fetched
-        const puzzleDataList = await Promise.all(
-            saveData.map(puzzle => getPuzzleDataPuzzle(puzzle.id))
-        );
+        // count tags from user data if it exists and database data if it doesnt
+        let puzzleDataList
+        if (saveData.length > 0) {
+            // Wait for all puzzle data to be fetched
+            puzzleDataList = await Promise.all(
+                saveData.map(puzzle => getPuzzleDataPuzzle(puzzle.id))
+            );
+        } else {
+            return ["animals","art","food","nature","people"].map((x, i) => {
+                return {"tag": x, "count": i}
+            })
+        }
+        console.log(puzzleDataList);
     
         // Count tags from each puzzle
         puzzleDataList.forEach(puzzleData => {
@@ -104,12 +77,65 @@ async function createSidescrollers() {
         // Format: [{ tag: "cat", count: 12 }, ...]
         return sortedTags.map(([tag, count]) => ({ tag, count }));
     }
+
+    topTags = await getTopTags(saveData)
+    console.log(topTags);
+    // topTags = seededShuffle(topTags, saveData.id)
+
+    if (saveData.length > 0) {
+        // make the recent puzzles sidescroller appear first
+        const recentSidescroller = document.querySelector(".container .quickPuzzles .recent .sidescroll")
+        const recentPuzzles = await getRecentPuzzles()
+        setupLazyPuzzleLoader(recentSidescroller, recentPuzzles)
+    } else {
+        const recentSidescroller = document.querySelector(".container .quickPuzzles .recent")
+        recentSidescroller.remove(true)
+        alertPopup(
+            "Welcome to Jigsaw Jam!",
+            "This is your home screen. You have no saved puzzles. When you save some puzzles they will be shown here, along with new puzzles we think you might like.",
+            "Okay",
+            "Epic",
+            () => {console.log("yes")},
+            () => {console.log("no")}
+        )
+        
+        // recentSidescroller.innerHTML = ""
+    }
+    
+    // create the rest of the sidescrollers
+    topTags.forEach(async tag => {
+        let html = document.createElement("div")
+        html.classList.add("shelf")
+        html.classList.add(tag.tag)
+        html.innerHTML = `<div class="title">${capitalizeFirstLetter(tag.tag)} Puzzles</div>`
+
+        let sidescroll = document.createElement("div")
+        sidescroll.classList.add("sidescroll")
+        html.appendChild(sidescroll)
+        quickPuzzles.appendChild(html)
+
+        let puzzles = await getDBData()
+        // console.log(puzzles);
+
+        // Now filter the puzzles that include the specific tag
+        let puzzlesWithTag = puzzles.Puzzles.filter(puzzle => {
+            return JSON.parse(puzzle.Tags).includes(tag.tag)
+        })
+        // console.log(puzzlesWithTag);
+
+        // setupLazyPuzzleLoader reads .id, but puzzlesWithTag has .ID
+        puzzlesWithTag.map(async x => {
+            x.id = x.ID
+            return x
+        })
+        setupLazyPuzzleLoader(sidescroll, puzzlesWithTag)
+    })
 }
 
 function setupLazyPuzzleLoader(wrapperEl, puzzlesData) {
     const BUFFER_PX = 300; // load puzzles this many pixels before they enter view
     const totalPuzzles = puzzlesData.length;
-    const puzzleElements = [];
+    let puzzleElements = [];
 
     wrapperEl.innerHTML = '';
 
@@ -121,6 +147,12 @@ function setupLazyPuzzleLoader(wrapperEl, puzzlesData) {
         wrapperEl.appendChild(puzzle);
         puzzleElements.push(puzzle);
     }
+
+    // every this many seconds the order of the puzzles will be shuffled
+    const secondsBetweenShuffles = 300
+    puzzleElements = seededShuffle(puzzleElements, Math.floor(Date.now() / (1000 * secondsBetweenShuffles)))
+
+    console.log(puzzleElements);
 
     async function renderVisible() {
         const wrapperRect = wrapperEl.getBoundingClientRect();
