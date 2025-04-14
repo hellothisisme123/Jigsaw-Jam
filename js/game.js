@@ -6,13 +6,79 @@ const tableRows = 2;
 const puzzleMaxWidth = 0.8;
 const puzzleMaxHeight = 0.8;
 
+async function sizeChange(newValue, id) {
+    const puzzleDataUser = await getPuzzleDataUser(id)
+    const puzzleDataPuzzle = await getPuzzleDataPuzzle(id)
+    const select = document.querySelector(".container .sizePopup .select")
+    const oldValue = select.dataset.value
+    console.log(oldValue, newValue);
+    
+    // console.log(puzzleDataUser.completionData.length);
+    if (oldValue == newValue) {
+        select.classList.toggle("selected")
+    } else {
+        uploadNewPuzzleToDB()
+
+        // userDataChange(id, (newUserData, puzzleDataPuzzle) => {
+        //     return newUserData.filter(data => {
+        //         if (data.id == id) {
+        //             // console.log(document.querySelector(".focusPuzzlePopup .select"));
+        //             data.width = parseInt(JSON.parse(puzzleDataPuzzle.Sizes)[newValue].split("x")[0])
+        //             data.height = parseInt(JSON.parse(puzzleDataPuzzle.Sizes)[newValue].split("x")[1])
+        //         }
+        //         return data
+        //     })
+        // })
+        
+        select.classList.toggle("selected")
+    }
+}
+
+async function toggleSizeDropdown(id) {
+    const select = document.querySelector(".container .sizePopup .select")
+    select.classList.toggle("selected")
+    console.log(select);
+}
+
+async function uploadNewPuzzleToDB() {
+    let newUserData = JSON.parse((await getUserData()).SaveData)
+    if (!newUserData) newUserData = []
+    const puzzleData_Puzzles = await getPuzzleDataPuzzle(id)
+    const puzzleData_Users = await getPuzzleDataUser(id)
+
+    // adds new puzzle data
+    newUserData.push({
+        "id": id,
+        "width": parseInt(JSON.parse(puzzleData_Puzzles.Sizes)[document.querySelector(".alertPopup .select").dataset.value].split("x")[0]),
+        "height": parseInt(JSON.parse(puzzleData_Puzzles.Sizes)[document.querySelector(".alertPopup .select").dataset.value].split("x")[1]),
+        "saved": false,
+        "completed": false,
+        "timeAccessed": Date.now(),
+        "completionData": []
+    })
+    
+    // push to database
+    const response = fetch('https://192.168.240.9:3006/jigsawJam/updateRowByIDFilter', {
+        method: 'POST', // or 'PUT' if your API supports it
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            id: (await getUserData()).ID,
+            value: JSON.stringify(newUserData),
+            table: "Users",
+            column: "SaveData"
+        })
+    }); 
+}
+
 (async () => {
     try {
         // --- Log Puzzle Data ---
         let puzzleDataUser = await getPuzzleDataUser(id)
         let puzzleDataPuzzle = await getPuzzleDataPuzzle(id)
         if (puzzleDataUser == undefined) {
-            puzzleSize = await getSize()
+            puzzleSize = await getSizePopup()
             puzzleDataUser = {
                 "id": id,
                 "width": puzzleSize[0],
@@ -38,13 +104,13 @@ const puzzleMaxHeight = 0.8;
         console.log(puzzleData);
 
         // gets the size for the puzzle if the user doesn't have one saved already
-        async function getSize() {
+        async function getSizePopup() {
             return new Promise((resolve) => {
                 // Create and populate the alert popup
-                const alertPopup = document.createElement("div");
-                alertPopup.classList.add("alertPopup");
+                const sizePopup = document.createElement("div");
+                sizePopup.classList.add("sizePopup");
         
-                alertPopup.innerHTML = `
+                sizePopup.innerHTML = `
                     <div class="bgWrapper">
                         <div class="responsive">
                             <div class="title">You need to select a size</div>
@@ -53,9 +119,15 @@ const puzzleMaxHeight = 0.8;
                             </div>
                             <div class="horizontalWrapper">
                                 <div class="dropdown wrapper">
-                                    <select name="boardMode" id="boardMode">
-                                        ${getSizeOptions(puzzleDataUser, puzzleDataPuzzle)}
-                                    </select>
+                                    <div class="select" data-value="${getSelectedValue(puzzleDataUser, puzzleDataPuzzle)}" name="boardMode" id="boardMode">
+                                        ${getSelectedDropdownOption(puzzleDataUser, puzzleDataPuzzle)}
+                                        <div class="options">
+                                            ${getSizeOptions(puzzleDataUser, puzzleDataPuzzle)}
+                                        </div>
+                                    </div>
+                                    <div class="dropdownArrow">
+                                        <img src="./production/images/chevron-down-solid.svg" alt="down facing arrow">
+                                    </div>
                                 </div>
                                 <div class="buttonWrapper">
                                     <div class="yes">Done</div>
@@ -66,21 +138,23 @@ const puzzleMaxHeight = 0.8;
                 `;
         
                 const container = document.querySelector(".container");
-                container.appendChild(alertPopup);
+                container.appendChild(sizePopup);
         
-                const yesBtn = alertPopup.querySelector(".yes");
+                const yesBtn = sizePopup.querySelector(".yes");
         
                 // Event listener for the "Done" button
                 yesBtn.addEventListener("click", () => {
-                    const selectedSize = JSON.parse(puzzleDataPuzzle.Sizes)[alertPopup.querySelector("#boardMode").value].split("x");
-                    alertPopup.remove();
+                    const selectedSize = JSON.parse(puzzleDataPuzzle.Sizes)[sizePopup.querySelector("#boardMode").value].split("x");
+                    console.log(selectedSize);
+                    
+                    sizePopup.remove();
                     resolve(selectedSize); // Resolves the promise with the selected size
                 });
             });
         }
 
         // gets the options for sizes as html stored in a string
-        function getSizeOptions(userPuzz, puzz) {
+        function getSizeOptions(userPuzz, puzz) {    
             function getSelected(size) {
                 if (userPuzz && userPuzz.width == size[0] && userPuzz.height == size[1]) return "selected"
                 else return ""
@@ -90,8 +164,46 @@ const puzzleMaxHeight = 0.8;
             let sizes = JSON.parse(puzz.Sizes)
             sizes.forEach((size, i) => {
                 size = size.split("x")
-                res += `<option ${getSelected(size)} value="${i}">${parseInt(size[0])}x${parseInt(size[1])} - ${parseInt(size[0]) * parseInt(size[1])} Pieces</option>`
+                let text = `${parseInt(size[0])}x${parseInt(size[1])} - ${parseInt(size[0]) * parseInt(size[1])} Pieces`
+                res += `<div class="option ${getSelected(size)}" onclick="sizeChange(${i}, ${puzz.ID})">${text}</div>`
             })
+        
+            return res
+        }
+
+        function getSelectedDropdownOption(userPuzz, puzz) {
+            let sizes = JSON.parse(puzz.Sizes)
+            let res
+        
+            if (!userPuzz) {
+                let size = sizes[0].split("x")
+                res = `<div class="selectedOption" onclick="toggleSizeDropdown()">${parseInt(size[0])}x${parseInt(size[1])} - ${parseInt(size[0]) * parseInt(size[1])} Pieces</div>`
+            } else {
+                sizes.forEach((size, i) => {
+                    size = size.split("x")
+                    if (userPuzz && userPuzz.width == size[0] && userPuzz.height == size[1]) {
+                        res = `<div class="selectedOption" onclick="toggleSizeDropdown()">${parseInt(size[0])}x${parseInt(size[1])} - ${parseInt(size[0]) * parseInt(size[1])} Pieces</div>`
+                    }
+                })
+            }
+            return res
+        }
+
+        function getSelectedValue(userPuzz, puzz) {
+            let sizes = JSON.parse(puzz.Sizes)
+            let res
+        
+            if (!userPuzz) {
+                res = 0
+            } else {
+                sizes.forEach((size, i) => {
+                    size = size.split("x")
+            
+                    if (userPuzz && userPuzz.width == size[0] && userPuzz.height == size[1]) {
+                        res = i
+                    }
+                })
+            }
         
             return res
         }
@@ -105,6 +217,7 @@ const puzzleMaxHeight = 0.8;
         for (let i = 0; i < (puzzleData.width * puzzleData.height); i++) {
             let newCell = document.createElement('div')
             newCell.classList.add("cell")
+            newCell.dataset.index = i
             grid.appendChild(newCell)
         }
         document.querySelector(".container").style.setProperty("--gridRows", puzzleData.height)
@@ -122,80 +235,111 @@ const puzzleMaxHeight = 0.8;
         grid.style.width = `${gridBgImg.naturalWidth}px`;
         grid.style.height = `${gridBgImg.naturalHeight}px`;
 
-        // --- Fill Table With Filled Cell Slots For Each Puzzle Piece
+        // --- Fill Table With Cell Slots For Each Puzzle Piece
         function cutImageIntoCells(imageElement, rows, cols) {
             return new Promise((resolve, reject) => {
                 const imageWidth = imageElement.naturalWidth;
                 const imageHeight = imageElement.naturalHeight;
         
-                // Calculate the width and height of each cell
-                const cellWidth = Math.floor(imageWidth / cols);
-                const cellHeight = Math.floor(imageHeight / rows);
+                const idealCellWidth = imageWidth / cols;
+                const idealCellHeight = imageHeight / rows;
         
-                // Create a canvas element to draw the cut images
-                const canvas = document.createElement("canvas");
-                const ctx = canvas.getContext("2d");
+                const totalCells = rows * cols;
+                const imageCells = new Array(totalCells);
+                let completed = 0;
         
-                const imageCells = [];
-        
-                // Loop through rows and columns to cut the image into cells
                 for (let row = 0; row < rows; row++) {
                     for (let col = 0; col < cols; col++) {
-                        // Set the canvas size to match the cell
-                        canvas.width = cellWidth;
-                        canvas.height = cellHeight;
+                        const index = row * cols + col;
         
-                        // Draw the current image section (cell) on the canvas
-                        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas before drawing
+                        // Calculate exact crop position
+                        const sx = Math.round(col * idealCellWidth);
+                        const sy = Math.round(row * idealCellHeight);
+        
+                        // Determine width and height for this tile
+                        const ex = Math.round((col + 1) * idealCellWidth);
+                        const ey = Math.round((row + 1) * idealCellHeight);
+        
+                        const sw = ex - sx;
+                        const sh = ey - sy;
+        
+                        // Create canvas for this tile
+                        const canvas = document.createElement("canvas");
+                        canvas.width = sw;
+                        canvas.height = sh;
+        
+                        const ctx = canvas.getContext("2d", { alpha: true });
+                        ctx.imageSmoothingEnabled = false;
+        
+                        // Draw exact region to the canvas
                         ctx.drawImage(
-                            imageElement, // Image element
-                            col * cellWidth, // X position of the crop
-                            row * cellHeight, // Y position of the crop
-                            cellWidth, // Width of the crop
-                            cellHeight, // Height of the crop
-                            0, 0, cellWidth, cellHeight // Where to draw on the canvas
+                            imageElement,
+                            sx, sy, sw, sh,     // Source rect
+                            0, 0, sw, sh        // Destination rect
                         );
         
-                        // Get the data URL for the cut image
-                        const dataURL = canvas.toDataURL("image/png");
+                        // Convert canvas to Blob for better performance
+                        canvas.toBlob(blob => {
+                            if (blob) {
+                                const objectURL = URL.createObjectURL(blob);
+                                imageCells[index] = objectURL;
+                                completed++;
         
-                        // Push the image src data to the array
-                        imageCells.push(dataURL);
+                                if (completed === totalCells) {
+                                    resolve(imageCells);
+                                }
+                            } else {
+                                reject(new Error("Failed to convert canvas to Blob"));
+                            }
+                        }, "image/png");
                     }
                 }
-        
-                // Resolve the promise with the array of image src data
-                resolve(imageCells);
             });
         }
         
         cutImageIntoCells(gridBgImg, puzzleData.height, puzzleData.width).then((imageCells) => {
-            let i = 0
             console.log(puzzleData);
-            console.log()
+            let i = 0
+
+            imageCells = imageCells.map(((x, i) => {
+                return {
+                    "image": x,
+                    "i": i
+                }
+            }))
+
+            // for (let i = 0; i < imageCells.length; i++) {
+            //     imageCells[i] = {
+            //         "image": imageCells[i],
+            //         "i": i
+            //     }
+            // }
+
+            console.log(imageCells);
 
             seededShuffle(imageCells, puzzleData.id).forEach(cell => {
                 i++
                 let pieceSlot = document.createElement("div")
                 pieceSlot.classList.add("pieceSlot")
                 pieceSlot.dataset.index = i
+                pieceSlot.dataset.pieceIndex = cell.i
                 pieceSlot.innerHTML = `
-                    <div class="piece" data-index="${i}">
-                        <img src="${cell}">
+                    <div class="piece" data-index="${cell.i}">
+                        <img src="${cell.image}">
                     </div>
                 `
 
                 document.querySelector(".container .table").appendChild(pieceSlot)
             })
-            
-            // wait for puzzle background to load
-            // await new Promise(resolve => {
-            //     if (gridBgImg.complete) {
-            //         resolve();
-            //     } else {
-            //         gridBgImg.addEventListener('load', resolve);
-            //     }
-            // });
+
+            // moves saved pieces from table to grid 
+            console.log(puzzleDataUser);
+            puzzleDataUser.completionData.forEach(piece => {
+                let cell = document.querySelector(`.cell[data-index="${parseInt(piece.bi)}"]`)
+                let pieceEl = document.querySelector(`.piece[data-index="${parseInt(piece.ai)}"]`)
+                console.log(cell);
+                cell.appendChild(pieceEl)
+            })
 
             // --- Canvas Zoom and Pan Setup ---
             const wrapper = document.querySelector('.board');
@@ -239,7 +383,6 @@ const puzzleMaxHeight = 0.8;
                 updateTransform();
             }
             centerOnNode("grid");
-
     
             // --- Canvas Event Listeners ---
             wrapper.addEventListener('wheel', (e) => {
@@ -338,8 +481,8 @@ const puzzleMaxHeight = 0.8;
                     start = { x: e.clientX, y: e.clientY };
                     wrapper.style.cursor = 'grabbing';
                 } else {
-                    console.log(e);
-                    if (e.button == 1 || e.ctrlKey || e.altKey) {
+                    console.log(e.target.parentElement);
+                    if (e.button == 1 || e.ctrlKey || e.altKey || e.target.parentElement.dataset.index == e.target.parentElement.parentElement.dataset.index) {
                         isPanning = true;
                         start = { x: e.clientX, y: e.clientY };
                         wrapper.style.cursor = 'grabbing';
@@ -366,8 +509,15 @@ const puzzleMaxHeight = 0.8;
             let draggedPiece = null;
     
             function setupDragAndDrop() {
+                
+                // hide the piece on drag start
                 document.querySelectorAll('.piece').forEach(piece => {
                     piece.addEventListener('dragstart', (e) => {
+                        if (piece.parentElement.dataset.index == piece.dataset.index) {
+                            e.preventDefault()
+                            return
+                        }
+                        
                         draggedPiece = piece;
                         setTimeout(() => {
                             piece.style.display = 'none';
@@ -380,44 +530,89 @@ const puzzleMaxHeight = 0.8;
                     });
                 });
     
+                // drag to grid cell
                 document.querySelectorAll('.cell').forEach(cell => {
                     cell.addEventListener('dragover', (e) => e.preventDefault());
                     cell.addEventListener('drop', () => {
-                        if (draggedPiece && cell.children.length === 0) {
+                        if (
+                            draggedPiece &&
+                            cell.children.length === 0// &&
+                            //cell.dataset.index == draggedPiece.dataset.index
+                        ) {
                             cell.appendChild(draggedPiece);
+                            updatePuzzlePiece(id, draggedPiece.dataset.index, cell.dataset.index)
                         }
+                        
+                        renderPage(currentTablePage)
                     });
-                });
-    
-
+                });                
                 
-                
+                // drag to table
                 document.querySelector('.table').addEventListener('dragover', (e) => e.preventDefault());
                 document.querySelector('.table').addEventListener('drop', () => {
                     document.querySelectorAll('.pieceSlot').forEach(slot => {
                         if (
                             draggedPiece &&
-                            slot.getAttribute('data-index') === draggedPiece.getAttribute('data-index') &&
-                            !slot.querySelector('.piece')
+                            slot.dataset.pieceIndex === draggedPiece.getAttribute('data-index')
                         ) {
+                            console.log("drag to table");
                             slot.appendChild(draggedPiece);
-                        }    
-                    });
-
-                });
-
-                document.querySelectorAll('.pieceSlot').forEach(slot => {
-                    slot.addEventListener('dragover', (e) => e.preventDefault());
-                    slot.addEventListener('drop', () => {
-                        if (
-                            draggedPiece &&
-                            slot.getAttribute('data-index') === draggedPiece.getAttribute('data-index') &&
-                            !slot.querySelector('.piece')
-                        ) {
-                            slot.appendChild(draggedPiece);
+                            updatePuzzlePiece(id, draggedPiece.dataset.index, undefined)
                         }
                     });
+                    
+                    renderPage(currentTablePage)                        
                 });
+
+                async function updatePuzzlePiece(id, a, b) {
+                    // gettings puzzle data
+                    let newUserData = JSON.parse((await getUserData()).SaveData)
+                    if (!newUserData) newUserData = []
+                    const puzzleData_Users = await getPuzzleDataUser(id)
+                
+                    // apply changes
+                    newUserData.forEach(data => {
+                        if (data.id == id) {
+                            console.log(data);
+
+                            if (isNaN(b)) {
+                                data.completionData = data.completionData.filter(x => x.ai !== a)
+                            } else {
+                                let found = false;
+
+                                data.completionData.map(x => {
+                                    if (x.ai === a) {
+                                        x.bi = b;
+                                        found = true;
+                                    }
+                                });
+
+                                // If the element with ai = a does not exist, create it
+                                if (!found) {
+                                    data.completionData.push({ ai: a, bi: b });
+                                }
+                            }
+
+                            console.log(data);
+                        }
+                    });
+
+                    newUserData.map(x => x.timeAccessed = Date.now())
+                
+                    // push to database
+                    const response = fetch('https://192.168.240.9:3006/jigsawJam/updateRowByIDFilter', {
+                        method: 'POST', // or 'PUT' if your API supports it
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            id: (await getUserData()).ID,
+                            value: JSON.stringify(newUserData),
+                            table: "Users",
+                            column: "SaveData"
+                        })
+                    });
+                }
             }
     
             setupDragAndDrop();
@@ -430,12 +625,17 @@ const puzzleMaxHeight = 0.8;
             let currentTablePage = 0;
     
             function renderPage(page) {
-                const start = page * (tableRows * tableCols);
-                const end = start + (tableRows * tableCols);
+                let start = page * (tableRows * tableCols);
+                let end = start + (tableRows * tableCols);
     
                 pieceSlots.forEach(slot => {
                     if (parseInt(slot.dataset.index) > start && parseInt(slot.dataset.index) <= end) {
-                        slot.style.display = "flex"
+                        if (slot.childElementCount > 0) {
+                            slot.style.display = "flex"
+                        } else {
+                            slot.style.display = "none"
+                            end++
+                        }
                     } else {
                         slot.style.display = "none"
                     }

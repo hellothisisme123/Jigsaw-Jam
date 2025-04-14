@@ -17,7 +17,6 @@ async function getRecentPuzzles() {
 }
 
 // keep puzzling button
-console.log("red")
 async function setupMostRecentPuzzle() {
     const recentPuzzles = await getRecentPuzzles()
     const recentPuzzleImg = document.querySelector(".container .mostRecentPuzzle .puzzle img")
@@ -41,7 +40,6 @@ async function createSidescrollers() {
     const quickPuzzles = document.querySelector(".container .quickPuzzles")
     let saveData = await getUserData()
     saveData = JSON.parse(saveData.SaveData) 
-    console.log(saveData);
 
     async function getTopTags(saveData, topN = 5) {
         const tagCounts = {};
@@ -58,7 +56,6 @@ async function createSidescrollers() {
                 return {"tag": x, "count": i}
             })
         }
-        console.log(puzzleDataList);
     
         // Count tags from each puzzle
         puzzleDataList.forEach(puzzleData => {
@@ -79,7 +76,6 @@ async function createSidescrollers() {
     }
 
     topTags = await getTopTags(saveData)
-    console.log(topTags);
     // topTags = seededShuffle(topTags, saveData.id)
 
     if (saveData.length > 0) {
@@ -152,7 +148,7 @@ function setupLazyPuzzleLoader(wrapperEl, puzzlesData) {
     const secondsBetweenShuffles = 300
     puzzleElements = seededShuffle(puzzleElements, Math.floor(Date.now() / (1000 * secondsBetweenShuffles)))
 
-    console.log(puzzleElements);
+    // console.log(puzzleElements);
 
     async function renderVisible() {
         const wrapperRect = wrapperEl.getBoundingClientRect();

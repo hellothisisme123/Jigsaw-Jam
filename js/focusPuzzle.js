@@ -137,6 +137,37 @@ function unFocusPuzzle() {
     })
 }
 
+async function getFocusHeader(focusedPuzzleUser, focusedPuzzlePuzzle) {
+    function getTitle(focusedPuzzleUser, focusedPuzzlePuzzle, topOfWrapper) {
+        if (topOfWrapper && focusedPuzzleUser) {
+            return `<div class="title">${getPercentComplete(focusedPuzzleUser, focusedPuzzlePuzzle)}% Complete</div>`
+        } else return ""
+    }
+    
+    let html = `
+        ${getTitle(focusedPuzzleUser, focusedPuzzlePuzzle, true)}
+        <div class="buttonWrapper">
+            ${getTitle(focusedPuzzleUser, focusedPuzzlePuzzle, false)}
+            <div class="dropdown wrapper">
+                <div class="select" data-value="${getSelectedValue(focusedPuzzleUser, focusedPuzzlePuzzle)}" name="boardMode" id="boardMode">
+                    ${getSelectedDropdownOption(focusedPuzzleUser, focusedPuzzlePuzzle)}
+                    <div class="options">
+                        ${getSizeOptions(focusedPuzzleUser, focusedPuzzlePuzzle)}
+                    </div>
+                </div>
+                <div class="dropdownArrow">
+                    <img src="./production/images/chevron-down-solid.svg" alt="down facing arrow">
+                </div>
+            </div>
+            <div class="reset" onclick="resetPuzzle(${focusedPuzzlePuzzle.ID})">
+                Reset Puzzle
+            </div>
+        </div>
+    `
+
+    return html
+}
+
 async function focusPuzzle(id) {
     unFocusPuzzle()
     // console.log("red");
@@ -158,23 +189,7 @@ async function focusPuzzle(id) {
             <div class="exitButton" onclick="unFocusPuzzle()">
                 <img src="./production/images/xmark-solid.svg" alt="exit button">
             </div>
-            <div class="title">${getPercentComplete(focusedPuzzleUser, focusedPuzzlePuzzle)}% Complete</div>
-            <div class="buttonWrapper">
-                <div class="dropdown wrapper">
-                    <div class="select" data-value="${getSelectedValue(focusedPuzzleUser, focusedPuzzlePuzzle)}" name="boardMode" id="boardMode">
-                        ${getSelectedDropdownOption(focusedPuzzleUser, focusedPuzzlePuzzle)}
-                        <div class="options">
-                            ${getSizeOptions(focusedPuzzleUser, focusedPuzzlePuzzle)}
-                        </div>
-                    </div>
-                    <div class="dropdownArrow">
-                        <img src="./production/images/chevron-down-solid.svg" alt="down facing arrow">
-                    </div>
-                </div>
-                <div class="reset" onclick="resetPuzzle(${focusedPuzzlePuzzle.ID})">
-                    Reset Puzzle
-                </div>
-            </div>
+            ${getFocusHeader(focusedPuzzleUser, focusedPuzzlePuzzle)}
             <div class="puzzle">
                 <div class="bookmark" onclick="bookmarkBtn(${focusedPuzzlePuzzle.ID})">
                     <img src="./production/images/${getBookmark(focusedPuzzleUser, false)}" alt="${getBookmark(focusedPuzzleUser, true)}">
@@ -205,55 +220,6 @@ async function focusPuzzle(id) {
 function openPuzzle(id) {
     window.location = `./game.html?id=${id}`
 }
-
-// async function bookmarkBtn(id) {
-//     let newUserData = JSON.parse((await getUserData()).SaveData)
-//     if (!newUserData) newUserData = []
-//     console.log(newUserData);
-
-//     const puzzleData_Puzzles = await getPuzzleDataPuzzle(id)
-//     const puzzleData_Users = await getPuzzleDataUser(id)
-    
-//     if (puzzleData_Users == undefined) {
-//         newUserData.push({
-//             "id": id,
-//             "width": parseInt(JSON.parse(puzzleData_Puzzles.Sizes)[document.querySelector(".focusPuzzlePopup .select#BoardMode").value].split("x")[0]),
-//             "height": parseInt(JSON.parse(puzzleData_Puzzles.Sizes)[document.querySelector(".focusPuzzlePopup .select#BoardMode").value].split("x")[1]),
-//             "saved": true,
-//             "completed": false,
-//             "timeAccessed": Date.now(),
-//             "completionData": []
-//         })
-//     } else {
-//         newUserData = newUserData.filter(data => {
-//             if (data.id == id) {
-//                 data.saved = !data.saved
-//             }
-//             return data
-//         })
-//     }
-    
-//     // push to database
-//     // update row
-//     console.log(newUserData);
-//     const response = fetch('https://192.168.240.9:3006/jigsawJam/updateRowByIDFilter', {
-//         method: 'POST', // or 'PUT' if your API supports it
-//         headers: {
-//             'Content-Type': 'application/json'
-//         },
-//         body: JSON.stringify({
-//             id: (await getUserData()).ID,
-//             value: JSON.stringify(newUserData),
-//             table: "Users",
-//             column: "SaveData"
-//         })
-//     }); 
-//     (await response).json().then(() => {
-//         // unFocusPuzzle()
-//         focusPuzzle(id)
-//         reloadPuzzleThumbnails(id)
-//     })
-// }
 
 async function userDataChange(id, change) {
     // gettings puzzle data
@@ -305,13 +271,6 @@ async function userDataChange(id, change) {
             column: "SaveData"
         })
     }); 
-
-    // display changes visually
-    (await response).json().then(() => {
-        // unFocusPuzzle()
-        focusPuzzle(id)
-        reloadPuzzleThumbnails(id)
-    })
 }
 
 async function bookmarkBtn(id) {
@@ -326,48 +285,43 @@ async function bookmarkBtn(id) {
 }
 
 async function sizeChange(newValue, id) {
-    // event.preventDefault()
-    // console.log(document.querySelector(".focusPuzzlePopup .select#boardMode").value);
     const puzzleDataUser = await getPuzzleDataUser(id)
     const puzzleDataPuzzle = await getPuzzleDataPuzzle(id)
     const select = document.querySelector(".container .focusPuzzlePopup .select")
     const oldValue = select.dataset.value
     console.log(oldValue, newValue);
     
+    // console.log(puzzleDataUser.completionData.length);
     if (oldValue == newValue) {
         select.classList.toggle("selected")
     } else {
+        if (puzzleDataUser && puzzleDataUser.completionData.length < 1) {
+            yesFunc()
+            return
+        }
+        
+        function yesFunc() {
+            userDataChange(id, (newUserData, puzzleDataPuzzle) => {
+                return newUserData.filter(data => {
+                    if (data.id == id) {
+                        // console.log(document.querySelector(".focusPuzzlePopup .select"));
+                        data.width = parseInt(JSON.parse(puzzleDataPuzzle.Sizes)[newValue].split("x")[0])
+                        data.height = parseInt(JSON.parse(puzzleDataPuzzle.Sizes)[newValue].split("x")[1])
+                    }
+                    return data
+                })
+            })
+            
+            select.classList.toggle("selected")
+        }
+            
         alertPopup(
             "Are you Sure?",
             "You would like to change the size of this puzzle. You have progress saved on this puzzle. All progress on the current sizing will be permanently deleted. The process is non-reversible.",
             "Yes, Change Size",
             "No, Cancel",
             () => {
-                userDataChange(id, (newUserData, puzzleDataPuzzle) => {
-                    return newUserData.filter(data => {
-                        if (data.id == id) {
-                            // console.log(document.querySelector(".focusPuzzlePopup .select"));
-                            data.width = parseInt(JSON.parse(puzzleDataPuzzle.Sizes)[newValue].split("x")[0])
-                            data.height = parseInt(JSON.parse(puzzleDataPuzzle.Sizes)[newValue].split("x")[1])
-                        }
-                        return data
-                    })
-                })
-    
-                // select.dataset.value = newValue
-                // let sizes = JSON.parse(puzzleDataPuzzle.Sizes)
-                // let size = sizes[newValue].split("x")
-                // console.log(sizes, size, oldValue, newValue);
-                // let text = `${parseInt(size[0])}x${parseInt(size[1])} - ${parseInt(size[0]) * parseInt(size[1])} Pieces`
-                // select.querySelector(".selectedOption").innerHTML = text
-                // console.log(select.querySelector(".selectedOption"));
-
-                // sizes.forEach((size, i) => {
-                //     size = size.split("x")
-                //     if (size[0])
-                // })
-                
-                select.classList.toggle("selected")
+                yesFunc()
             },
             () => {
                 select.classList.toggle("selected")
