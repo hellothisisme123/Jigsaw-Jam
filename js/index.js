@@ -210,6 +210,85 @@ function setupLazyPuzzleLoader(wrapperEl, puzzlesData) {
     });
 }
 
+async function refreshLazyPuzzleWrapper(wrapperEl, newPuzzlesData) {
+    const existingElsMap = new Map();
+    const newIds = new Set(newPuzzlesData.map(p => p.id));
+
+    // Index existing elements by their data-id
+    for (const child of wrapperEl.children) {
+        if (child.dataset.id) {
+            existingElsMap.set(child.dataset.id, child);
+        }
+    }
+
+    const newElements = [];
+
+    for (let i = 0; i < newPuzzlesData.length; i++) {
+        const puzzleData = newPuzzlesData[i];
+        let el = existingElsMap.get(puzzleData.id);
+
+        const puzzleDataPuzzles = await getPuzzleDataPuzzle(puzzleData.id);
+        const puzzleDataUsers = await getPuzzleDataUser(puzzleData.id);
+
+        if (!el) {
+            // Create new element
+            el = document.createElement('div');
+            el.className = 'puzzle';
+            el.dataset.id = puzzleData.id;
+
+            el.onclick = () => focusPuzzle(puzzleData.id);
+            el.dataset.loaded = 'true'; // Since we're filling it now
+
+            el.innerHTML = `
+                <div class="star">
+                    <img src="./production/images/${getStar(puzzleDataUsers, false)}" alt="${getStar(puzzleDataUsers, true)}">
+                </div>
+                <div class="background">
+                    <img src="./production/images/puzzle-images/${puzzleDataPuzzles.Src}" alt="${puzzleDataPuzzles.Alt}">
+                </div>
+                <div class="bookmark">
+                    <img src="./production/images/${getBookmark(puzzleDataUsers, false)}" alt="${getBookmark(puzzleDataUsers, true)}">
+                </div>
+            `;
+        } else {
+            // Update only if visuals have changed
+            const starImg = el.querySelector('.star img');
+            const bookmarkImg = el.querySelector('.bookmark img');
+            const backgroundImg = el.querySelector('.background img');
+
+            const newStarSrc = `./production/images/${getStar(puzzleDataUsers, false)}`;
+            const newStarAlt = getStar(puzzleDataUsers, true);
+            const newBookmarkSrc = `./production/images/${getBookmark(puzzleDataUsers, false)}`;
+            const newBookmarkAlt = getBookmark(puzzleDataUsers, true);
+            const newBackgroundSrc = `./production/images/puzzle-images/${puzzleDataPuzzles.Src}`;
+            const newBackgroundAlt = puzzleDataPuzzles.Alt;
+
+            if (starImg?.src !== newStarSrc) starImg.src = newStarSrc;
+            if (starImg?.alt !== newStarAlt) starImg.alt = newStarAlt;
+
+            if (bookmarkImg?.src !== newBookmarkSrc) bookmarkImg.src = newBookmarkSrc;
+            if (bookmarkImg?.alt !== newBookmarkAlt) bookmarkImg.alt = newBookmarkAlt;
+
+            if (backgroundImg?.src !== newBackgroundSrc) backgroundImg.src = newBackgroundSrc;
+            if (backgroundImg?.alt !== newBackgroundAlt) backgroundImg.alt = newBackgroundAlt;
+        }
+
+        newElements.push(el);
+    }
+
+    // Remove any elements no longer in the new data
+    for (const [id, el] of existingElsMap.entries()) {
+        if (!newIds.has(id)) {
+            wrapperEl.removeChild(el);
+        }
+    }
+
+    // Append in correct order (will move if needed)
+    newElements.forEach(el => {
+        wrapperEl.appendChild(el);
+    });
+}
+
 // setTimeout(() => {
 //     focusPuzzle(24)
 // }, 5000);

@@ -137,37 +137,6 @@ function unFocusPuzzle() {
     })
 }
 
-async function getFocusHeader(focusedPuzzleUser, focusedPuzzlePuzzle) {
-    function getTitle(focusedPuzzleUser, focusedPuzzlePuzzle, topOfWrapper) {
-        if (topOfWrapper && focusedPuzzleUser) {
-            return `<div class="title">${getPercentComplete(focusedPuzzleUser, focusedPuzzlePuzzle)}% Complete</div>`
-        } else return ""
-    }
-    
-    let html = `
-        ${getTitle(focusedPuzzleUser, focusedPuzzlePuzzle, true)}
-        <div class="buttonWrapper">
-            ${getTitle(focusedPuzzleUser, focusedPuzzlePuzzle, false)}
-            <div class="dropdown wrapper">
-                <div class="select" data-value="${getSelectedValue(focusedPuzzleUser, focusedPuzzlePuzzle)}" name="boardMode" id="boardMode">
-                    ${getSelectedDropdownOption(focusedPuzzleUser, focusedPuzzlePuzzle)}
-                    <div class="options">
-                        ${getSizeOptions(focusedPuzzleUser, focusedPuzzlePuzzle)}
-                    </div>
-                </div>
-                <div class="dropdownArrow">
-                    <img src="./production/images/chevron-down-solid.svg" alt="down facing arrow">
-                </div>
-            </div>
-            <div class="reset" onclick="resetPuzzle(${focusedPuzzlePuzzle.ID})">
-                Reset Puzzle
-            </div>
-        </div>
-    `
-
-    return html
-}
-
 async function focusPuzzle(id) {
     unFocusPuzzle()
     // console.log("red");
@@ -189,7 +158,23 @@ async function focusPuzzle(id) {
             <div class="exitButton" onclick="unFocusPuzzle()">
                 <img src="./production/images/xmark-solid.svg" alt="exit button">
             </div>
-            ${getFocusHeader(focusedPuzzleUser, focusedPuzzlePuzzle)}
+            <div class="title">${getPercentComplete(focusedPuzzleUser, focusedPuzzlePuzzle)}% Complete</div>
+            <div class="buttonWrapper">
+                <div class="dropdown wrapper">
+                    <div class="select" data-value="${getSelectedValue(focusedPuzzleUser, focusedPuzzlePuzzle)}" name="boardMode" id="boardMode">
+                        ${getSelectedDropdownOption(focusedPuzzleUser, focusedPuzzlePuzzle)}
+                        <div class="options">
+                            ${getSizeOptions(focusedPuzzleUser, focusedPuzzlePuzzle)}
+                        </div>
+                    </div>
+                    <div class="dropdownArrow">
+                        <img src="./production/images/chevron-down-solid.svg" alt="down facing arrow">
+                    </div>
+                </div>
+                <div class="reset" onclick="resetPuzzle(${focusedPuzzlePuzzle.ID})">
+                    Delete Puzzle
+                </div>
+            </div>
             <div class="puzzle">
                 <div class="bookmark" onclick="bookmarkBtn(${focusedPuzzlePuzzle.ID})">
                     <img src="./production/images/${getBookmark(focusedPuzzleUser, false)}" alt="${getBookmark(focusedPuzzleUser, true)}">
@@ -199,9 +184,11 @@ async function focusPuzzle(id) {
                     <img src="./production/images/${getStar(focusedPuzzleUser, false)}" alt="${getStar(focusedPuzzleUser, true)}">
                 </div>
             </div>
-            <div class="tagWrapper">
+            <div class="tagsGrid">
                 <div class="label">Tags:</div>
-                ${getTags(focusedPuzzleUser, focusedPuzzlePuzzle, false)}
+                <div class="tagWrapper">
+                    ${getTags(focusedPuzzleUser, focusedPuzzlePuzzle, false)}
+                </div>
             </div>
             <div class="openPuzzleButton" onclick="openPuzzle(${focusedPuzzlePuzzle.ID})">
                 <div class="text">
@@ -226,24 +213,31 @@ async function userDataChange(id, change) {
     let newUserData = JSON.parse((await getUserData()).SaveData)
     if (!newUserData) newUserData = []
     const puzzleData_Puzzles = await getPuzzleDataPuzzle(id)
-    const puzzleData_Users = await getPuzzleDataUser(id)
+    let puzzleData_Users = await getPuzzleDataUser(id)
 
     // create puzzle data if none exists
     if (puzzleData_Users == undefined) {
-        newUserData.push({
+        let newPuzzleData = {
             "id": id,
-            "width": parseInt(JSON.parse(puzzleData_Puzzles.Sizes)[document.querySelector(".focusPuzzlePopup .select").dataset.value].split("x")[0]),
-            "height": parseInt(JSON.parse(puzzleData_Puzzles.Sizes)[document.querySelector(".focusPuzzlePopup .select").dataset.value].split("x")[1]),
+            "width": parseInt(JSON.parse(puzzleData_Puzzles.Sizes)[0].split("x")[0]),
+            "height": parseInt(JSON.parse(puzzleData_Puzzles.Sizes)[0].split("x")[1]),
             "saved": false,
             "completed": false,
             "timeAccessed": Date.now(),
             "completionData": []
-        })
+        }
+        newUserData.push(newPuzzleData)
+
+        puzzleData_Users = newPuzzleData
     }
 
     // apply changes
-    newUserData = change(newUserData, puzzleData_Puzzles)
-    newUserData.map(x => x.timeAccessed = Date.now())
+    newUserData = await change(newUserData)
+    newUserData.map(x => {
+        if (x.id == id) {
+            x.timeAccessed = Date.now()
+        }
+    })
 
     // remove puzzle save data if the save data is default
     let newPuzzleData = newUserData[newUserData.findIndex(data => data.id === id)]
@@ -259,7 +253,7 @@ async function userDataChange(id, change) {
     }
 
     // push to database
-    const response = fetch('https://192.168.240.9:3006/jigsawJam/updateRowByIDFilter', {
+    const response = await fetch('https://192.168.240.9:3006/jigsawJam/updateRowByIDFilter', {
         method: 'POST', // or 'PUT' if your API supports it
         headers: {
             'Content-Type': 'application/json'
@@ -271,16 +265,33 @@ async function userDataChange(id, change) {
             column: "SaveData"
         })
     }); 
+
+    return newUserData.filter(x => x.id == id)[0]
 }
 
 async function bookmarkBtn(id) {
-    userDataChange(id, (newUserData, puzzleDataPuzzles) => {
+    userDataChange(id, async (newUserData) => {
+        let puzzleDataUsers = await getPuzzleDataUser(id)
+        
         return newUserData.filter(data => {
             if (data.id == id) {
-                data.saved = !data.saved
+                if (puzzleDataUsers) {
+                    data.saved = !puzzleDataUsers.saved
+                } else data.saved = true
             }
             return data
         })
+    }).then(async newPuzzleData => {
+        const bookmarkImg = document.querySelector(".focusPuzzlePopup .bookmark img") 
+        bookmarkImg.src = `./production/images/${getBookmark(newPuzzleData, false)}`
+        bookmarkImg.alt = getBookmark(newPuzzleData, true)
+
+        if (window.location.toString().split("/")[window.location.toString().split("/").length-1] == "index.html") {
+            const recentSidescroller = document.querySelector(".container .quickPuzzles .recent .sidescroll")
+            const recentPuzzles = await getRecentPuzzles()
+            refreshLazyPuzzleWrapper(recentSidescroller, recentPuzzles)
+        }
+        // reloadPuzzleThumbnails(id)
     })
 }
 
@@ -300,19 +311,24 @@ async function sizeChange(newValue, id) {
             return
         }
         
-        function yesFunc() {
-            userDataChange(id, (newUserData, puzzleDataPuzzle) => {
+        async function yesFunc() {
+            userDataChange(id, async (newUserData) => {
+                let puzzleDataPuzzles = await getPuzzleDataPuzzle(id)
+                
                 return newUserData.filter(data => {
                     if (data.id == id) {
-                        // console.log(document.querySelector(".focusPuzzlePopup .select"));
-                        data.width = parseInt(JSON.parse(puzzleDataPuzzle.Sizes)[newValue].split("x")[0])
-                        data.height = parseInt(JSON.parse(puzzleDataPuzzle.Sizes)[newValue].split("x")[1])
+                        data.width = parseInt(JSON.parse(puzzleDataPuzzles.Sizes)[newValue].split("x")[0])
+                        data.height = parseInt(JSON.parse(puzzleDataPuzzles.Sizes)[newValue].split("x")[1])
                     }
                     return data
                 })
             })
             
             select.classList.toggle("selected")
+            let sizes = JSON.parse(puzzleDataPuzzle.Sizes)
+            let size = sizes[newValue].split("x")
+            select.querySelector('.selectedOption').innerHTML = `${parseInt(size[0])}x${parseInt(size[1])} - ${parseInt(size[0]) * parseInt(size[1])} Pieces`
+            select.dataset.value = newValue
         }
             
         alertPopup(
@@ -367,71 +383,44 @@ async function reloadPuzzleThumbnails(id) {
     })
 }
 
-function resetPuzzle(id) {
-    console.log("blue");
-    
-    alertPopup(
-        "Are you sure?", 
-        "You would like to reset this puzzle to it's default state. This will permanently remove all progress on the puzzle. The process is non-reversible.", 
-        "Yes, Reset Puzzle", 
-        "No, Cancel", 
-        async () => { // yesFunc
-            // gets all of the current users data
-            const thisUserData = await getUserData()
-            // console.log(thisUserData[0], data);
-
-            let newSaveDataValue = JSON.parse(thisUserData.SaveData)
-            // console.log(newSaveDataValue);
-            newSaveDataValue = newSaveDataValue.filter(puzzleSave => {
-                if (puzzleSave.id == id) return
-                else return puzzleSave 
-            })
-            // console.log(JSON.parse(newSaveDataValue));
-
-            // update row
-            const response = fetch('https://192.168.240.9:3006/jigsawJam/updateRowByIDFilter', {
-                method: 'POST', // or 'PUT' if your API supports it
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    id: thisUserData.ID,
-                    value: JSON.stringify(newSaveDataValue),
-                    table: "Users",
-                    column: "SaveData"
-                })
-            }); 
-            console.log((await response).json());
-    
-            // unFocusPuzzle()
-            focusPuzzle(id)
-            reloadPuzzleThumbnails(id)
-        },
-        () => { // noFunc
-
-        }
-    )
-}
-
 async function resetPuzzle(id) {
-    const select = document.querySelector(".container .focusPuzzlePopup .select")
-    alertPopup(
-        "Are you Sure?",
-        "You would like to reset this puzzle to it's default state. This will permanently remove all progress on the puzzle. The process is non-reversible.",
-        "Yes, Reset Puzzle",
-        "No, Cancel",
-        () => {
-            userDataChange(id, (newUserData) => {
-                return newUserData.filter(data => {
-                    if (data.id == id) return
-                    else return data
+    const puzzleData_Users = await getPuzzleDataUser(id)
+    if (puzzleData_Users) {
+        alertPopup(
+            "Are you Sure?",
+            "You would like to delete this puzzle. This will permanently remove all saved progress on the puzzle. The process is non-reversible.",
+            "Yes, Delete Puzzle",
+            "No, Cancel",
+            () => {
+                userDataChange(id, (newUserData) => {
+                    return newUserData.filter(data => {
+                        if (data.id != id) return data
+                    })
+                }).then(async newUserData => {
+                    unFocusPuzzle()
+                    // reloadPuzzleThumbnails(id)
+                    if (window.location.toString().split("/")[window.location.toString().split("/").length-1] == "index.html") {
+                        const recentSidescroller = document.querySelector(".container .quickPuzzles .recent .sidescroll")
+                        const recentPuzzles = await getRecentPuzzles()
+                        refreshLazyPuzzleWrapper(recentSidescroller, recentPuzzles)
+                    }
                 })
-            })
 
-            select.classList.toggle("selected")
-        },
-        () => {
-            select.classList.toggle("selected")
-        }
-    )
+            },
+            () => {
+            }
+        )
+    } else {
+        alertPopup(
+            "Error",
+            "You do not have saved data on this puzzle to delete. When you start this puzzle you will be able to delete your data with this button.",
+            "Okay",
+            "Epic",
+            () => {
+            },
+            () => {
+            }
+        )
+    }
+    
 }

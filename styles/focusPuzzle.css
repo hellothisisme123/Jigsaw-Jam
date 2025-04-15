@@ -100,6 +100,7 @@
             @media screen and (width <= 360px) {
                 flex-wrap: wrap;
                 justify-content: center;
+                height: fit-content;
 
                 .reset {
                     width: 100%;
@@ -234,12 +235,15 @@
             } */
         }
 
-        .tagWrapper {
-            display: flex;
+        .tagsGrid {
+            display: grid;
+            grid-template-columns: 1fr auto auto 1fr;
+            width: 100%;
+            align-items: center;
             gap: 8px;
-            justify-content: center;
 
             .label {
+                grid-column-start: 2;
                 height: 100%;
                 display: flex;
                 justify-content: center;
@@ -247,23 +251,36 @@
                 font-size: calc(2rem * var(--fontSizeMult));
             }
 
-            .tag {
-                border: 3px solid var(--darkBrown);
-                background-color: var(--lightBrown);
-                min-height: 32px;
-                border-radius: 100px;
-                padding: 2px 8px;
-                font-size: calc(1.125rem * var(--fontSizeMult));
-                cursor: pointer;
+            .tagWrapper {
                 display: flex;
+                width: 100%;
+                gap: 0 8px;
+                flex-wrap: wrap;
+                gap: 8px;
                 justify-content: center;
                 align-items: center;
-                text-align: center;
+                height: fit-content;
+                
+                .tag {
+                    border: 3px solid var(--darkBrown);
+                    background-color: var(--lightBrown);
+                    min-height: 32px;
+                    max-height: 48px;
+                    border-radius: 100px;
+                    padding: 2px 8px;
+                    font-size: calc(1.125rem * var(--fontSizeMult));
+                    cursor: pointer;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    text-align: center;
+                }
+    
+                .tag.active {
+                    background-color: var(--lightButtonSolid);
+                }
             }
 
-            .tag.active {
-                background-color: var(--lightButtonSolid);
-            }
         }
 
         .openPuzzleButton {
