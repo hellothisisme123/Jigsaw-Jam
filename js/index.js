@@ -23,10 +23,13 @@ async function setupMostRecentPuzzle() {
     const keepPuzzlingBtn = document.querySelector(".container .mostRecentPuzzle .keepPuzzlingBtn ")
     const completionPerc = document.querySelector(".container .mostRecentPuzzle .completionLevel .percentage")
     
+    console.log(recentPuzzles);
     if (recentPuzzles.length > 0) {
         let mostRecentPuzzle = await getPuzzleDataPuzzle(recentPuzzles[0].id)
-        keepPuzzlingBtn.href = `./game.html?id=${mostRecentPuzzle.ID}`
-        recentPuzzleImg.src = `./production/images/puzzle-images/${mostRecentPuzzle.Src}`
+        if (mostRecentPuzzle) {
+            keepPuzzlingBtn.href = `./game.html?id=${mostRecentPuzzle.ID}`
+            recentPuzzleImg.src = `./production/images/puzzle-images/${mostRecentPuzzle.Src}`
+        }
         completionPerc.innerHTML = `${Math.floor(recentPuzzles[0].completionData.length / (recentPuzzles[0].width * recentPuzzles[0].height))}%`
     } else {
         const recentPuzzleWrapper = document.querySelector(".container .mostRecentPuzzle")
