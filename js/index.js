@@ -140,6 +140,53 @@ function setupLazyPuzzleLoader(wrapperEl, puzzlesData) {
 
     wrapperEl.innerHTML = '';
 
+    let isDragging = false;
+    let hasDragged = false;
+    let startX = 0;
+    let scrollLeft = 0;
+    let dragThreshold = 5; // minimum pixels to consider it a drag
+
+    function onDragStart(e) {
+        isDragging = true;
+        hasDragged = false;
+        startX = (e.touches ? e.touches[0].pageX : e.pageX) - wrapperEl.offsetLeft;
+        scrollLeft = wrapperEl.scrollLeft;
+
+        wrapperEl.style.cursor = 'grabbing';
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    function onDragMove(e) {
+        if (!isDragging) return;
+
+        const x = (e.touches ? e.touches[0].pageX : e.pageX) - wrapperEl.offsetLeft;
+        const walk = x - startX;
+
+        if (Math.abs(walk) > dragThreshold) {
+            hasDragged = true;
+        }
+
+        wrapperEl.scrollLeft = scrollLeft - walk;
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    function onDragEnd() {
+        isDragging = false;
+        wrapperEl.style.cursor = 'grab';
+    }
+
+    // Mouse events
+    wrapperEl.addEventListener('mousedown', onDragStart);
+    wrapperEl.addEventListener('mousemove', onDragMove);
+    window.addEventListener('mouseup', onDragEnd);
+
+    // Touch events
+    wrapperEl.addEventListener('touchstart', onDragStart, { passive: false });
+    wrapperEl.addEventListener('touchmove', onDragMove, { passive: false });
+    window.addEventListener('touchend', onDragEnd);
+
     // Create placeholder puzzle divs in order
     for (let i = 0; i < totalPuzzles; i++) {
         const puzzle = document.createElement('div');
@@ -181,13 +228,23 @@ function setupLazyPuzzleLoader(wrapperEl, puzzlesData) {
                                 <img src="./production/images/${getStar(puzzleDataUsers, false)}" alt="${getStar(puzzleDataUsers, true)}">
                             </div>
                             <div class="background">
-                                <img src="./production/images/puzzle-images/${puzzleDataPuzzles.Src}" alt="${puzzleDataPuzzles.Alt}">
+                                <img src="./production/images/puzzle-images/${puzzleDataPuzzles.Src}" draggable="false" alt="${puzzleDataPuzzles.Alt}">
                             </div>
                             <div class="bookmark">
                                 <img src="./production/images/${getBookmark(puzzleDataUsers, false)}" alt="${getBookmark(puzzleDataUsers, true)}">
                             </div>
                         `;
-                        el.onclick = () => focusPuzzle(puzzlesData[i].id);
+                        function handlePuzzleClick(e) {
+                            if (hasDragged) {
+                                hasDragged = false;
+                                return;
+                            }
+                            focusPuzzle(puzzlesData[i].id);
+                        }
+                        // Attach both for cross-device support
+                        el.addEventListener("click", handlePuzzleClick);
+                        el.addEventListener("touchend", handlePuzzleClick, { passive: true });
+                        
                         el.dataset.id = puzzlesData[i].id
                         el.dataset.loaded = 'true';
                     } catch (err) {

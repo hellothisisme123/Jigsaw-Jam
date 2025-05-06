@@ -68,7 +68,8 @@ async function uploadNewPuzzleToDB() {
             value: JSON.stringify(newUserData),
             table: "Users",
             column: "SaveData"
-        })
+        }),
+        signal: signal
     }); 
 }
 
@@ -577,6 +578,7 @@ async function uploadNewPuzzleToDB() {
                     // apply changes
                     newUserData.forEach(data => {
                         if (data.id == id) {
+                            data.timeAccessed = Date.now()
                             console.log(data);
 
                             if (isNaN(b)) {
@@ -600,8 +602,6 @@ async function uploadNewPuzzleToDB() {
                             console.log(data);
                         }
                     });
-
-                    newUserData.map(x => x.timeAccessed = Date.now())
                 
                     // push to database
                     const response = fetch('https://192.168.240.9:3006/jigsawJam/updateRowByIDFilter', {
@@ -614,7 +614,8 @@ async function uploadNewPuzzleToDB() {
                             value: JSON.stringify(newUserData),
                             table: "Users",
                             column: "SaveData"
-                        })
+                        }),
+                        signal: signal
                     });
                 }
             }

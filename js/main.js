@@ -1,3 +1,11 @@
+// fix errors when refreshing the page during puzzle loading
+const controller = new AbortController();
+const signal = controller.signal;
+
+window.addEventListener("beforeunload", () => {
+    controller.abort(); // abort any ongoing fetches
+});
+
 // ----- nav -----
 function enableNavbar() {
     const homeBtn = document.querySelector("nav .home")
@@ -17,7 +25,13 @@ function enableNavbar() {
         window.location = "./settings.html"
     })
 }
-enableNavbar()
+
+const currentPage = window.location.href.split("/")[window.location.href.split("/").length-1]
+if (currentPage == "index.html") {
+    enableNavbar()
+} else {
+    enableNavbar()
+}
 
 // ----- force javascript -----
 const requireJavascript = document.querySelectorAll(".requireJavascript")
@@ -62,30 +76,30 @@ function alertPopup(title, text, yesText, noText, yesFunc, noFunc) {
     const noBtn = alertPopup.querySelector(".no");
 
     yesBtn.addEventListener("click", () => {
+        tabIndexList.forEach((item, i) => item.tabIndex = i+1)
         yesFunc();
         alertPopup.remove();
-        tabIndexList.forEach((item, i) => tabIndex = i+1)
     });
 
     yesBtn.addEventListener("keydown", (e) => {
         if (e.key == "Enter" || e.keyCode == 13) {
+            tabIndexList.forEach((item, i) => item.tabIndex = i+1)
             yesFunc();
             alertPopup.remove();
-            tabIndexList.forEach((item, i) => tabIndex = i+1)
         }
     });
 
     noBtn.addEventListener("click", () => {
+        tabIndexList.forEach((item, i) => item.tabIndex = i+1)
         noFunc();
         alertPopup.remove();
-        tabIndexList.forEach((item, i) => tabIndex = i+1)
     });
 
     noBtn.addEventListener("keydown", (e) => {
         if (e.key == "Enter" || e.keyCode == 13) {
+            tabIndexList.forEach((item, i) => item.tabIndex = i+1)
             noFunc();
             alertPopup.remove();
-            tabIndexList.forEach((item, i) => tabIndex = i+1)
         }
     });
 
@@ -104,13 +118,13 @@ function alertPopup(title, text, yesText, noText, yesFunc, noFunc) {
 // ----- get db data -----
 async function getDBData() {
     try {
-        const response = await fetch('https://192.168.240.9:3006/jigsawJam/data')
+        const response = await fetch('https://192.168.240.9:3006/jigsawJam/data', { signal })
         const data = await response.json()
         return data       
     } catch (error) {
-        const currentPage = window.location.href.split("/")[window.location.href.split("/").length-1]
-        if (currentPage != "failedToConnect.html") {
-            // window.location = "./failedToConnect.html"
+        console.error(error);
+        if (error instanceof TypeError && currentPage != "failedToConnect.html") {
+            window.location = "./failedToConnect.html"
         }
     }
 }
@@ -131,42 +145,54 @@ async function getDBData() {
 })()
 
 async function getUserData() {
-    const data = await getDBData()
-    
-    const thisUserData = data.Users.filter((user) => {
-        if (user.Username == localStorage.getItem('username') &&
-        user.Password == localStorage.getItem('password')) {
-            return user
-        }
-    })[0]
-    
-    return thisUserData
+    try {
+        const data = await getDBData()
+        
+        const thisUserData = data.Users.filter((user) => {
+            if (user.Username == localStorage.getItem('username') &&
+            user.Password == localStorage.getItem('password')) {
+                return user
+            }
+        })[0]
+        
+        return thisUserData
+    } catch (error) {
+        console.error(error)
+    }
 }
 
 async function getPuzzleDataUser(id) {
-    const thisUserData = await getUserData(id)
-
-    // gets the user table data for the clicked puzzle 
-    let focusedPuzzleUser = JSON.parse(thisUserData.SaveData).filter(filterData => {
-        if (filterData.id == id) {
-            return filterData
-        }
-    })[0]
-
-    return focusedPuzzleUser
+    try {
+        const thisUserData = await getUserData(id)
+    
+        // gets the user table data for the clicked puzzle 
+        let focusedPuzzleUser = JSON.parse(thisUserData.SaveData).filter(filterData => {
+            if (filterData.id == id) {
+                return filterData
+            }
+        })[0]
+    
+        return focusedPuzzleUser
+    } catch (error) {
+        console.error(error)
+    }
 }
 
 async function getPuzzleDataPuzzle(id) {
-    const data = await getDBData()
+    try {
+        const data = await getDBData()
+        
+        // gets the puzzle table data for the clicked puzzle 
+        let focusedPuzzlePuzzle = data.Puzzles.filter(filterData => {
+            if (filterData.ID == id) {
+                return filterData
+            }
+        })[0]
     
-    // gets the puzzle table data for the clicked puzzle 
-    let focusedPuzzlePuzzle = data.Puzzles.filter(filterData => {
-        if (filterData.ID == id) {
-            return filterData
-        }
-    })[0]
-
-    return focusedPuzzlePuzzle
+        return focusedPuzzlePuzzle
+    } catch (error) {
+        console.error(error)
+    }
 }
 
 // shuffles array accordingly to the seed

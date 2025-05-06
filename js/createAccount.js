@@ -106,7 +106,8 @@ async function createAccount(username, password) {
                 Password: password,
                 SaveData: JSON.stringify([]),
                 Settings: JSON.stringify({})
-            })  // Send the data object as JSON
+            }),  // Send the data object as JSON
+            signal: signal
         })
         .then(response => response.json())
         .then(data => {

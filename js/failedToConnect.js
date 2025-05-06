@@ -7,22 +7,29 @@ if (navigator.userAgent.includes("OPR")) { // opera
 }
 
 async function checkDBConnection() {
-    let dbConnCheck
+    let dbConnCheck = "Unknown"; // Default value
+
     try {
-        let red = await getDBData()
-        if (red.length != 0) {
-            console.log(red);
-            dbConnCheck = "-------Database Connected-------"
+        const response = await fetch('https://192.168.240.9:3006/jigsawJam/data')
+        const data = await response.json()
+        let red = await data
+        console.log(red);
+        if (red.length !== 0) {
+            dbConnCheck = "-------Database Connected-------";
+        } else {
+            dbConnCheck = "-------Database Empty, But Connected-------"; // Just in case the DB is empty
         }
     } catch (error) {
-        dbConnCheck = "---Database Connection Failed---"
+        dbConnCheck = "---Database Connection Failed---";
         console.error(error);
     } finally {
-        if (dbConnCheck == "-------Database Connected-------") {
-            window.location = "index.html"
+        console.log(dbConnCheck); // Logs connection status before redirection
+
+        if (dbConnCheck === "-------Database Connected-------") {
+            // Redirect only if the connection is successful
+            window.location = "index.html";
         }
-        console.log(dbConnCheck);
     }
 }
 
-// setInterval(checkDBConnection, 1500);
+setInterval(checkDBConnection, 1500);

@@ -94,15 +94,15 @@ async function asyncTask(puzzle, index) {
     let puzzleData_Users = await getPuzzleDataUser(puzzle.ID);
     let puzzleData_Puzzles = await getPuzzleDataPuzzle(puzzle.ID);
     const html = `
-        <div class="puzzle active ${getTags(puzzleData_Users, puzzleData_Puzzles, true)}" onclick="focusPuzzle(${puzzle.ID})" data-id="${puzzle.ID}">
+        <div class="puzzle active ${getTags(puzzleData_Users, puzzleData_Puzzles, true)}" draggable="false" onclick="focusPuzzle(${puzzle.ID})" data-id="${puzzle.ID}">
             <div class="star">
-                <img class="lazy" data-src="./production/images/${getStar(puzzleData_Users, false)}" alt="${getStar(puzzleData_Users, true)}">
+                <img class="lazy" draggable="false" data-src="./production/images/${getStar(puzzleData_Users, false)}" alt="${getStar(puzzleData_Users, true)}">
             </div>
             <div class="background">
-                <img class="lazy" data-src="./production/images/puzzle-images/${puzzle.Src}" alt="${puzzle.Alt}">
+                <img class="lazy" draggable="false" data-src="./production/images/puzzle-images/${puzzle.Src}" alt="${puzzle.Alt}">
             </div>
             <div class="bookmark">
-                <img class="lazy" data-src="./production/images/${getBookmark(puzzleData_Users, false)}" alt="${getBookmark(puzzleData_Users, true)}">
+                <img class="lazy" draggable="false" data-src="./production/images/${getBookmark(puzzleData_Users, false)}" alt="${getBookmark(puzzleData_Users, true)}">
             </div>
         </div>
     `;
@@ -160,58 +160,65 @@ async function fillSearchTabs() {
 }
 
 fillSearchTabs().then(() => {
-    const tabs = document.querySelectorAll('.container .navigation .navResponsive .settingsTabWrapper .tab'),
-    puzzlesWrapper = document.querySelector('.container .main .mainResponsive')
+    const tabs = document.querySelectorAll('.container .navigation .navResponsive .settingsTabWrapper .tab')
+    const puzzlesWrapper = document.querySelector('.container .main .mainResponsive')
+
+    function updateNoPuzzlesMessageVisibility() {
+        const visiblePuzzles = puzzlesWrapper.querySelectorAll(".active");
+
+        noPuzzlesWithCurrentFilters = document.querySelector('.container .main .mainResponsive .noPuzzlesWithCurrentFilters')
+        if (visiblePuzzles.length === 0) {
+            noPuzzlesWithCurrentFilters.classList.add("active")
+        } else {
+            noPuzzlesWithCurrentFilters.classList.remove("active")
+        }
+    }
 
     fillPuzzles().then(() => {
         tabs.forEach(tab => {
-            if (tab.innerHTML == "all") {
+            if (tab.innerHTML.trim() == "all") {
+                let allEnabled = true
                 tab.addEventListener("click", () => {
+                    allEnabled = !allEnabled
                     tabs.forEach(tab => {
-                        tab.click()
+                        if (allEnabled) {
+                            tab.classList.add("active")
+                        } else {
+                            tab.classList.remove("active")
+                        }
                     })
+                    const allPuzzles = document.querySelectorAll('.container .main .mainResponsive .puzzle')
+
+                    allPuzzles.forEach(puzzle => {
+                        if (allEnabled) {
+                            puzzle.classList.add("active")
+                        } else {
+                            puzzle.classList.remove("active")
+                        }
+                    })
+
+                    updateNoPuzzlesMessageVisibility()
                 })
+
                 return
             }
             
-            let active = true
-    
             tab.addEventListener("click", () => {
-                active = !active
-        
-                if (active) {
-                    tab.classList.add("active")
-    
-                    const puzzles = puzzlesWrapper.querySelectorAll(`.puzzle.${tab.innerHTML}`)
+                tab.classList.toggle("active")
+                
+                const puzzles = puzzlesWrapper.querySelectorAll(`.puzzle.${tab.innerHTML.trim()}`)
+                console.log(puzzles);
+                if (tab.classList.contains("active")) {
                     puzzles.forEach(element => {
                         element.classList.add("active")
                     });
                 } else {
-                    tab.classList.remove("active")
-                    
-                    const puzzles = puzzlesWrapper.querySelectorAll(`.puzzle.${tab.innerHTML}`)
                     puzzles.forEach(element => {
                         element.classList.remove("active")
                     });
                 }
     
-                const visiblePuzzles = [...puzzlesWrapper.children].filter(child => {
-                    if (child.classList.contains("puzzle")) return child
-                    else return
-                }).filter(child => 
-                    getComputedStyle(child).display !== "none"
-                );
-    
-    
-                console.log(document.querySelector('.container .main .mainResponsive .noPuzzlesWithCurrentFilters'));
-    
-    
-                noPuzzlesWithCurrentFilters = document.querySelector('.container .main .mainResponsive .noPuzzlesWithCurrentFilters')
-                if (visiblePuzzles.length === 0) {
-                    noPuzzlesWithCurrentFilters.classList.add("active")
-                } else {
-                    noPuzzlesWithCurrentFilters.classList.remove("active")
-                }
+                updateNoPuzzlesMessageVisibility()
             })
         })
     })

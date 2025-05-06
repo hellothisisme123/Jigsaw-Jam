@@ -23,8 +23,9 @@ function getStar(puzz, alt) {
         } else {
             if (puzz.completionData.length < 1) {
                 return "star-regular.svg"
+            } else {
+                return "star-half-stroke-regular.svg"
             }
-            return "star-half-stroke-regular.svg"
         }
     }
 }
@@ -49,7 +50,8 @@ function getBookmark(puzz, alt) {
 
 function getPercentComplete(userPuzz, puzz) {
     if (!userPuzz) return "0"
-    return Math.round(userPuzz.completionData.length / userPuzz.height * userPuzz.width)
+    console.log(userPuzz, puzz);
+    return Math.round(userPuzz.completionData.length / (userPuzz.height * userPuzz.width) * 100)
 }
 
 function getSizeOptions(userPuzz, puzz) {    
@@ -263,7 +265,8 @@ async function userDataChange(id, change) {
             value: JSON.stringify(newUserData),
             table: "Users",
             column: "SaveData"
-        })
+        }),
+        signal: signal
     }); 
 
     return newUserData.filter(x => x.id == id)[0]

@@ -149,7 +149,8 @@ function setupUploader(inputFile, tagWrapper, sizeWrapper, altText, button) {
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(data)  // Send the data object as JSON
+                    body: JSON.stringify(data),  // Send the data object as JSON
+                    signal: signal
                 })
                 .then(response => response.json())
                 .then(data => {
