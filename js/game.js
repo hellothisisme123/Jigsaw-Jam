@@ -110,6 +110,7 @@ async function uploadNewPuzzleToDB() {
                 // Create and populate the alert popup
                 const sizePopup = document.createElement("div");
                 sizePopup.classList.add("sizePopup");
+                console.log(sizePopup);
         
                 sizePopup.innerHTML = `
                     <div class="bgWrapper">
@@ -138,7 +139,7 @@ async function uploadNewPuzzleToDB() {
                     </div>
                 `;
         
-                const container = document.querySelector(".container");
+                const container = document.querySelector(".container .responsive");
                 container.appendChild(sizePopup);
         
                 const yesBtn = sizePopup.querySelector(".yes");
