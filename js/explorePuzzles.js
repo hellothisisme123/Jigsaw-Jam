@@ -50,13 +50,14 @@ function getBookmark(puzz, alt) {
 async function fillPuzzles() {
     try {
         const data = await getDBData();
-        console.log(data);
         const totalPuzzles = data.Puzzles.length;
         const batchSize = 10;
         const batches = [];
+        const secondsBetweenShuffles = 300;
+        const orderedPuzzles = seededShuffle(data.Puzzles, Math.floor(Date.now() / (1000 * secondsBetweenShuffles))) 
         
         for (let i = 0; i < totalPuzzles; i += batchSize) {
-            batches.push(data.Puzzles.slice(i, i + batchSize));
+            batches.push(orderedPuzzles.slice(i, i + batchSize));
         }
         
         for (const batch of batches) {
@@ -207,7 +208,6 @@ fillSearchTabs().then(() => {
                 tab.classList.toggle("active")
                 
                 const puzzles = puzzlesWrapper.querySelectorAll(`.puzzle.${tab.innerHTML.trim()}`)
-                console.log(puzzles);
                 if (tab.classList.contains("active")) {
                     puzzles.forEach(element => {
                         element.classList.add("active")

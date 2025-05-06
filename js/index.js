@@ -16,7 +16,7 @@ async function getRecentPuzzles() {
     return recentPuzzles
 }
 
-// keep puzzling button
+// fill puzzling button section
 async function setupMostRecentPuzzle() {
     const recentPuzzles = await getRecentPuzzles()
     const recentPuzzleImg = document.querySelector(".container .mostRecentPuzzle .puzzle img")
@@ -30,7 +30,8 @@ async function setupMostRecentPuzzle() {
             keepPuzzlingBtn.href = `./game.html?id=${mostRecentPuzzle.ID}`
             recentPuzzleImg.src = `./production/images/puzzle-images/${mostRecentPuzzle.Src}`
         }
-        completionPerc.innerHTML = `${Math.floor(recentPuzzles[0].completionData.length / (recentPuzzles[0].width * recentPuzzles[0].height))}%`
+        console.log(`${Math.round(recentPuzzles[0].completionData.length / (recentPuzzles[0].height * recentPuzzles[0].width) * 100)}%`);
+        completionPerc.innerHTML = `${Math.round(recentPuzzles[0].completionData.length / (recentPuzzles[0].height * recentPuzzles[0].width) * 100)}%`
     } else {
         const recentPuzzleWrapper = document.querySelector(".container .mostRecentPuzzle")
         recentPuzzleWrapper.innerHTML = ""
@@ -87,7 +88,7 @@ async function createSidescrollers() {
         // make the recent puzzles sidescroller appear first
         const recentSidescroller = document.querySelector(".container .quickPuzzles .recent .sidescroll")
         const recentPuzzles = await getRecentPuzzles()
-        setupLazyPuzzleLoader(recentSidescroller, recentPuzzles)
+        setupLazyPuzzleLoader(recentSidescroller, recentPuzzles, false)
     } else {
         const recentSidescroller = document.querySelector(".container .quickPuzzles .recent")
         recentSidescroller.remove(true)
@@ -129,11 +130,11 @@ async function createSidescrollers() {
             x.id = x.ID
             return x
         })
-        setupLazyPuzzleLoader(sidescroll, puzzlesWithTag)
+        setupLazyPuzzleLoader(sidescroll, puzzlesWithTag, true)
     })
 }
 
-function setupLazyPuzzleLoader(wrapperEl, puzzlesData) {
+function setupLazyPuzzleLoader(wrapperEl, puzzlesData, randomOrder) {
     const BUFFER_PX = 300; // load puzzles this many pixels before they enter view
     const totalPuzzles = puzzlesData.length;
     let puzzleElements = [];
@@ -152,7 +153,6 @@ function setupLazyPuzzleLoader(wrapperEl, puzzlesData) {
         startX = (e.touches ? e.touches[0].pageX : e.pageX) - wrapperEl.offsetLeft;
         scrollLeft = wrapperEl.scrollLeft;
 
-        wrapperEl.style.cursor = 'grabbing';
         e.preventDefault();
         e.stopPropagation();
     }
@@ -174,7 +174,6 @@ function setupLazyPuzzleLoader(wrapperEl, puzzlesData) {
 
     function onDragEnd() {
         isDragging = false;
-        wrapperEl.style.cursor = 'grab';
     }
 
     // Mouse events
@@ -198,7 +197,9 @@ function setupLazyPuzzleLoader(wrapperEl, puzzlesData) {
 
     // every this many seconds the order of the puzzles will be shuffled
     const secondsBetweenShuffles = 300
-    puzzleElements = seededShuffle(puzzleElements, Math.floor(Date.now() / (1000 * secondsBetweenShuffles)))
+    if (randomOrder) {
+        puzzleElements = seededShuffle(puzzleElements, Math.floor(Date.now() / (1000 * secondsBetweenShuffles)))
+    }
 
     // console.log(puzzleElements);
 

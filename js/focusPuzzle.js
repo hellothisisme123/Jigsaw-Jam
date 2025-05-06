@@ -50,7 +50,6 @@ function getBookmark(puzz, alt) {
 
 function getPercentComplete(userPuzz, puzz) {
     if (!userPuzz) return "0"
-    console.log(userPuzz, puzz);
     return Math.round(userPuzz.completionData.length / (userPuzz.height * userPuzz.width) * 100)
 }
 
@@ -245,8 +244,6 @@ async function userDataChange(id, change) {
     let newPuzzleData = newUserData[newUserData.findIndex(data => data.id === id)]
     if (
         newPuzzleData &&
-        newPuzzleData.width == parseInt(JSON.parse(puzzleData_Puzzles.Sizes)[0].split("x")[0]) &&
-        newPuzzleData.height == parseInt(JSON.parse(puzzleData_Puzzles.Sizes)[0].split("x")[1]) &&
         !newPuzzleData.completed &&
         !newPuzzleData.saved &&
         newPuzzleData.completionData.length < 1
@@ -272,6 +269,19 @@ async function userDataChange(id, change) {
     return newUserData.filter(x => x.id == id)[0]
 }
 
+// update every instance of a puzzle in the dom
+async function updateEachPuzzleInstance(id) {
+    const puzzleData = await getPuzzleDataUser(id)
+    console.log(id, puzzleData);
+    
+    document.querySelectorAll(`.puzzle[data-id="${id}"]`).forEach(puzzle => {
+        puzzle.querySelector(".star img").src = `./production/images/${getStar(puzzleData, false)}`
+        puzzle.querySelector(".star img").alt = getStar(puzzleData, true)
+        puzzle.querySelector(".bookmark img").src = `./production/images/${getBookmark(puzzleData, false)}`
+        puzzle.querySelector(".bookmark img").alt = getBookmark(puzzleData, true)
+    })
+}
+
 async function bookmarkBtn(id) {
     userDataChange(id, async (newUserData) => {
         let puzzleDataUsers = await getPuzzleDataUser(id)
@@ -285,16 +295,21 @@ async function bookmarkBtn(id) {
             return data
         })
     }).then(async newPuzzleData => {
+        // popup changes
         const bookmarkImg = document.querySelector(".focusPuzzlePopup .bookmark img") 
         bookmarkImg.src = `./production/images/${getBookmark(newPuzzleData, false)}`
         bookmarkImg.alt = getBookmark(newPuzzleData, true)
 
+        // update recent sidescroller on home page
         if (window.location.toString().split("/")[window.location.toString().split("/").length-1] == "index.html") {
             const recentSidescroller = document.querySelector(".container .quickPuzzles .recent .sidescroll")
             const recentPuzzles = await getRecentPuzzles()
+            setupMostRecentPuzzle()
             refreshLazyPuzzleWrapper(recentSidescroller, recentPuzzles)
         }
-        // reloadPuzzleThumbnails(id)
+
+        // updatePuzzleThumbnails
+        updateEachPuzzleInstance(id)
     })
 }
 
@@ -322,30 +337,51 @@ async function sizeChange(newValue, id) {
                     if (data.id == id) {
                         data.width = parseInt(JSON.parse(puzzleDataPuzzles.Sizes)[newValue].split("x")[0])
                         data.height = parseInt(JSON.parse(puzzleDataPuzzles.Sizes)[newValue].split("x")[1])
+                        data.completionData = []
                     }
                     return data
-                })
+                })                
+            }).then(async newPuzzleData => {
+                // popup changes
+                select.classList.toggle("selected")
+                let sizes = JSON.parse(puzzleDataPuzzle.Sizes)
+                let size = sizes[newValue].split("x")
+                select.querySelector('.selectedOption').innerHTML = `${parseInt(size[0])}x${parseInt(size[1])} - ${parseInt(size[0]) * parseInt(size[1])} Pieces`
+                document.querySelector('.container .focusPuzzlePopup .title').innerHTML = `0% Complete`
+                const starImg = document.querySelector('.container .focusPuzzlePopup .star img')
+                starImg.src = "./production/images/star-regular.svg"
+                starImg.alt = "hollow star icon"
+                select.dataset.value = newValue
+                
+                // update recent sidescroller on home page
+                if (window.location.toString().split("/")[window.location.toString().split("/").length-1] == "index.html") {
+                    const recentSidescroller = document.querySelector(".container .quickPuzzles .recent .sidescroll")
+                    const recentPuzzles = await getRecentPuzzles()
+                    setupMostRecentPuzzle()
+                    refreshLazyPuzzleWrapper(recentSidescroller, recentPuzzles)
+                }
+
+                // updatePuzzleThumbnails
+                updateEachPuzzleInstance(id)
             })
-            
-            select.classList.toggle("selected")
-            let sizes = JSON.parse(puzzleDataPuzzle.Sizes)
-            let size = sizes[newValue].split("x")
-            select.querySelector('.selectedOption').innerHTML = `${parseInt(size[0])}x${parseInt(size[1])} - ${parseInt(size[0]) * parseInt(size[1])} Pieces`
-            select.dataset.value = newValue
         }
             
-        alertPopup(
-            "Are you Sure?",
-            "You would like to change the size of this puzzle. You have progress saved on this puzzle. All progress on the current sizing will be permanently deleted. The process is non-reversible.",
-            "Yes, Change Size",
-            "No, Cancel",
-            () => {
-                yesFunc()
-            },
-            () => {
-                select.classList.toggle("selected")
-            }
-        )
+        if (puzzleDataUser && puzzleDataUser.completionData > 1) {
+            alertPopup(
+                "Are you Sure?",
+                "You would like to change the size of this puzzle. You have progress saved on this puzzle. All progress on the current sizing will be permanently deleted. The process is non-reversible.",
+                "Yes, Change Size",
+                "No, Cancel",
+                () => {
+                    yesFunc()
+                },
+                () => {
+                    select.classList.toggle("selected")
+                }
+            )
+        } else {
+            yesFunc()
+        }
     }
 }
 
@@ -400,15 +436,20 @@ async function resetPuzzle(id) {
                         if (data.id != id) return data
                     })
                 }).then(async newUserData => {
+                    // popup changes
                     unFocusPuzzle()
-                    // reloadPuzzleThumbnails(id)
+
+                    // update recent sidescroller on home page
                     if (window.location.toString().split("/")[window.location.toString().split("/").length-1] == "index.html") {
                         const recentSidescroller = document.querySelector(".container .quickPuzzles .recent .sidescroll")
                         const recentPuzzles = await getRecentPuzzles()
+                        setupMostRecentPuzzle()
                         refreshLazyPuzzleWrapper(recentSidescroller, recentPuzzles)
                     }
-                })
 
+                    // updatePuzzleThumbnails
+                    updateEachPuzzleInstance(id)
+                })
             },
             () => {
             }
