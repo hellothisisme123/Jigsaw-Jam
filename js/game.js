@@ -144,7 +144,7 @@ async function uploadNewPuzzleToDB() {
         
                 // Event listener for the "Done" button
                 yesBtn.addEventListener("click", () => {
-                    const selectedSize = JSON.parse(puzzleDataPuzzle.Sizes)[sizePopup.querySelector("#boardMode").value].split("x");
+                    const selectedSize = JSON.parse(puzzleDataPuzzle.Sizes)[sizePopup.querySelector("#boardMode").dataset.value].split("x");
                     console.log(selectedSize);
                     
                     sizePopup.remove();
@@ -513,9 +513,13 @@ async function uploadNewPuzzleToDB() {
                 // hide the piece on drag start
                 document.querySelectorAll('.piece').forEach(piece => {
                     piece.addEventListener('dragstart', (e) => {
-                        if (piece.parentElement.dataset.index == piece.dataset.index) {
-                            e.preventDefault()
-                            return
+                        console.log(piece.parentElement.dataset.index);
+                        console.log(piece.dataset.index);
+                        if (piece.parentElement.classList.contains("cell")) {
+                            if (piece.parentElement.dataset.index == piece.dataset.index) {
+                                e.preventDefault()
+                                return
+                            }
                         }
                         
                         draggedPiece = piece;
@@ -620,6 +624,7 @@ async function uploadNewPuzzleToDB() {
             // --- Pagination Logic ---
             const pieces = document.querySelectorAll('.piece');
             const pieceSlots = document.querySelectorAll('.pieceSlot');
+            console.log(pieceSlots);
             const leftBtn = document.querySelector('.leftBtn');
             const rightBtn = document.querySelector('.rightBtn');
             let currentTablePage = 0;
@@ -661,6 +666,10 @@ async function uploadNewPuzzleToDB() {
         
 
     } catch (error) {
+        if (id == null) {
+            window.location = "./index.html"
+        }
+        
         document.querySelector(".container .board").innerHTML += `
             <div class='title'>
                 <p>The puzzle with id ${id} does not exist. Please find another puzzle with a valid id.</p>

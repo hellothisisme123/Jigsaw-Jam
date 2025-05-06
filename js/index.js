@@ -54,6 +54,7 @@ async function createSidescrollers() {
             puzzleDataList = await Promise.all(
                 saveData.map(puzzle => getPuzzleDataPuzzle(puzzle.id))
             );
+            // puzzleDataList = puzzleDataList.filter(x => x != undefined)
         } else {
             return ["animals","art","food","nature","people"].map((x, i) => {
                 return {"tag": x, "count": i}
@@ -61,6 +62,7 @@ async function createSidescrollers() {
         }
     
         // Count tags from each puzzle
+        console.log(puzzleDataList);
         puzzleDataList.forEach(puzzleData => {
             const tags = JSON.parse(puzzleData.Tags); // assuming Tags is a JSON string array
     

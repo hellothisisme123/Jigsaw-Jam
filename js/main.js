@@ -33,6 +33,12 @@ requireJavascript.forEach(el => {
 // yesFunc | a function that runs when the user presses yes
 // noFunc  | a function that runs when the user presses no
 function alertPopup(title, text, yesText, noText, yesFunc, noFunc) {
+    // make all tabable elements not tabable
+    const tabIndexList = document.querySelectorAll('[tabindex]')
+    tabIndexList.forEach(item => {
+        item.tabIndex = -1
+    })
+    
     const alertPopup = document.createElement("div");
     alertPopup.classList.add("alertPopup");
 
@@ -42,8 +48,8 @@ function alertPopup(title, text, yesText, noText, yesFunc, noFunc) {
                 <div class="title">${title}</div>
                 <div class="text">${text}</div>
                 <div class="buttonWrapper">
-                    <div class="yes">${yesText}</div>
-                    <div class="no">${noText}</div>
+                    <div class="yes" tabindex="1">${yesText}</div>
+                    <div class="no" tabindex="2">${noText}</div>
                 </div>
             </div>
         </div>
@@ -58,11 +64,29 @@ function alertPopup(title, text, yesText, noText, yesFunc, noFunc) {
     yesBtn.addEventListener("click", () => {
         yesFunc();
         alertPopup.remove();
+        tabIndexList.forEach((item, i) => tabIndex = i+1)
+    });
+
+    yesBtn.addEventListener("keydown", (e) => {
+        if (e.key == "Enter" || e.keyCode == 13) {
+            yesFunc();
+            alertPopup.remove();
+            tabIndexList.forEach((item, i) => tabIndex = i+1)
+        }
     });
 
     noBtn.addEventListener("click", () => {
         noFunc();
         alertPopup.remove();
+        tabIndexList.forEach((item, i) => tabIndex = i+1)
+    });
+
+    noBtn.addEventListener("keydown", (e) => {
+        if (e.key == "Enter" || e.keyCode == 13) {
+            noFunc();
+            alertPopup.remove();
+            tabIndexList.forEach((item, i) => tabIndex = i+1)
+        }
     });
 
     console.log(alertPopup);

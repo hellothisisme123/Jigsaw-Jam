@@ -1,8 +1,25 @@
 // ----- buttons -----
 const dontHaveAnAccountBtn = document.querySelector(".signInPage .buttonWrapper .dontHaveAnAccount")
-const createAccountBtn = document.querySelector(".signInPage .buttonWrapper .signIn")
-dontHaveAnAccountBtn.addEventListener("click", () => {window.location = "./createAccount.html"})
-createAccountBtn.addEventListener("click", async () => {
+const signInBtn = document.querySelector(".signInPage .buttonWrapper .signIn")
+dontHaveAnAccountBtn.addEventListener("click", dontHaveAnAccountFunc)
+dontHaveAnAccountBtn.addEventListener("keydown", (e) => {
+    if (e.key == "Enter" || e.keyCode == 13) {
+        dontHaveAnAccountFunc()
+    }
+})
+
+function dontHaveAnAccountFunc() {
+    window.location = "./createAccount.html"
+}
+
+signInBtn.addEventListener("click", signInFunc)
+signInBtn.addEventListener("keydown", (e) => {
+    if (e.key == "Enter" || e.keyCode == 13) {
+        signInFunc()
+    }
+})
+
+async function signInFunc() {
     console.log("sign in")
     const username = document.querySelector(".usernameInput").value;
     const password = document.querySelector(".passwordInput").value;
@@ -28,5 +45,5 @@ createAccountBtn.addEventListener("click", async () => {
             }
         )
     }
-})
+}
 

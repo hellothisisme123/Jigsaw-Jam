@@ -2,7 +2,11 @@
 const alreadyHaveAnAccountBtn = document.querySelector(".createAccountPage .buttonWrapper .alreadyHaveAnAccount")
 const createAccountBtn = document.querySelector(".createAccountPage .buttonWrapper .createAccount")
 alreadyHaveAnAccountBtn.addEventListener("click", () => {window.location = "./signIn.html"})
-createAccountBtn.addEventListener("click", () => {
+alreadyHaveAnAccountBtn.addEventListener("keydown", (e) => {if (e.key == "Enter" || e.keyCode == 13) window.location = "./signIn.html"})
+createAccountBtn.addEventListener("click", createAccountFunc);
+createAccountBtn.addEventListener("keydown", (e) => {if (e.key == "Enter" || e.keyCode == 13) createAccountFunc()});
+
+function createAccountFunc() {
     // Get input values
     const username = document.querySelector(".usernameInput").value;
     const confirmUsername = document.querySelector(".confirmUsernameInput").value;
@@ -77,7 +81,7 @@ createAccountBtn.addEventListener("click", () => {
 
 
 
-});
+}
 
 // this function adds the account with proper credentials 
 async function createAccount(username, password) {
