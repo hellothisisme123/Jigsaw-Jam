@@ -312,7 +312,7 @@
         
         .table { 
             border-top: 12px solid var(--darkBrown);
-            background-image: url(../production/images/wood-panel-1.png);
+            background-image: url("../production/images/wood-panel-1.png");
             background-repeat: repeat;
             background-size: 480px;
             background-position: 0px 325px;

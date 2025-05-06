@@ -76,11 +76,11 @@ nav {
     }
 
     .home {
-        background-image: url(../production/images/home-button.svg);
+        background-image: url("../production/images/home-button.svg");
     }
 
     .settings {
-        background-image: url(../production/images/settings-button.svg);
+        background-image: url("../production/images/settings-button.svg");
     }
 
     .dividerBar {

@@ -214,7 +214,7 @@
                     translate: 0 -50%;
                     top: 50%;
                     aspect-ratio: 1;
-                    background-image: url(../production/images/chevron-down-solid.svg);
+                    background-image: url("../production/images/chevron-down-solid.svg");
                     background-repeat: no-repeat;
                     right: 67px; /* 64 + the border width */
                     @media screen and (width <= 420px) {
