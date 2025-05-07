@@ -269,7 +269,6 @@
                     border-radius: 100px;
                     padding: 2px 8px;
                     font-size: calc(1.125rem * var(--fontSizeMult));
-                    cursor: pointer;
                     display: flex;
                     justify-content: center;
                     align-items: center;

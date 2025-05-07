@@ -209,66 +209,6 @@ function openPuzzle(id) {
     window.location = `./game.html?id=${id}`
 }
 
-async function userDataChange(id, change) {
-    // gettings puzzle data
-    let newUserData = JSON.parse((await getUserData()).SaveData)
-    if (!newUserData) newUserData = []
-    const puzzleData_Puzzles = await getPuzzleDataPuzzle(id)
-    let puzzleData_Users = await getPuzzleDataUser(id)
-
-    // create puzzle data if none exists
-    if (puzzleData_Users == undefined) {
-        let newPuzzleData = {
-            "id": id,
-            "width": parseInt(JSON.parse(puzzleData_Puzzles.Sizes)[0].split("x")[0]),
-            "height": parseInt(JSON.parse(puzzleData_Puzzles.Sizes)[0].split("x")[1]),
-            "saved": false,
-            "completed": false,
-            "timeAccessed": Date.now(),
-            "completionData": []
-        }
-        newUserData.push(newPuzzleData)
-
-        puzzleData_Users = newPuzzleData
-    }
-
-    // apply changes
-    newUserData = await change(newUserData)
-    newUserData.map(x => {
-        if (x.id == id) {
-            x.timeAccessed = Date.now()
-        }
-    })
-
-    // remove puzzle save data if the save data is default
-    let newPuzzleData = newUserData[newUserData.findIndex(data => data.id === id)]
-    if (
-        newPuzzleData &&
-        !newPuzzleData.completed &&
-        !newPuzzleData.saved &&
-        newPuzzleData.completionData.length < 1
-    ) {
-        newUserData = newUserData.filter(x => x.id != id)
-    }
-
-    // push to database
-    const response = await fetch('https://192.168.240.9:3006/jigsawJam/updateRowByIDFilter', {
-        method: 'POST', // or 'PUT' if your API supports it
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            id: (await getUserData()).ID,
-            value: JSON.stringify(newUserData),
-            table: "Users",
-            column: "SaveData"
-        }),
-        signal: signal
-    }); 
-
-    return newUserData.filter(x => x.id == id)[0]
-}
-
 // update every instance of a puzzle in the dom
 async function updateEachPuzzleInstance(id) {
     const puzzleData = await getPuzzleDataUser(id)
@@ -294,7 +234,7 @@ async function bookmarkBtn(id) {
             }
             return data
         })
-    }).then(async newPuzzleData => {
+    }, false).then(async newPuzzleData => {
         // popup changes
         const bookmarkImg = document.querySelector(".focusPuzzlePopup .bookmark img") 
         bookmarkImg.src = `./production/images/${getBookmark(newPuzzleData, false)}`

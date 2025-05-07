@@ -23,35 +23,44 @@
             position: relative;
             cursor: grab;
     
-            .title {
-                font-size: calc(2rem * var(--fontSizeMult));
-                text-align: center;
-                padding: 1rem;
+            .headerWrapper {
                 display: flex;
-                height: 100%;
-                justify-content: center;
-                align-items: center;
-                flex-direction: column;
+                justify-content: space-between;
+                padding: 0 16px;
                 width: 100%;
-                gap: 8px;
-                z-index: 4;
-    
-                .horizontalWrapper {
+                height: 100px;
+                position: absolute;
+                user-select: none;
+                pointer-events: none;
+
+                .bookmark {
+                    height: 70%;
+
+                    img {
+                        display: block;
+                        height: 100%;
+                        width: 100%;
+                    }
+                }
+
+                .percentComplete {
+                    font-size: calc(2.25rem * var(--fontSizeMult));
+                    place-self: center;
                     display: flex;
-                    gap: 16px;
-                    justify-content: space-between;
-                    padding: 8px 32px;
-                    width: 100%;
-                    
-                    a {
-                        text-decoration: none;
-                        font-size: calc(1.5rem * var(--fontSizeMult));
-                        background-color: var(--lightButtonSolid);
-                        border: 3px solid var(--darkBrown);
-                        border-radius: 15px;
-                        padding: 4px 16px;
-                        width: fit-content;
-                        cursor: pointer;
+                    justify-content: center;
+                    text-align: center;
+                    height: 70px;
+                    font-weight: 700;
+                }
+                
+                .star {
+                    height: 70%;
+                    place-self: center;
+
+                    img {
+                        display: block;
+                        height: 100%;
+                        width: 100%;
                     }
                 }
             }
@@ -67,6 +76,7 @@
                 .grid {
                     /* box-shadow: inset 0 0 0 4px var(--darkBrown); */
                     border: 4px solid var(--darkBrown);
+                    user-select: none;
                     /* box-sizing: content-box; */
                     display: grid;
                     grid-template-columns: repeat(var(--gridCols), 1fr);
@@ -81,6 +91,7 @@
                         0 0 4px 0 rgb(47, 30, 20, 80%),
                         0 0 2px 0 rgb(47, 30, 20, 75%);
                     /* aspect-ratio: 1728 / 1428; */
+                    z-index: 100000;
         
                     .bg {
                         position: absolute;
@@ -118,6 +129,45 @@
     
                     .cell:has(div) {
                         box-shadow: none;
+                    }
+                }
+
+                .grid::before {
+                    display: block;
+                    content: "";
+                    background-color: var(--lightBrown);
+                    width: 100%;
+                    height: 100%;
+                    position: absolute;
+                    z-index: -1;
+                }
+
+                .controllerButtons {
+                    user-select: none;
+                    padding: 0;
+                    margin: 0;
+                    position: absolute;
+                    z-index: 100000;
+                    display: none;
+                    justify-content: space-between;
+                    gap: calc(var(--gap) * var(--fontSizeMult));
+                    
+                    --gap: 32px;
+                    --localFontSizeMult: 4;
+
+                    div {
+                        background-color: var(--lightButtonSolid);
+                        font-size: calc(1.25rem * var(--fontSizeMult) * var(--localFontSizeMult));
+                        border-radius: calc(12px * var(--localFontSizeMult));
+                        height: min-content;
+                        border: calc(3px * var(--localFontSizeMult)) solid var(--darkBrown);
+                        padding: calc(4px * var(--localFontSizeMult)) calc(8px * var(--localFontSizeMult));
+                        cursor: pointer;
+                        text-align: center;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        text-wrap: wrap;
                     }
                 }
             }

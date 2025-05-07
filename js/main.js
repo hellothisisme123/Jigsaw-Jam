@@ -195,6 +195,66 @@ async function getPuzzleDataPuzzle(id) {
     }
 }
 
+async function userDataChange(id, change, setTime=true) {
+    // gettings puzzle data
+    let newUserData = JSON.parse((await getUserData()).SaveData)
+    if (!newUserData) newUserData = []
+    const puzzleData_Puzzles = await getPuzzleDataPuzzle(id)
+    let puzzleData_Users = await getPuzzleDataUser(id)
+
+    // create puzzle data if none exists
+    if (puzzleData_Users == undefined) {
+        let newPuzzleData = {
+            "id": id,
+            "width": parseInt(JSON.parse(puzzleData_Puzzles.Sizes)[0].split("x")[0]),
+            "height": parseInt(JSON.parse(puzzleData_Puzzles.Sizes)[0].split("x")[1]),
+            "saved": false,
+            "completed": false,
+            "timeAccessed": Date.now(),
+            "completionData": []
+        }
+        newUserData.push(newPuzzleData)
+
+        puzzleData_Users = newPuzzleData
+    }
+
+    // apply changes
+    newUserData = await change(newUserData)
+    newUserData.map(x => {
+        if (x.id == id && setTime) {
+            x.timeAccessed = Date.now()
+        }
+    })
+
+    // remove puzzle save data if the save data is default
+    let newPuzzleData = newUserData[newUserData.findIndex(data => data.id === id)]
+    if (
+        newPuzzleData &&
+        !newPuzzleData.completed &&
+        !newPuzzleData.saved &&
+        newPuzzleData.completionData.length < 1
+    ) {
+        newUserData = newUserData.filter(x => x.id != id)
+    }
+
+    // push to database
+    const response = await fetch('https://192.168.240.9:3006/jigsawJam/updateRowByIDFilter', {
+        method: 'POST', // or 'PUT' if your API supports it
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            id: (await getUserData()).ID,
+            value: JSON.stringify(newUserData),
+            table: "Users",
+            column: "SaveData"
+        }),
+        signal: signal
+    }); 
+
+    return newUserData.filter(x => x.id == id)[0]
+}
+
 // shuffles array accordingly to the seed
 function seededShuffle(array, seed) {
     const result = array.slice(); // make a copy

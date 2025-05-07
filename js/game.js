@@ -1,56 +1,138 @@
+// --- Global Functions ---
+function getStar(puzz, alt) {
+    // returns the value accordingly
+    if (alt) {
+        if (!puzz) {
+            return "hollow star icon"
+        }
+        
+        if (puzz.completed) {
+            return "solid star icon"
+        } else {
+            if (puzz.completionData.length < 1) {
+                return "hollow star icon"
+            }
+            return "half solid star icon"
+        }
+    } else {
+        if (!puzz) {
+            return "star-regular.svg"
+        }
+
+        if (puzz.completed) {
+            return "star-solid.svg"
+        } else {
+            if (puzz.completionData.length < 1) {
+                return "star-regular.svg"
+            } else {
+                return "star-half-stroke-regular.svg"
+            }
+        }
+    }
+}
+
+function getBookmark(puzz, alt) {
+    // console.log(puzz);
+    // returns the value accordingly
+    if (alt) {
+        if (puzz && puzz.saved) {
+            return "solid bookmark icon"
+        } else {
+            return "hollow bookmark icon"
+        }
+    } else {
+        if (puzz && puzz.saved) {
+            return "bookmark-solid.svg"
+        } else {
+            return "bookmark-hollow.svg"
+        }
+    }
+}
+
 // --- Global Variables ---
 const urlParams = new URLSearchParams(window.location.search);
 const id = urlParams.get('id');
 const tableCols = 4;
 const tableRows = 2;
-const puzzleMaxWidth = 0.8;
-const puzzleMaxHeight = 0.8;
+const puzzleMaxWidth = 0.75;
+const puzzleMaxHeight = 0.75;
+
+let animatingIncorrectPieces = false
+
+// temporary for debugging
+async function removeFinalPiece(...pieces) {
+    userDataChange(id, async (newUserData) => {
+        return newUserData.filter(data => {
+            if (data.id == id) {
+                console.log("red");
+                pieces.forEach(pieceI => {
+                    if (pieceI) {
+                        data.completionData = data.completionData.filter(x => {
+                            if (x.ai != pieceI) return x;
+                        });
+                    }
+                });
+            }
+            return data;
+        });
+    }).then(async newPuzzleData => {
+        window.location.reload();
+    });
+}
+
+// remove later
+document.querySelector("body nav .title").onclick = () => {
+    removeFinalPiece(10)
+}
+
+// remove later
+document.querySelector("body nav .dividerBar").onclick = () => {
+    removeFinalPiece(10, 11)
+}
 
 async function sizeChange(newValue, id) {
     const puzzleDataUser = await getPuzzleDataUser(id)
     const puzzleDataPuzzle = await getPuzzleDataPuzzle(id)
     const select = document.querySelector(".container .sizePopup .select")
     const oldValue = select.dataset.value
-    console.log(oldValue, newValue);
     
-    // console.log(puzzleDataUser.completionData.length);
-    if (oldValue == newValue) {
-        select.classList.toggle("selected")
-    } else {
-        uploadNewPuzzleToDB()
+    select.dataset.value = newValue
+    let sizes = JSON.parse(puzzleDataPuzzle.Sizes)
+    let size = sizes[newValue].split("x")
+    console.log(`set size to [${size[0]}x${size[1]}]`);
+    select.querySelector('.selectedOption').innerHTML = `${parseInt(size[0])}x${parseInt(size[1])} - ${parseInt(size[0]) * parseInt(size[1])} Pieces`
+    select.classList.toggle("selected")
 
-        // userDataChange(id, (newUserData, puzzleDataPuzzle) => {
-        //     return newUserData.filter(data => {
-        //         if (data.id == id) {
-        //             // console.log(document.querySelector(".focusPuzzlePopup .select"));
-        //             data.width = parseInt(JSON.parse(puzzleDataPuzzle.Sizes)[newValue].split("x")[0])
-        //             data.height = parseInt(JSON.parse(puzzleDataPuzzle.Sizes)[newValue].split("x")[1])
-        //         }
-        //         return data
-        //     })
-        // })
-        
-        select.classList.toggle("selected")
+    if (puzzleDataUser) {
+        userDataChange(id, async (newUserData) => {
+            let puzzleDataUsers = await getPuzzleDataUser(id)
+            
+            return newUserData.filter(data => {
+                if (data.id == id) {
+                    if (puzzleDataUsers) {
+                        data.width = parseInt(size[0])
+                        data.height = parseInt(size[1])
+                    }
+                }
+                return data
+            })
+        }).then(async newPuzzleData => {
+            console.log(newPuzzleData);
+        })
     }
 }
 
-async function toggleSizeDropdown(id) {
-    const select = document.querySelector(".container .sizePopup .select")
-    select.classList.toggle("selected")
-    console.log(select);
-}
 
-async function uploadNewPuzzleToDB() {
+
+async function uploadNewPuzzleToDB(size) {
     let newUserData = JSON.parse((await getUserData()).SaveData)
     if (!newUserData) newUserData = []
-    const puzzleData_Puzzles = await getPuzzleDataPuzzle(id)
-    const puzzleData_Users = await getPuzzleDataUser(id)
 
     // adds new puzzle data
     newUserData.push({
-        "id": id,
-        "width": parseInt(JSON.parse(puzzleData_Puzzles.Sizes)[document.querySelector(".alertPopup .select").dataset.value].split("x")[0]),
-        "height": parseInt(JSON.parse(puzzleData_Puzzles.Sizes)[document.querySelector(".alertPopup .select").dataset.value].split("x")[1]),
+        "id": parseInt(id),
+        "width": parseInt(size[0]),
+        "height": parseInt(size[1]),
         "saved": false,
         "completed": false,
         "timeAccessed": Date.now(),
@@ -73,12 +155,18 @@ async function uploadNewPuzzleToDB() {
     }); 
 }
 
+async function toggleSizeDropdown() {
+    const select = document.querySelector(".container .sizePopup .select")
+    select.classList.toggle("selected")
+    console.log(select);
+}
+
 (async () => {
     try {
         // --- Log Puzzle Data ---
         let puzzleDataUser = await getPuzzleDataUser(id)
         let puzzleDataPuzzle = await getPuzzleDataPuzzle(id)
-        if (puzzleDataUser == undefined) {
+        if (puzzleDataUser == undefined || puzzleDataUser && puzzleDataUser.completionData.length < 1) {
             puzzleSize = await getSizePopup()
             puzzleDataUser = {
                 "id": id,
@@ -89,7 +177,7 @@ async function uploadNewPuzzleToDB() {
                 "completionData": []
             }
         }
-
+        
         const puzzleData = {
             completed: puzzleDataUser.completed,
             completionData: puzzleDataUser.completionData,
@@ -106,7 +194,63 @@ async function uploadNewPuzzleToDB() {
 
         // gets the size for the puzzle if the user doesn't have one saved already
         async function getSizePopup() {
+            // gets the options for sizes as html stored in a string
+            function getSizeOptions(userPuzz, puzz) {    
+                function getSelected(size) {
+                    if (userPuzz && userPuzz.width == size[0] && userPuzz.height == size[1]) return "selected"
+                    else return ""
+                }
+                
+                let res = ""
+                let sizes = JSON.parse(puzz.Sizes)
+                sizes.forEach((size, i) => {
+                    size = size.split("x")
+                    let text = `${parseInt(size[0])}x${parseInt(size[1])} - ${parseInt(size[0]) * parseInt(size[1])} Pieces`
+                    res += `<div class="option ${getSelected(size)}" onclick="sizeChange(${i}, ${puzz.ID})">${text}</div>`
+                })
+            
+                return res
+            }
+
+            function getSelectedDropdownOption(userPuzz, puzz) {
+                let sizes = JSON.parse(puzz.Sizes)
+                let res
+            
+                if (!userPuzz) {
+                    let size = sizes[0].split("x")
+                    res = `<div class="selectedOption" onclick="toggleSizeDropdown()">${parseInt(size[0])}x${parseInt(size[1])} - ${parseInt(size[0]) * parseInt(size[1])} Pieces</div>`
+                } else {
+                    sizes.forEach((size, i) => {
+                        size = size.split("x")
+                        if (userPuzz && userPuzz.width == size[0] && userPuzz.height == size[1]) {
+                            res = `<div class="selectedOption" onclick="toggleSizeDropdown()">${parseInt(size[0])}x${parseInt(size[1])} - ${parseInt(size[0]) * parseInt(size[1])} Pieces</div>`
+                        }
+                    })
+                }
+                return res
+            }
+
+            function getSelectedValue(userPuzz, puzz) {
+                let sizes = JSON.parse(puzz.Sizes)
+                let res
+            
+                if (!userPuzz) {
+                    res = 0
+                } else {
+                    sizes.forEach((size, i) => {
+                        size = size.split("x")
+                
+                        if (userPuzz && userPuzz.width == size[0] && userPuzz.height == size[1]) {
+                            res = i
+                        }
+                    })
+                }
+            
+                return res
+            }
+
             return new Promise((resolve) => {
+                console.log("red")
                 // Create and populate the alert popup
                 const sizePopup = document.createElement("div");
                 sizePopup.classList.add("sizePopup");
@@ -147,7 +291,12 @@ async function uploadNewPuzzleToDB() {
                 // Event listener for the "Done" button
                 yesBtn.addEventListener("click", () => {
                     const selectedSize = JSON.parse(puzzleDataPuzzle.Sizes)[sizePopup.querySelector("#boardMode").dataset.value].split("x");
-                    console.log(selectedSize);
+
+                    if (puzzleDataUser) {
+
+                    } else {
+                        // uploadNewPuzzleToDB(selectedSize)
+                    }
                     
                     sizePopup.remove();
                     resolve(selectedSize); // Resolves the promise with the selected size
@@ -155,60 +304,7 @@ async function uploadNewPuzzleToDB() {
             });
         }
 
-        // gets the options for sizes as html stored in a string
-        function getSizeOptions(userPuzz, puzz) {    
-            function getSelected(size) {
-                if (userPuzz && userPuzz.width == size[0] && userPuzz.height == size[1]) return "selected"
-                else return ""
-            }
-            
-            let res = ""
-            let sizes = JSON.parse(puzz.Sizes)
-            sizes.forEach((size, i) => {
-                size = size.split("x")
-                let text = `${parseInt(size[0])}x${parseInt(size[1])} - ${parseInt(size[0]) * parseInt(size[1])} Pieces`
-                res += `<div class="option ${getSelected(size)}" onclick="sizeChange(${i}, ${puzz.ID})">${text}</div>`
-            })
         
-            return res
-        }
-
-        function getSelectedDropdownOption(userPuzz, puzz) {
-            let sizes = JSON.parse(puzz.Sizes)
-            let res
-        
-            if (!userPuzz) {
-                let size = sizes[0].split("x")
-                res = `<div class="selectedOption" onclick="toggleSizeDropdown()">${parseInt(size[0])}x${parseInt(size[1])} - ${parseInt(size[0]) * parseInt(size[1])} Pieces</div>`
-            } else {
-                sizes.forEach((size, i) => {
-                    size = size.split("x")
-                    if (userPuzz && userPuzz.width == size[0] && userPuzz.height == size[1]) {
-                        res = `<div class="selectedOption" onclick="toggleSizeDropdown()">${parseInt(size[0])}x${parseInt(size[1])} - ${parseInt(size[0]) * parseInt(size[1])} Pieces</div>`
-                    }
-                })
-            }
-            return res
-        }
-
-        function getSelectedValue(userPuzz, puzz) {
-            let sizes = JSON.parse(puzz.Sizes)
-            let res
-        
-            if (!userPuzz) {
-                res = 0
-            } else {
-                sizes.forEach((size, i) => {
-                    size = size.split("x")
-            
-                    if (userPuzz && userPuzz.width == size[0] && userPuzz.height == size[1]) {
-                        res = i
-                    }
-                })
-            }
-        
-            return res
-        }
 
         // --- Set Grid Size to Match Background Image ---
         const grid = document.querySelector('.container .board .grid');
@@ -234,6 +330,7 @@ async function uploadNewPuzzleToDB() {
             }
         });
 
+        // set grid to size
         grid.style.width = `${gridBgImg.naturalWidth}px`;
         grid.style.height = `${gridBgImg.naturalHeight}px`;
 
@@ -300,9 +397,22 @@ async function uploadNewPuzzleToDB() {
         }
         
         cutImageIntoCells(gridBgImg, puzzleData.height, puzzleData.width).then((imageCells) => {
+            // set percent
+            document.querySelector(".headerWrapper .percentComplete").innerHTML = `${Math.round(puzzleData.completionData.length / (puzzleData.height * puzzleData.width / 100))}% Complete`
+            
+            // set bookmark
+            const bookmark = document.querySelector(".headerWrapper .bookmark img")
+            bookmark.src = `./production/images/${getBookmark(puzzleData, false)}`
+            bookmark.alt = getBookmark(puzzleData, true)
+            
+            // set star
+            const star = document.querySelector(".headerWrapper .star img")
+            star.src = `./production/images/${getStar(puzzleData, false)}`
+            star.alt = getStar(puzzleData, true)
+            
             console.log(puzzleData);
+            
             let i = 0
-
             imageCells = imageCells.map(((x, i) => {
                 return {
                     "image": x,
@@ -339,7 +449,6 @@ async function uploadNewPuzzleToDB() {
             puzzleDataUser.completionData.forEach(piece => {
                 let cell = document.querySelector(`.cell[data-index="${parseInt(piece.bi)}"]`)
                 let pieceEl = document.querySelector(`.piece[data-index="${parseInt(piece.ai)}"]`)
-                console.log(cell);
                 cell.appendChild(pieceEl)
             })
 
@@ -382,6 +491,13 @@ async function uploadNewPuzzleToDB() {
                 translate.x = centerX - nodeX * scale - (node.offsetWidth * scale) / 2;
                 translate.y = centerY - nodeY * scale - (node.offsetHeight * scale) / 2;
             
+                document.querySelector(".controllerButtons").style.width = `${gridBgImg.naturalWidth}px`
+                document.querySelector(".controllerButtons").style.height = `${gridBgImg.naturalWidth / 10}px`
+                document.querySelector(".controllerButtons").style.top = `${32+gridBgImg.naturalHeight}px`
+                document.querySelector(".controllerButtons").style.display = "flex"
+                document.querySelector(".controllerButtons").style.setProperty("--localFontSizeMult", 1)
+                document.querySelector(".controllerButtons").style.setProperty("--gap", 1)
+                
                 updateTransform();
             }
             centerOnNode("grid");
@@ -515,8 +631,14 @@ async function uploadNewPuzzleToDB() {
                 // hide the piece on drag start
                 document.querySelectorAll('.piece').forEach(piece => {
                     piece.addEventListener('dragstart', (e) => {
-                        console.log(piece.parentElement.dataset.index);
-                        console.log(piece.dataset.index);
+                        // only allow user to move pieces when pieces aren't animating
+                        if (animatingIncorrectPieces) {
+                            e.preventDefault()
+                            return
+                        }
+                        
+                        // console.log(piece.parentElement.dataset.index);
+                        // console.log(piece.dataset.index);
                         if (piece.parentElement.classList.contains("cell")) {
                             if (piece.parentElement.dataset.index == piece.dataset.index) {
                                 e.preventDefault()
@@ -561,7 +683,7 @@ async function uploadNewPuzzleToDB() {
                             draggedPiece &&
                             slot.dataset.pieceIndex === draggedPiece.getAttribute('data-index')
                         ) {
-                            console.log("drag to table");
+                            // console.log("drag to table");
                             slot.appendChild(draggedPiece);
                             updatePuzzlePiece(id, draggedPiece.dataset.index, undefined)
                         }
@@ -574,50 +696,142 @@ async function uploadNewPuzzleToDB() {
                     // gettings puzzle data
                     let newUserData = JSON.parse((await getUserData()).SaveData)
                     if (!newUserData) newUserData = []
-                    const puzzleData_Users = await getPuzzleDataUser(id)
                 
-                    // apply changes
-                    newUserData.forEach(data => {
-                        if (data.id == id) {
-                            data.timeAccessed = Date.now()
-                            console.log(data);
+                    if (puzzleDataUser) {
+                        userDataChange(id, async (newUserData) => {
+                            // console.log(a, b);
+                            return newUserData.filter(data => {
+                                if (data.id == id) {
+                                    // console.log(data);
 
-                            if (isNaN(b)) {
-                                data.completionData = data.completionData.filter(x => x.ai !== a)
-                            } else {
-                                let found = false;
+                                    // move piece out of puzzle grid
+                                    if (isNaN(b)) {
+                                        data.completionData = data.completionData.filter(x => x.ai !== a)
+                                    } else { // move piece into puzzle grid 
+                                        let found = false;
 
-                                data.completionData.map(x => {
-                                    if (x.ai === a) {
-                                        x.bi = b;
-                                        found = true;
+                                        // move piece from one grid square to another
+                                        data.completionData.map(x => {
+                                            if (x.ai === a) {
+                                                x.bi = b;
+                                                found = true
+                                            }
+                                        });
+
+                                        // if the piece isn't in the grid yet, add it
+                                        if (!found) {
+                                            data.completionData.push({ ai: a, bi: b });
+                                        }
                                     }
-                                });
 
-                                // If the element with ai = a does not exist, create it
-                                if (!found) {
-                                    data.completionData.push({ ai: a, bi: b });
+                                }
+                                return data
+                            })
+                        }).then(async newPuzzleData => {
+                            // set percent
+                            document.querySelector(".headerWrapper .percentComplete").innerHTML = `${Math.round(puzzleData.completionData.length / (puzzleData.height * puzzleData.width / 100))}% Complete`
+                            
+                            // set star
+                            const star = document.querySelector(".headerWrapper .star img")
+                            star.src = `./production/images/${getStar(puzzleData, false)}`
+                            star.alt = getStar(puzzleData, true)
+                            
+                            // check win
+                            let win = winCheck(newPuzzleData)
+                            console.log(win);
+                            if (win === true) {
+                                console.log("win")
+                            } else {
+                                console.log("lose")
+                                animateIncorrectPieces(win)
+
+                                function animateIncorrectPieces(loop) {
+                                    animatingIncorrectPieces = true
+                                    
+                                    loop.forEach(piece => {
+                                        const onFlash = {
+                                            borderColor: 'var(--darkBrown)', 
+                                            backgroundColor: 'var(--darkBrown)', 
+                                            boxShadow: `
+                                                0 0 4px 4px white inset
+                                            `
+                                        };
+                                        
+                                        const offFlash = {
+                                            borderColor: 'var(--lightBrown)', 
+                                            backgroundColor: 'var(--lightBrown)', 
+                                            boxShadow: `
+                                                0 0 4px 4px white inset
+                                            `
+                                        };
+                                        
+                                        const cell = document.querySelector(`.grid .cell[data-index="${piece.bi}"]`);
+                                        
+                                        // Create overlay div
+                                        const overlay = document.createElement('div');
+                                        Object.assign(overlay.style, {
+                                            position: 'absolute',
+                                            top: 0,
+                                            left: 0,
+                                            right: 0,
+                                            bottom: 0,
+                                            backgroundColor: 'transparent',
+                                            boxSizing: 'border-box',
+                                            boxShadow: '0 0 0 transparent',
+                                            pointerEvents: 'none',
+                                            zIndex: 9999 // Ensure it's on top of the content
+                                        });
+                                        
+                                        // Make the cell position-relative if it's not already
+                                        const originalPosition = cell.style.position;
+                                        if (getComputedStyle(cell).position === 'static') {
+                                            cell.style.position = 'relative';
+                                        }
+                                        
+                                        // Append overlay to the cell
+                                        cell.appendChild(overlay);
+                                        
+                                        // Animate using onFlash and offFlash
+                                        overlay.animate([
+                                            offFlash,
+                                            onFlash,
+                                            offFlash,
+                                            onFlash,
+                                            offFlash,
+                                            onFlash,
+                                            offFlash,
+                                        ], {
+                                            duration: 3000,  // Total animation duration
+                                            easing: 'linear'
+                                        }).onfinish = () => {
+                                            overlay.remove(); // Clean up after animation
+                                            cell.style.position = originalPosition; // Restore the original position style
+                                            animatingIncorrectPieces = false
+                                        };
+                                    })
                                 }
                             }
-
-                            console.log(data);
-                        }
-                    });
-                
-                    // push to database
-                    const response = fetch('https://192.168.240.9:3006/jigsawJam/updateRowByIDFilter', {
-                        method: 'POST', // or 'PUT' if your API supports it
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            id: (await getUserData()).ID,
-                            value: JSON.stringify(newUserData),
-                            table: "Users",
-                            column: "SaveData"
-                        }),
-                        signal: signal
-                    });
+                            
+                            function winCheck(puzzleData) {
+                                let failedPieces = [];
+                            
+                                // Always check for mismatches and collect failed pieces
+                                for (let x of puzzleData.completionData) {
+                                    if (x.ai !== x.bi) {
+                                        failedPieces.push(x);
+                                    }
+                                }
+                            
+                                // Check if win condition is met: full puzzle + no failed pieces
+                                let win = (
+                                    puzzleData.completionData.length === (puzzleData.width * puzzleData.height) &&
+                                    failedPieces.length === 0
+                                );
+                            
+                                return win ? true : failedPieces;
+                            }
+                        })
+                    } 
                 }
             }
     
