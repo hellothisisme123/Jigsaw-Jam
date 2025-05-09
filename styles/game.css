@@ -118,6 +118,7 @@
                     .cell {
                         width: 100%;
                         height: 100%;
+                        position: relative;
                         box-shadow: inset 0 0 0 2px var(--darkBrown);
     
                         img {
@@ -150,9 +151,8 @@
                     z-index: 100000;
                     display: none;
                     justify-content: space-between;
-                    gap: calc(var(--gap) * var(--fontSizeMult));
+                    gap: 32px;
                     
-                    --gap: 32px;
                     --localFontSizeMult: 4;
 
                     div {
@@ -278,6 +278,7 @@
             padding-bottom: 94px;
             display: flex;
             align-items: center;
+            background-color: var(--lightBrown);
     
             .bgWrapper {
                 display: flex;

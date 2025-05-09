@@ -230,8 +230,8 @@ async function userDataChange(id, change, setTime=true) {
     let newPuzzleData = newUserData[newUserData.findIndex(data => data.id === id)]
     if (
         newPuzzleData &&
-        !newPuzzleData.completed &&
-        !newPuzzleData.saved &&
+        newPuzzleData.completed === false &&
+        newPuzzleData.saved === false &&
         newPuzzleData.completionData.length < 1
     ) {
         newUserData = newUserData.filter(x => x.id != id)

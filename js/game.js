@@ -57,6 +57,9 @@ const tableRows = 2;
 const puzzleMaxWidth = 0.75;
 const puzzleMaxHeight = 0.75;
 
+const controllerWrapperMaxHeight = 0.125;
+
+let currentTablePage = 0;
 let animatingIncorrectPieces = false
 
 // temporary for debugging
@@ -122,8 +125,6 @@ async function sizeChange(newValue, id) {
     }
 }
 
-
-
 async function uploadNewPuzzleToDB(size) {
     let newUserData = JSON.parse((await getUserData()).SaveData)
     if (!newUserData) newUserData = []
@@ -161,21 +162,30 @@ async function toggleSizeDropdown() {
     console.log(select);
 }
 
-(async () => {
+async function startGamePage() {
     try {
+        // reset to initial state
+        currentTablePage = 0
+        document.querySelectorAll('.container .board .grid .cell').forEach(cell => cell.remove())
+        document.querySelectorAll('.container .table .pieceSlot').forEach(slot => slot.remove())
+        document.querySelector('.container').innerHTML = document.querySelector('.container').innerHTML
+
         // --- Log Puzzle Data ---
         let puzzleDataUser = await getPuzzleDataUser(id)
         let puzzleDataPuzzle = await getPuzzleDataPuzzle(id)
         if (puzzleDataUser == undefined || puzzleDataUser && puzzleDataUser.completionData.length < 1) {
             puzzleSize = await getSizePopup()
+            console.log(puzzleDataUser);
             puzzleDataUser = {
                 "id": id,
                 "width": puzzleSize[0],
                 "height": puzzleSize[1],
-                "saved": true,
-                "completed": false,
+                "saved": (puzzleDataUser?.saved ?? false),
+                "completed": (puzzleDataUser?.completed ?? false),
                 "completionData": []
             }
+            console.log(puzzleDataUser);
+            
         }
         
         const puzzleData = {
@@ -192,6 +202,16 @@ async function toggleSizeDropdown() {
         }
         console.log(puzzleData);
 
+        // check win
+        let win = await winCheck(puzzleData)
+        console.log(win);
+        if (win === true) {
+            console.log("win")
+
+            // win popup
+            winPopup()
+        }
+        
         // gets the size for the puzzle if the user doesn't have one saved already
         async function getSizePopup() {
             // gets the options for sizes as html stored in a string
@@ -304,8 +324,6 @@ async function toggleSizeDropdown() {
             });
         }
 
-        
-
         // --- Set Grid Size to Match Background Image ---
         const grid = document.querySelector('.container .board .grid');
         const gridBgImg = document.querySelector('.container .board .grid .bg img');
@@ -409,6 +427,56 @@ async function toggleSizeDropdown() {
             const star = document.querySelector(".headerWrapper .star img")
             star.src = `./production/images/${getStar(puzzleData, false)}`
             star.alt = getStar(puzzleData, true)
+
+            // show wrong pieces button
+            document.querySelector('.controllerButtons .showIncorrectPieces').addEventListener("click", async () => {
+                let win = await winCheck()
+                
+                if (win === true) {
+                    winScreenPopup()
+                }
+                
+                if (win !== true) {
+                    animateIncorrectPieces(win)
+                }
+            })
+
+            // clear wrong pieces button
+            document.querySelector('.controllerButtons .clearIncorrectPieces').addEventListener("click", async () => {
+                let win = await winCheck()
+                
+                if (win !== true) {
+                    console.log(win);
+                    win.forEach(piece => {
+                        let pieceEl = document.querySelector(`.grid .cell[data-index="${piece.bi}"] .piece`)
+                        let slotEl = document.querySelector(`.table .pieceSlot[data-piece-index="${pieceEl.dataset.index}"]`)
+                        slotEl.appendChild(pieceEl)
+                        renderPage()
+                        
+                        userDataChange(id, async (newUserData) => {
+                            return newUserData.filter(data => {
+                                if (data.id == id) {
+                                    // move piece out of puzzle grid
+                                    data.completionData = data.completionData.filter(x => x.bi != piece.bi)
+                                }
+                                return data
+                            })
+                        }).then(async newPuzzleData => {
+                            // set percent
+                            document.querySelector(".headerWrapper .percentComplete").innerHTML = `${Math.round(newPuzzleData.completionData.length / (puzzleData.height * puzzleData.width / 100))}% Complete`
+                            
+                            // set star
+                            const star = document.querySelector(".headerWrapper .star img")
+                            star.src = `./production/images/${getStar(puzzleData, false)}`
+                            star.alt = getStar(puzzleData, true)
+                        })
+                    })
+                } 
+
+                if (win.length == 0) {
+
+                }
+            })
             
             console.log(puzzleData);
             
@@ -475,28 +543,30 @@ async function toggleSizeDropdown() {
                 const maxWidth = wrapperRect.width * puzzleMaxWidth;
                 const maxHeight = wrapperRect.height * puzzleMaxHeight;
             
+                
                 // Calculate scale based on width and height constraints
                 const scaleX = maxWidth / node.offsetWidth;
                 const scaleY = maxHeight / node.offsetHeight;
-            
+                
                 // Use the smaller scale to make sure both constraints are satisfied
                 scale = Math.min(scaleX, scaleY);
-            
+                
                 // Center the node
                 const nodeX = node.offsetLeft;
                 const nodeY = node.offsetTop;
                 const centerX = wrapperRect.width / 2;
                 const centerY = wrapperRect.height / 2;
-            
+                
                 translate.x = centerX - nodeX * scale - (node.offsetWidth * scale) / 2;
                 translate.y = centerY - nodeY * scale - (node.offsetHeight * scale) / 2;
-            
-                document.querySelector(".controllerButtons").style.width = `${gridBgImg.naturalWidth}px`
-                document.querySelector(".controllerButtons").style.height = `${gridBgImg.naturalWidth / 10}px`
-                document.querySelector(".controllerButtons").style.top = `${32+gridBgImg.naturalHeight}px`
-                document.querySelector(".controllerButtons").style.display = "flex"
-                document.querySelector(".controllerButtons").style.setProperty("--localFontSizeMult", 1)
-                document.querySelector(".controllerButtons").style.setProperty("--gap", 1)
+
+                // size controllerWrapper accordingly
+                const controllerWrapper = document.querySelector(".controllerButtons");
+                controllerWrapper.style.width = `${gridBgImg.naturalWidth}px`
+                controllerWrapper.style.height = `${gridBgImg.naturalWidth / 10}px`
+                controllerWrapper.style.top = `${16+gridBgImg.naturalHeight}px`
+                controllerWrapper.style.setProperty("--localFontSizeMult", 0.7 / scale)
+                controllerWrapper.style.display = "flex"
                 
                 updateTransform();
             }
@@ -671,7 +741,7 @@ async function toggleSizeDropdown() {
                             updatePuzzlePiece(id, draggedPiece.dataset.index, cell.dataset.index)
                         }
                         
-                        renderPage(currentTablePage)
+                        renderPage()
                     });
                 });                
                 
@@ -689,7 +759,7 @@ async function toggleSizeDropdown() {
                         }
                     });
                     
-                    renderPage(currentTablePage)                        
+                    renderPage()                        
                 });
 
                 async function updatePuzzlePiece(id, a, b) {
@@ -729,107 +799,44 @@ async function toggleSizeDropdown() {
                             })
                         }).then(async newPuzzleData => {
                             // set percent
-                            document.querySelector(".headerWrapper .percentComplete").innerHTML = `${Math.round(puzzleData.completionData.length / (puzzleData.height * puzzleData.width / 100))}% Complete`
+                            document.querySelector(".headerWrapper .percentComplete").innerHTML = `${Math.round(newPuzzleData.completionData.length / (puzzleData.height * puzzleData.width / 100))}% Complete`
                             
-                            // set star
-                            const star = document.querySelector(".headerWrapper .star img")
-                            star.src = `./production/images/${getStar(puzzleData, false)}`
-                            star.alt = getStar(puzzleData, true)
+                            // // set star
+                            // const star = document.querySelector(".headerWrapper .star img")
+                            // star.src = `./production/images/${getStar(puzzleData, false)}`
+                            // star.alt = getStar(puzzleData, true)
                             
                             // check win
-                            let win = winCheck(newPuzzleData)
+                            let win = await winCheck(newPuzzleData)
                             console.log(win);
                             if (win === true) {
                                 console.log("win")
+                                userDataChange(id, async (newUserData) => {
+                                    return newUserData.filter(data => {
+                                        if (data.id == id) {
+                                            // move piece out of puzzle grid
+                                            data.completed = true
+                                        }
+                                        return data
+                                    })
+                                }).then(async newPuzzleData => {
+                                    // win popup
+                                    winPopup()
+                                })
+
                             } else {
                                 console.log("lose")
-                                animateIncorrectPieces(win)
+                                console.log(puzzleData);
+                                console.log(puzzleDataUser);
+                                console.log(newPuzzleData.completionData);
+                                if (newPuzzleData.completionData.length >= (puzzleData.width * puzzleData.height)) {
+                                    animateIncorrectPieces(win)
+                                }
 
-                                function animateIncorrectPieces(loop) {
-                                    animatingIncorrectPieces = true
-                                    
-                                    loop.forEach(piece => {
-                                        const onFlash = {
-                                            borderColor: 'var(--darkBrown)', 
-                                            backgroundColor: 'var(--darkBrown)', 
-                                            boxShadow: `
-                                                0 0 4px 4px white inset
-                                            `
-                                        };
-                                        
-                                        const offFlash = {
-                                            borderColor: 'var(--lightBrown)', 
-                                            backgroundColor: 'var(--lightBrown)', 
-                                            boxShadow: `
-                                                0 0 4px 4px white inset
-                                            `
-                                        };
-                                        
-                                        const cell = document.querySelector(`.grid .cell[data-index="${piece.bi}"]`);
-                                        
-                                        // Create overlay div
-                                        const overlay = document.createElement('div');
-                                        Object.assign(overlay.style, {
-                                            position: 'absolute',
-                                            top: 0,
-                                            left: 0,
-                                            right: 0,
-                                            bottom: 0,
-                                            backgroundColor: 'transparent',
-                                            boxSizing: 'border-box',
-                                            boxShadow: '0 0 0 transparent',
-                                            pointerEvents: 'none',
-                                            zIndex: 9999 // Ensure it's on top of the content
-                                        });
-                                        
-                                        // Make the cell position-relative if it's not already
-                                        const originalPosition = cell.style.position;
-                                        if (getComputedStyle(cell).position === 'static') {
-                                            cell.style.position = 'relative';
-                                        }
-                                        
-                                        // Append overlay to the cell
-                                        cell.appendChild(overlay);
-                                        
-                                        // Animate using onFlash and offFlash
-                                        overlay.animate([
-                                            offFlash,
-                                            onFlash,
-                                            offFlash,
-                                            onFlash,
-                                            offFlash,
-                                            onFlash,
-                                            offFlash,
-                                        ], {
-                                            duration: 3000,  // Total animation duration
-                                            easing: 'linear'
-                                        }).onfinish = () => {
-                                            overlay.remove(); // Clean up after animation
-                                            cell.style.position = originalPosition; // Restore the original position style
-                                            animatingIncorrectPieces = false
-                                        };
-                                    })
-                                }
+                                
                             }
                             
-                            function winCheck(puzzleData) {
-                                let failedPieces = [];
                             
-                                // Always check for mismatches and collect failed pieces
-                                for (let x of puzzleData.completionData) {
-                                    if (x.ai !== x.bi) {
-                                        failedPieces.push(x);
-                                    }
-                                }
-                            
-                                // Check if win condition is met: full puzzle + no failed pieces
-                                let win = (
-                                    puzzleData.completionData.length === (puzzleData.width * puzzleData.height) &&
-                                    failedPieces.length === 0
-                                );
-                            
-                                return win ? true : failedPieces;
-                            }
                         })
                     } 
                 }
@@ -839,43 +846,22 @@ async function toggleSizeDropdown() {
     
             // --- Pagination Logic ---
             const pieces = document.querySelectorAll('.piece');
-            const pieceSlots = document.querySelectorAll('.pieceSlot');
-            console.log(pieceSlots);
             const leftBtn = document.querySelector('.leftBtn');
             const rightBtn = document.querySelector('.rightBtn');
-            let currentTablePage = 0;
-    
-            function renderPage(page) {
-                let start = page * (tableRows * tableCols);
-                let end = start + (tableRows * tableCols);
-    
-                pieceSlots.forEach(slot => {
-                    if (parseInt(slot.dataset.index) > start && parseInt(slot.dataset.index) <= end) {
-                        if (slot.childElementCount > 0) {
-                            slot.style.display = "flex"
-                        } else {
-                            slot.style.display = "none"
-                            end++
-                        }
-                    } else {
-                        slot.style.display = "none"
-                    }
-                })
-            }
     
             leftBtn.addEventListener('click', () => {
                 const maxPage = Math.floor((pieces.length - 1) / (tableRows * tableCols));
                 currentTablePage = currentTablePage > 0 ? currentTablePage - 1 : maxPage;
-                renderPage(currentTablePage);
+                renderPage();
             });
     
             rightBtn.addEventListener('click', () => {
                 const maxPage = Math.floor((pieces.length - 1) / (tableRows * tableCols));
                 currentTablePage = currentTablePage < maxPage ? currentTablePage + 1 : 0;
-                renderPage(currentTablePage);
+                renderPage();
             });
     
-            renderPage(currentTablePage);
+            renderPage();
             
         })
 
@@ -884,22 +870,207 @@ async function toggleSizeDropdown() {
     } catch (error) {
         if (id == null) {
             window.location = "./index.html"
+        } else {
+            document.querySelector(".container .board").innerHTML += `
+                <div class='title'>
+                    <p>The puzzle with id ${id} does not exist. Please find another puzzle with a valid id.</p>
+                    <div class="horizontalWrapper">
+                    <a href="./index.html">Home</a>
+                        <a href="./explorePuzzles.html">Explore Puzzles</a>
+                    </div>
+                </div>
+    
+            `
+            document.querySelector(".container .board .canvas").style.display = "none"
+            document.querySelector(".container .board").style.setProperty("cursor", "unset")
+    
+            console.error("Error setting up puzzle canvas:", error);
+            console.error("Error Code:", error.message);
         }
+    }
+}
+
+startGamePage()
+
+async function winCheck(puzzleData) {
+    let failedPieces = [];
+    if (!puzzleData) puzzleData = await getPuzzleDataUser(id)
+
+    // Always check for mismatches and collect failed pieces
+    for (let x of puzzleData.completionData) {
+        if (x.ai !== x.bi) {
+            failedPieces.push(x);
+        }
+    }
+
+    // Check if win condition is met: full puzzle + no failed pieces
+    let win = (
+        puzzleData.completionData.length === (puzzleData.width * puzzleData.height) &&
+        failedPieces.length === 0
+    );
+
+    return win ? true : failedPieces;
+}
+
+function animateIncorrectPieces(loop) {
+    if (loop.length < 1) return
+    animatingIncorrectPieces = true
+    
+    loop.forEach(piece => {
+        const onFlash = {
+            borderColor: 'var(--darkBrown)', 
+            backgroundColor: 'var(--darkBrown)', 
+            boxShadow: `
+                0 0 4px 4px white inset
+            `
+        };
         
-        document.querySelector(".container .board").innerHTML += `
-            <div class='title'>
-                <p>The puzzle with id ${id} does not exist. Please find another puzzle with a valid id.</p>
-                <div class="horizontalWrapper">
-                <a href="./index.html">Home</a>
-                    <a href="./explorePuzzles.html">Explore Puzzles</a>
+        const offFlash = {
+            borderColor: 'var(--lightBrown)', 
+            backgroundColor: 'var(--lightBrown)', 
+            boxShadow: `
+                0 0 4px 4px white inset
+            `
+        };
+        
+        const cell = document.querySelector(`.grid .cell[data-index="${piece.bi}"]`);
+        
+        // Create overlay div
+        const overlay = document.createElement('div');
+        Object.assign(overlay.style, {
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'transparent',
+            boxSizing: 'border-box',
+            boxShadow: '0 0 0 transparent',
+            pointerEvents: 'none',
+            zIndex: 9999 // Ensure it's on top of the content
+        });
+        
+        // Append overlay to the cell
+        cell.appendChild(overlay);
+        
+        // Animate using onFlash and offFlash
+        overlay.animate([
+            offFlash,
+            onFlash,
+            offFlash,
+            onFlash,
+            offFlash,
+            onFlash,
+            offFlash,
+        ], {
+            duration: 3000,  // Total animation duration
+            easing: 'linear'
+        }).onfinish = () => {
+            overlay.remove(); // Clean up after animation
+            animatingIncorrectPieces = false
+        };
+    })
+}
+
+function renderPage() {
+    let start = currentTablePage * (tableRows * tableCols);
+    let end = start + (tableRows * tableCols);
+
+    const pieceSlots = document.querySelectorAll('.pieceSlot');
+    pieceSlots.forEach(slot => {
+        if (parseInt(slot.dataset.index) > start && parseInt(slot.dataset.index) <= end) {
+            if (slot.childElementCount > 0) {
+                slot.style.display = "flex"
+            } else {
+                slot.style.display = "none"
+                end++
+            }
+        } else {
+            slot.style.display = "none"
+        }
+    })
+}
+
+function getWinSize(userPuzz, puzz) {
+    let sizes = JSON.parse(puzz.Sizes)
+    let res
+
+    sizes.forEach((size, i) => {
+        size = size.split("x")
+        if (userPuzz && userPuzz.width == size[0] && userPuzz.height == size[1]) {
+            res = `<div class="selectedOption">${parseInt(size[0])}x${parseInt(size[1])} - ${parseInt(size[0]) * parseInt(size[1])} Pieces</div>`
+        }
+    })
+
+    return res
+}
+
+async function winPopup() {
+    // unFocusPuzzle()
+
+    let focusedPuzzleUser = await getPuzzleDataUser(id)
+    let focusedPuzzlePuzzle = await getPuzzleDataPuzzle(id)
+
+    // brings up the focus puzzle section   
+    let html = document.createElement("div")
+    html.classList.add("focusPuzzlePopup", "win")
+    html.dataset.id = focusedPuzzlePuzzle.ID
+    // console.log(getSelectedValue(focusedPuzzleUser, focusedPuzzlePuzzle));
+    html.innerHTML = `
+        <div class="responsive">
+            <div class="bookmark">
+                <img src="./production/images/${getBookmark(focusedPuzzleUser, false)}" alt="${getBookmark(focusedPuzzleUser, true)}">
+            </div>
+            <div class="star">
+                <img src="./production/images/${getStar(focusedPuzzleUser, false)}" alt="${getStar(focusedPuzzleUser, true)}">
+            </div>
+            <div class="percent">100% Complete</div>
+            <div class="title">YOU WIN!!!</div>
+            <div class="buttonWrapper">
+                <div class="select">
+                    ${getWinSize(focusedPuzzleUser, focusedPuzzlePuzzle)}
+                </div>
+                <div class="reset" onclick="clearPieces(${focusedPuzzlePuzzle.ID})">
+                    Restart Puzzle
                 </div>
             </div>
+            <div class="puzzle">
+                <div class="background"><img src="./production/images/puzzle-images/${focusedPuzzlePuzzle.Src}" alt="${focusedPuzzlePuzzle.Alt}"></div>
+            </div>
+            <div class="openPuzzleButton" onclick="window.location = './index.html'">
+                <div class="text">
+                    Exit Puzzle
+                </div>
+                <div class="img">
+                    <img src="./production/images/keep-puzzling-button.png" alt="Exit Puzzle Button">
+                </div>
+            </div>
+        </div>
+    `
+    document.querySelector(".container").appendChild(html)
+}
 
-        `
-        document.querySelector(".container .board .canvas").style.display = "none"
-        document.querySelector(".container .board").style.setProperty("cursor", "unset")
 
-        console.error("Error setting up puzzle canvas:", error);
-        console.error("Error Code:", error.message);
-    }
-})();
+async function clearPieces(id) {
+    alertPopup(
+        "Are you Sure?",
+        "You would like to clear all saved pieces on this puzzle. This will permanently remove all pieces from the save. The star marking your completion will stay filled. You can clear the star by resetting the puzzle from the home or explore puzzles screens. The process is non-reversible.",
+        "Yes, Clear Pieces",
+        "No, Cancel",
+        () => {
+            userDataChange(id, (newUserData) => {
+                return newUserData.filter(data => {
+                    if (data.id == id) {
+                        data.completionData = []
+                    }
+                    return data
+                })
+            }).then(async newUserData => {
+                // document.querySelector(".focusPuzzlePopup.win").remove()
+                // startGamePage()
+            })
+        },
+        () => {
+        }
+    )
+}

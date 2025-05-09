@@ -220,7 +220,7 @@ async function focusPuzzle(id) {
                     Open Puzzle
                 </div>
                 <div class="img">
-                    <img src="./production/images/keep-puzzling-button.png" alt="">
+                    <img src="./production/images/keep-puzzling-button.png" alt="Open Puzzle Button">
                 </div>
             </div>
             <div class="space"></div>

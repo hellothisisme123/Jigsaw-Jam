@@ -329,3 +329,101 @@
     backdrop-filter: blur(3px);
     z-index: -110;
 }
+
+.focusPuzzlePopup.win {
+    background-color: var(--lightBrown);
+    
+    .responsive {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .percent {
+        font-size: calc(2rem * var(--fontSizeMult));
+    }
+
+    .star, .bookmark {
+        position: absolute;
+        height: 70px;
+
+        img {
+            height: 100%;
+        }
+    }
+
+    .star {
+        right: 16px;
+        top: 16px;
+    }
+
+    .bookmark {
+        left: 16px;
+        top: 0;
+    }
+    
+    .title {
+        font-size: calc(5rem * var(--fontSizeMult));
+        margin-top: calc(-0.5rem * var(--fontSizeMult));
+        margin-bottom: calc(-1rem * var(--fontSizeMult));
+        font-weight: 900;
+    }
+
+    .buttonWrapper {
+        width: 100%;
+    }
+
+    .select {
+        background-color: var(--lightButtonSolid);
+        border: 3px solid var(--darkBrown);
+        padding: 4px 16px;
+        border-radius: 12px;
+        height: 100%;
+        font-size: calc(1rem * var(--fontSizeMult));
+        color: var(--darkBrown);
+        min-height: 100%;
+        height: fit-content;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+
+        .selectedOption {
+            width: 100%;
+            font-size: calc(1.25rem * var(--fontSizeMult));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .options {
+            display: flex;
+            height: 0px;
+            width: 100%;
+            overflow: hidden;
+            flex-wrap: nowrap;
+
+            justify-content: center;
+            flex-direction: column;
+            
+            .option {
+                padding: 8px 40px 8px 8px;
+                /* background-color: var(--lightBrown); */
+                font-size: calc(1.25rem * var(--fontSizeMult));
+                /* background-color: var(--lightButtonSolid); */
+                /* display: flex; */
+            }
+
+            .option.selected {
+            }
+
+            .option:hover {
+                background-color: var(--lightBrown);
+                /* width: 100%; */
+            }
+        }
+    }
+}
