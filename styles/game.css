@@ -185,6 +185,7 @@
             grid-template-columns: repeat(var(--tableCols), 1fr);
             grid-template-rows: repeat(var(--tableRows), 1fr);
             padding: 16px 48px;
+            gap: 8px;
             
             .leftBtn, .rightBtn {
                 top: 50%;
