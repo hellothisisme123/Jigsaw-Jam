@@ -1,3 +1,5 @@
+let puzzlesLoaded = false
+
 function getStar(puzz, alt) {
     // returns the value accordingly
     if (alt) {
@@ -93,6 +95,7 @@ async function processBatch(batch) {
 
 async function asyncTask(puzzle, index) {
     let puzzleData_Users = await getPuzzleDataUser(puzzle.ID);
+    // console.log(puzzleData_Users);
     let puzzleData_Puzzles = await getPuzzleDataPuzzle(puzzle.ID);
     const html = `
         <div class="puzzle active ${getTags(puzzleData_Users, puzzleData_Puzzles, true)}" draggable="false" onclick="focusPuzzle(${puzzle.ID})" data-id="${puzzle.ID}">
@@ -152,9 +155,13 @@ async function fillSearchTabs() {
     
     tags = removeDuplicates(tags)
 
-    tabWrapper.innerHTML += `<div class="tab active">all</div>`
+    tabWrapper.innerHTML += `<div class="tab">all</div>`
+    tabWrapper.innerHTML += `<div class="tab">saved</div>`
+    tabWrapper.innerHTML += `<div class="tab">unsaved</div>`
+    tabWrapper.innerHTML += `<div class="tab">completed</div>`
+    tabWrapper.innerHTML += `<div class="tab">uncompleted</div>`
     tags.forEach(tag => {
-        tabWrapper.innerHTML += `<div class="tab active">${tag}</div>`
+        tabWrapper.innerHTML += `<div class="tab">${tag}</div>`
     })
     console.log(tags);
 
@@ -165,7 +172,8 @@ fillSearchTabs().then(() => {
     const puzzlesWrapper = document.querySelector('.container .main .mainResponsive')
 
     function updateNoPuzzlesMessageVisibility() {
-        const visiblePuzzles = puzzlesWrapper.querySelectorAll(".active");
+        const visiblePuzzles = puzzlesWrapper.querySelectorAll(".puzzle.active");
+        console.log(visiblePuzzles);
 
         noPuzzlesWithCurrentFilters = document.querySelector('.container .main .mainResponsive .noPuzzlesWithCurrentFilters')
         if (visiblePuzzles.length === 0) {
@@ -174,52 +182,84 @@ fillSearchTabs().then(() => {
             noPuzzlesWithCurrentFilters.classList.remove("active")
         }
     }
-
-    fillPuzzles().then(() => {
-        tabs.forEach(tab => {
-            if (tab.innerHTML.trim() == "all") {
-                let allEnabled = true
-                tab.addEventListener("click", () => {
-                    allEnabled = !allEnabled
-                    tabs.forEach(tab => {
-                        if (allEnabled) {
-                            tab.classList.add("active")
-                        } else {
-                            tab.classList.remove("active")
-                        }
-                    })
-                    const allPuzzles = document.querySelectorAll('.container .main .mainResponsive .puzzle')
-
-                    allPuzzles.forEach(puzzle => {
-                        if (allEnabled) {
-                            puzzle.classList.add("active")
-                        } else {
-                            puzzle.classList.remove("active")
-                        }
-                    })
-
-                    updateNoPuzzlesMessageVisibility()
-                })
-
-                return
-            }
-            
-            tab.addEventListener("click", () => {
-                tab.classList.toggle("active")
-                
-                const puzzles = puzzlesWrapper.querySelectorAll(`.puzzle.${tab.innerHTML.trim()}`)
-                if (tab.classList.contains("active")) {
-                    puzzles.forEach(element => {
-                        element.classList.add("active")
-                    });
-                } else {
-                    puzzles.forEach(element => {
-                        element.classList.remove("active")
-                    });
-                }
     
+    function displayPuzzlesByFilter() {
+        let query = ".puzzle"
+        let activeTabs = [...tabs].filter(x => {
+            if (x.classList.contains("active")) return x.innerHTML
+        })
+        activeTabs = activeTabs.map(x => x.innerHTML.trim())
+        activeTabs.forEach(tab => query += `.${tab}`)
+        console.log(query);
+
+        const displayedPuzzles = [...puzzlesWrapper.querySelectorAll(query)]
+        const allPuzzles = [...puzzlesWrapper.querySelectorAll(".puzzle")]
+        const undisplayedPuzzles = allPuzzles.filter(p => !displayedPuzzles.includes(p));
+
+        console.log(displayedPuzzles.length, undisplayedPuzzles.length, allPuzzles.length);
+
+        displayedPuzzles.forEach(puzzle => {
+            puzzle.classList.add("active")
+        })
+
+        undisplayedPuzzles.forEach(puzzle => {
+            puzzle.classList.remove("active")
+        })
+    }
+    
+    tabs.forEach(tab => {
+        if (tab.innerHTML.trim() == "all") {
+            let allEnabled = true
+            tab.addEventListener("click", () => {
+                if (!puzzlesLoaded) {
+                    alertPopup(
+                        "Please wait",
+                        "The puzzles have not loaded yet, you need to wait a few seconds for all puzzles to load in order to use filters.",
+                        "Okay",
+                        "Epic",
+                        () => {},
+                        () => {}
+                    )
+                    return;
+                }
+
+                allEnabled = !allEnabled
+                tabs.forEach(tab => {
+                    if (allEnabled) {
+                        tab.classList.add("active")
+                    } else {
+                        tab.classList.remove("active")
+                    }
+                })
+                displayPuzzlesByFilter()
                 updateNoPuzzlesMessageVisibility()
             })
+
+            return
+        }
+        
+        tab.addEventListener("click", () => {
+            if (!puzzlesLoaded) {
+                alertPopup(
+                    "Please wait",
+                    "The puzzles have not loaded yet, you need to wait a few seconds for all puzzles to load in order to use filters.",
+                    "Okay",
+                    "Epic",
+                    () => {},
+                    () => {}
+                )
+                return;
+            }
+
+            tab.classList.toggle("active")
+            
+            displayPuzzlesByFilter()
+            updateNoPuzzlesMessageVisibility()
         })
+    })
+    
+    fillPuzzles().then(() => {
+        puzzlesLoaded = true
+        
     })
 })

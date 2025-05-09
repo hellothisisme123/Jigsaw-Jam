@@ -123,6 +123,30 @@ function getTags(userPuzz, puzz, list) {
         tags.forEach(tag => {
             res += ` ${tag}`
         })
+
+        if (userPuzz) {
+            if (userPuzz.id == 56) console.log(userPuzz);
+            
+            if (userPuzz.saved) {
+                res += " saved"
+            }
+
+            if (!userPuzz.saved) {
+                res += " unsaved"
+            }
+
+            if (userPuzz.completed) {
+                res += " completed"
+            }
+
+            if (!userPuzz.completed) {
+                res += " uncompleted"
+            }
+        } else {
+            res += " uncompleted"
+            res += " unsaved"
+        }
+
         return res.trim()
     }
 }
@@ -215,6 +239,30 @@ async function updateEachPuzzleInstance(id) {
     console.log(id, puzzleData);
     
     document.querySelectorAll(`.puzzle[data-id="${id}"]`).forEach(puzzle => {
+
+        if (puzzleData) {
+            if (puzzleData.saved) {
+                puzzle.classList.remove("unsaved")
+                puzzle.classList.add("saved")
+            } else {
+                puzzle.classList.add("unsaved")
+                puzzle.classList.remove("saved")
+            }
+
+            if (puzzleData.completed) {
+                puzzle.classList.remove("uncompleted")
+                puzzle.classList.add("completed")
+            } else {
+                puzzle.classList.add("uncompleted")
+                puzzle.classList.remove("completed")
+            }
+        } else {
+            puzzle.classList.add("unsaved")
+            puzzle.classList.remove("saved")
+            puzzle.classList.add("uncompleted")
+            puzzle.classList.remove("completed")
+        }
+        
         puzzle.querySelector(".star img").src = `./production/images/${getStar(puzzleData, false)}`
         puzzle.querySelector(".star img").alt = getStar(puzzleData, true)
         puzzle.querySelector(".bookmark img").src = `./production/images/${getBookmark(puzzleData, false)}`
