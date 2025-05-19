@@ -1058,7 +1058,7 @@ async function clearPieces(id, restartPuzzle = false) {
         "Yes, Clear Pieces",
         "No, Cancel",
         () => {
-            userDataChange(id, (newUserData) => {
+            userDataChange(id, async (newUserData) => {
                 return newUserData.filter(data => {
                     if (data.id == id) {
                         data.completionData = []
