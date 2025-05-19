@@ -1058,7 +1058,7 @@ async function clearPieces(id, restartPuzzle = false) {
         "Yes, Clear Pieces",
         "No, Cancel",
         () => {
-            userDataChange(id, async (newUserData) => {
+            userDataChange(id, (newUserData) => {
                 return newUserData.filter(data => {
                     if (data.id == id) {
                         data.completionData = []
@@ -1066,9 +1066,6 @@ async function clearPieces(id, restartPuzzle = false) {
                     return data
                 })
             }).then(async newUserData => {
-                if (restartPuzzle) {
-                    window.location.reload()
-                }
                 // document.querySelector(".focusPuzzlePopup.win").remove()
                 // startGamePage()
             })
