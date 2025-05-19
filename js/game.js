@@ -169,6 +169,7 @@ async function startGamePage() {
         document.querySelectorAll('.container .board .grid .cell').forEach(cell => cell.remove())
         document.querySelectorAll('.container .table .pieceSlot').forEach(slot => slot.remove())
         document.querySelector('.container').innerHTML = document.querySelector('.container').innerHTML
+        // document.querySelector('.focusPuzzlePopup.win').remove()
 
         // --- Log Puzzle Data ---
         let puzzleDataUser = await getPuzzleDataUser(id)
@@ -1030,7 +1031,7 @@ async function winPopup() {
                 <div class="select">
                     ${getWinSize(focusedPuzzleUser, focusedPuzzlePuzzle)}
                 </div>
-                <div class="reset" onclick="clearPieces(${focusedPuzzlePuzzle.ID, true})">
+                <div class="reset" onclick="clearPieces(${focusedPuzzlePuzzle.ID}, true)">
                     Restart Puzzle
                 </div>
             </div>
@@ -1052,13 +1053,15 @@ async function winPopup() {
 
 
 async function clearPieces(id, restartPuzzle = false) {
+    console.log(id);
+    
     alertPopup(
         "Are you Sure?",
         "You would like to clear all saved pieces on this puzzle. This will permanently remove all pieces from the save. The star marking your completion will stay filled. You can clear the star by resetting the puzzle from the home or explore puzzles screens. The process is non-reversible.",
         "Yes, Clear Pieces",
         "No, Cancel",
         () => {
-            userDataChange(id, (newUserData) => {
+            userDataChange(id, async (newUserData) => {
                 return newUserData.filter(data => {
                     if (data.id == id) {
                         data.completionData = []
@@ -1066,8 +1069,10 @@ async function clearPieces(id, restartPuzzle = false) {
                     return data
                 })
             }).then(async newUserData => {
-                // document.querySelector(".focusPuzzlePopup.win").remove()
-                // startGamePage()
+                if (restartPuzzle) {
+                    document.querySelector('.focusPuzzlePopup.win').remove()
+                    startGamePage()
+                }
             })
         },
         () => {
