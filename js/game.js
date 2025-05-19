@@ -1030,7 +1030,7 @@ async function winPopup() {
                 <div class="select">
                     ${getWinSize(focusedPuzzleUser, focusedPuzzlePuzzle)}
                 </div>
-                <div class="reset" onclick="clearPieces(${focusedPuzzlePuzzle.ID})">
+                <div class="reset" onclick="clearPieces(${focusedPuzzlePuzzle.ID, true})">
                     Restart Puzzle
                 </div>
             </div>
@@ -1051,7 +1051,7 @@ async function winPopup() {
 }
 
 
-async function clearPieces(id) {
+async function clearPieces(id, restartPuzzle = false) {
     alertPopup(
         "Are you Sure?",
         "You would like to clear all saved pieces on this puzzle. This will permanently remove all pieces from the save. The star marking your completion will stay filled. You can clear the star by resetting the puzzle from the home or explore puzzles screens. The process is non-reversible.",
@@ -1066,6 +1066,9 @@ async function clearPieces(id) {
                     return data
                 })
             }).then(async newUserData => {
+                if (restartPuzzle) {
+                    window.location.reload()
+                }
                 // document.querySelector(".focusPuzzlePopup.win").remove()
                 // startGamePage()
             })
