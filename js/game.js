@@ -62,36 +62,36 @@ const controllerWrapperMaxHeight = 0.125;
 let currentTablePage = 0;
 let animatingIncorrectPieces = false
 
-// temporary for debugging
-async function removeFinalPiece(...pieces) {
-    userDataChange(id, async (newUserData) => {
-        return newUserData.filter(data => {
-            if (data.id == id) {
-                console.log("red");
-                pieces.forEach(pieceI => {
-                    if (pieceI) {
-                        data.completionData = data.completionData.filter(x => {
-                            if (x.ai != pieceI) return x;
-                        });
-                    }
-                });
-            }
-            return data;
-        });
-    }).then(async newPuzzleData => {
-        window.location.reload();
-    });
-}
+// // temporary for debugging
+// async function removeFinalPiece(...pieces) {
+//     userDataChange(id, async (newUserData) => {
+//         return newUserData.filter(data => {
+//             if (data.id == id) {
+//                 console.log("red");
+//                 pieces.forEach(pieceI => {
+//                     if (pieceI) {
+//                         data.completionData = data.completionData.filter(x => {
+//                             if (x.ai != pieceI) return x;
+//                         });
+//                     }
+//                 });
+//             }
+//             return data;
+//         });
+//     }).then(async newPuzzleData => {
+//         window.location.reload();
+//     });
+// }
 
-// remove later
-document.querySelector("body nav .title").onclick = () => {
-    removeFinalPiece(10)
-}
+// // remove later
+// document.querySelector("body nav .title").onclick = () => {
+//     removeFinalPiece(10)
+// }
 
-// remove later
-document.querySelector("body nav .dividerBar").onclick = () => {
-    removeFinalPiece(10, 11)
-}
+// // remove later
+// document.querySelector("body nav .dividerBar").onclick = () => {
+//     removeFinalPiece(10, 11)
+// }
 
 async function sizeChange(newValue, id) {
     const puzzleDataUser = await getPuzzleDataUser(id)
