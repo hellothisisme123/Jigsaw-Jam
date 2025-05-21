@@ -1,3 +1,26 @@
+function getVercelDomain(url) {
+    const hostname = new URL(url).hostname;
+    if (hostname.endsWith('.vercel.app')) {
+        return hostname;
+    }
+    return null;
+}
+
+// Example
+const url = window.location;
+const domain = getVercelDomain(url);
+if (domain) {
+    alertPopup(
+        "Your on the public site",
+        "This page doesn't work",
+        "Okay",
+        "Epic",
+        () => {},
+        () => {}
+    )
+    return
+}
+
 function generateScaledProportions(width, height) {
     function getRandomBetween(a, b) {
         // Generate a random number between a and b with decimals
