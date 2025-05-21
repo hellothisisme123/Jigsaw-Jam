@@ -12,7 +12,7 @@ let nonHostedWebsite = false
 const domain = getVercelDomain(url);
 if (domain) {
     alertPopup(
-        "Your on the public site",
+        "You're on the public site",
         "This page doesn't work",
         "Okay",
         "Epic",
