@@ -10,7 +10,10 @@ function getStar(puzz, alt) {
         if (puzz.completed) {
             return "solid star icon"
         } else {
-            if (puzz.completionData.length < 1) {
+            if (puzz.completionData?.length < 1) {
+                return "hollow star icon"
+            }
+            if (!puzz.completionData) {
                 return "hollow star icon"
             }
             return "half solid star icon"
@@ -23,7 +26,10 @@ function getStar(puzz, alt) {
         if (puzz.completed) {
             return "star-solid.svg"
         } else {
-            if (puzz.completionData.length < 1) {
+            if (puzz.completionData?.length < 1) {
+                return "star-regular.svg"
+            }
+            if (!puzz.completionData) {
                 return "star-regular.svg"
             }
             return "star-half-stroke-regular.svg"
@@ -32,16 +38,15 @@ function getStar(puzz, alt) {
 }
 
 function getBookmark(puzz, alt) {
-    // console.log(puzz);
     // returns the value accordingly
     if (alt) {
-        if (puzz && puzz.saved) {
+        if (puzz?.saved) {
             return "solid bookmark icon"
         } else {
             return "hollow bookmark icon"
         }
     } else {
-        if (puzz && puzz.saved) {
+        if (puzz?.saved) {
             return "bookmark-solid.svg"
         } else {
             return "bookmark-hollow.svg"
@@ -56,7 +61,20 @@ async function fillPuzzles() {
         const batchSize = 10;
         const batches = [];
         const secondsBetweenShuffles = 300;
-        const orderedPuzzles = seededShuffle(data.Puzzles, Math.floor(Date.now() / (1000 * secondsBetweenShuffles))) 
+        let orderedPuzzles = seededShuffle(data.Puzzles, Math.floor(Date.now() / (1000 * secondsBetweenShuffles))) 
+        console.log(orderedPuzzles);
+
+        let userSavedData = await getUserData()
+        userSavedData = JSON.parse(userSavedData.SaveData);
+        console.log(userSavedData);
+
+        userSavedData.forEach(puzzleData => {
+            orderedPuzzles = orderedPuzzles.map(x => {
+                if (x.ID == puzzleData.id) {
+                    return { ...x, ...puzzleData }
+                } else return x
+            })
+        })
         
         for (let i = 0; i < totalPuzzles; i += batchSize) {
             batches.push(orderedPuzzles.slice(i, i + batchSize));
@@ -93,20 +111,63 @@ async function processBatch(batch) {
     observeLazyImages();
 }
 
+function getTagsExplore(puzz, list) {
+    if (!list) {
+        let res = ""
+        let tags = JSON.parse(puzz.Tags)
+        if (puzz.completionData && puzz.saved) res += `<div class="tag active">Saved</div>`
+        tags.forEach(tag => {
+            res += `<div class="tag active">${capitalizeFirstLetter(tag)}</div>`
+        })
+        
+        return res
+    } else {
+        let res = ""
+        let tags = JSON.parse(puzz.Tags)
+        tags.forEach(tag => {
+            res += ` ${tag}`
+        })
+
+        if (puzz.completionData) {
+            if (puzz.saved) {
+                res += " saved"
+            }
+
+            if (!puzz.saved) {
+                res += " unsaved"
+            }
+
+            if (puzz.completed) {
+                res += " completed"
+            }
+
+            if (!puzz.completed) {
+                res += " uncompleted"
+            }
+
+            if (!puzz.completed && puzz.completionData.length > 0) {
+                res += " unfinished"
+            }
+        } else {
+            res += " uncompleted"
+            res += " unsaved"
+        }
+
+        return res.trim()
+    }
+}
+
 async function asyncTask(puzzle, index) {
-    let puzzleData_Users = await getPuzzleDataUser(puzzle.ID);
-    // console.log(puzzleData_Users);
-    let puzzleData_Puzzles = await getPuzzleDataPuzzle(puzzle.ID);
     const html = `
-        <div class="puzzle active ${getTags(puzzleData_Users, puzzleData_Puzzles, true)}" draggable="false" onclick="focusPuzzle(${puzzle.ID})" data-id="${puzzle.ID}">
+        <div class="puzzle active ${getTagsExplore(puzzle, true)}" draggable="false" onclick="focusPuzzle(${puzzle.ID})" data-id="${puzzle.ID}">
             <div class="star">
-                <img class="lazy" draggable="false" data-src="./production/images/${getStar(puzzleData_Users, false)}" alt="${getStar(puzzleData_Users, true)}">
+                <img class="lazy" draggable="false" data-src="./production/images/${getStar(puzzle, false)}" alt="${getStar(puzzle, true)}">
             </div>
             <div class="background">
                 <img class="lazy" draggable="false" data-src="./production/images/puzzle-images/${puzzle.Src}" alt="${puzzle.Alt}">
             </div>
             <div class="bookmark">
-                <img class="lazy" draggable="false" data-src="./production/images/${getBookmark(puzzleData_Users, false)}" alt="${getBookmark(puzzleData_Users, true)}">
+                <img class="lazy" draggable="false" data-src="./production/images/${getBookmark(puzzle, false)}" alt="${getBookmark(puzzle, true)}">
             </div>
         </div>
     `;
@@ -160,6 +221,7 @@ async function fillSearchTabs() {
     tabWrapper.innerHTML += `<div class="tab">unsaved</div>`
     tabWrapper.innerHTML += `<div class="tab">completed</div>`
     tabWrapper.innerHTML += `<div class="tab">uncompleted</div>`
+    tabWrapper.innerHTML += `<div class="tab">unfinished</div>`
     tags.forEach(tag => {
         tabWrapper.innerHTML += `<div class="tab">${tag}</div>`
     })
@@ -263,3 +325,4 @@ fillSearchTabs().then(() => {
         
     })
 })
+

@@ -125,8 +125,6 @@ function getTags(userPuzz, puzz, list) {
         })
 
         if (userPuzz) {
-            if (userPuzz.id == 56) console.log(userPuzz);
-            
             if (userPuzz.saved) {
                 res += " saved"
             }
@@ -169,8 +167,7 @@ async function focusPuzzle(id) {
     let focusedPuzzleUser = await getPuzzleDataUser(id)
     let focusedPuzzlePuzzle = await getPuzzleDataPuzzle(id)
 
-    console.log(focusedPuzzleUser);
-    console.log(focusedPuzzlePuzzle)
+    console.log({...focusedPuzzleUser, ...focusedPuzzlePuzzle});
 
     // brings up the focus puzzle section   
     let html = document.createElement("div")
@@ -454,5 +451,4 @@ async function resetPuzzle(id) {
             }
         )
     }
-    
 }
