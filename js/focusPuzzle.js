@@ -31,7 +31,6 @@ function getStar(puzz, alt) {
 }
 
 function getBookmark(puzz, alt) {
-    // console.log(puzz);
     // returns the value accordingly
     if (alt) {
         if (puzz && puzz.saved) {
@@ -162,7 +161,6 @@ function unFocusPuzzle() {
 
 async function focusPuzzle(id) {
     unFocusPuzzle()
-    // console.log("red");
     
     let focusedPuzzleUser = await getPuzzleDataUser(id)
     let focusedPuzzlePuzzle = await getPuzzleDataPuzzle(id)
@@ -173,7 +171,6 @@ async function focusPuzzle(id) {
     let html = document.createElement("div")
     html.classList.add("focusPuzzlePopup")
     html.dataset.id = focusedPuzzlePuzzle.ID
-    // console.log(getSelectedValue(focusedPuzzleUser, focusedPuzzlePuzzle));
     html.innerHTML = `
         <div class="responsive">
             <div class="space"></div>
@@ -233,7 +230,6 @@ function openPuzzle(id) {
 // update every instance of a puzzle in the dom
 async function updateEachPuzzleInstance(id) {
     const puzzleData = await getPuzzleDataUser(id)
-    console.log(id, puzzleData);
     
     document.querySelectorAll(`.puzzle[data-id="${id}"]`).forEach(puzzle => {
 
@@ -303,9 +299,7 @@ async function sizeChange(newValue, id) {
     const puzzleDataPuzzle = await getPuzzleDataPuzzle(id)
     const select = document.querySelector(".container .focusPuzzlePopup .select")
     const oldValue = select.dataset.value
-    console.log(oldValue, newValue);
-    
-    // console.log(puzzleDataUser.completionData.length);
+
     if (oldValue == newValue) {
         select.classList.toggle("selected")
     } else {
@@ -373,7 +367,6 @@ async function sizeChange(newValue, id) {
 async function toggleSizeDropdown(id) {
     const select = document.querySelector(".container .focusPuzzlePopup .select")
     select.classList.toggle("selected")
-    console.log(select);
 }
 
 async function reloadPuzzleThumbnails(id) {
@@ -393,8 +386,6 @@ async function reloadPuzzleThumbnails(id) {
         ) {
             thumbnail.remove()
         }
-        // console.log(await getUserData());
-        // if (focusedPuzzleUser)
 
         const bookmark = thumbnail.querySelector(".bookmark img")
         const star = thumbnail.querySelector(".star img")
