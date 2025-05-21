@@ -152,10 +152,42 @@
                     display: none;
                     justify-content: space-between;
                     gap: 32px;
+                    flex-wrap: wrap;
                     
                     --localFontSizeMult: 4;
+                    
+                    .slider.wrapper {
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        flex-basis: 100%;
+                        height: calc(32px * var(--localFontSizeMult));
+                        gap: calc(8px * var(--localFontSizeMult));
+                        cursor: default;
+    
+                        .label {
+                            text-wrap: nowrap;
+                            font-size: calc(1.25rem * var(--fontSizeMult) * var(--localFontSizeMult));
+                        }
 
-                    div {
+                        .range {
+                            border: calc(3px * var(--localFontSizeMult)) solid var(--darkBrown);
+                            height: 100%;
+                            width: 100%;
+                            border-radius: calc(100px * var(--localFontSizeMult));
+                            overflow: hidden;
+                            --perc: 0%;
+    
+                            .fill {
+                                background-color: var(--lightButtonTransparent);
+                                border-right: calc(3px * var(--localFontSizeMult)) solid var(--darkBrown);
+                                width: var(--perc);
+                                height: 100%;
+                            }
+                        }
+                    }
+
+                    .button {
                         background-color: var(--lightButtonSolid);
                         font-size: calc(1.25rem * var(--fontSizeMult) * var(--localFontSizeMult));
                         border-radius: calc(12px * var(--localFontSizeMult));
@@ -168,6 +200,7 @@
                         align-items: center;
                         justify-content: center;
                         text-wrap: wrap;
+                        flex-basis: 40%;
                     }
                 }
             }
@@ -347,6 +380,7 @@
                         display: flex;
                         height: 48px;
                         justify-content: space-between;
+                        flex-wrap: wrap;
             
                         .dropdown.wrapper {
                             display: flex;

@@ -171,6 +171,58 @@ async function startGamePage() {
         document.querySelector('.container').innerHTML = document.querySelector('.container').innerHTML
         // document.querySelector('.focusPuzzlePopup.win').remove()
 
+        // range sliders
+        const ranges = document.querySelectorAll(".container .slider.wrapper .range")
+        console.log(ranges)
+        ranges.forEach((child) => {
+            const bounds = child.getBoundingClientRect()
+            let obj = {
+                mousex: 0,
+                rangex1: bounds.left+3,
+                rangex2: bounds.right-3,
+                min: child.dataset.min,
+                max: child.dataset.max,
+                step: child.dataset.step, 
+                value: child.dataset.value
+            }
+            mouseHeld = false
+
+            child.addEventListener("mousemove", (e) => {
+                if (!mouseHeld) return;
+
+                // Translate mouseX relative to slider’s bounding box
+                const rect = child.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left; // local X within the slider element
+
+                // Calculate percentage based on relative position
+                let rawPercentage = mouseX / rect.width;
+                rawPercentage = Math.max(0, Math.min(1, rawPercentage)); // Clamp between 0 and 1
+
+                // Map to slider range
+                const valueRange = obj.max - obj.min;
+                let value = obj.min + rawPercentage * valueRange;
+
+                // Round to nearest step
+                const round = (number, step) => Math.round(number / step) * step;
+                value = round(value, obj.step);
+
+                // Update visual and data attributes
+                child.dataset.value = value;
+                child.style.setProperty("--perc", `${(value - obj.min) / valueRange * 100}%`);
+                document.querySelector('.canvas .grid .bg').style.opacity = `${child.dataset.value}`
+
+            })
+            child.setAttribute("style", `--perc: ${child.dataset.value}%;`)
+            
+            document.addEventListener("mouseup", (e) => {
+                mouseHeld = false
+            })
+
+            child.addEventListener("mousedown", (e) => {
+                mouseHeld = true
+            })
+        })
+        
         // --- Log Puzzle Data ---
         let puzzleDataUser = await getPuzzleDataUser(id)
         let puzzleDataPuzzle = await getPuzzleDataPuzzle(id)
@@ -448,30 +500,65 @@ async function startGamePage() {
                 
                 if (win !== true) {
                     console.log(win);
-                    win.forEach(piece => {
-                        let pieceEl = document.querySelector(`.grid .cell[data-index="${piece.bi}"] .piece`)
-                        let slotEl = document.querySelector(`.table .pieceSlot[data-piece-index="${pieceEl.dataset.index}"]`)
-                        slotEl.appendChild(pieceEl)
-                        renderPage()
-                        
-                        userDataChange(id, async (newUserData) => {
-                            return newUserData.filter(data => {
-                                if (data.id == id) {
-                                    // move piece out of puzzle grid
-                                    data.completionData = data.completionData.filter(x => x.bi != piece.bi)
-                                }
-                                return data
-                            })
-                        }).then(async newPuzzleData => {
+                    userDataChange(id, async (newUserData) => {
+                        return newUserData.map(data => {
+                            if (data.id == id) {
+                                data.completionData = data.completionData.filter(piece =>
+                                    !win.some(wrong => wrong.ai === piece.ai && wrong.bi === piece.bi)
+                                );
+                            }
+                            return data;
+                        });
+                    }).then((newPuzzleData) => {
+                        win.forEach(piece => {
+                            let pieceEl = document.querySelector(`.grid .cell[data-index="${piece.bi}"] .piece`)
+                            let slotEl = document.querySelector(`.table .pieceSlot[data-piece-index="${pieceEl.dataset.index}"]`)
+                            slotEl.appendChild(pieceEl)
+                        })
+
+                        if (!newPuzzleData) {
                             // set percent
-                            document.querySelector(".headerWrapper .percentComplete").innerHTML = `${Math.round(newPuzzleData.completionData.length / (puzzleData.height * puzzleData.width / 100))}% Complete`
+                            document.querySelector(".headerWrapper .percentComplete").innerHTML = "0% Complete"
                             
                             // set star
                             const star = document.querySelector(".headerWrapper .star img")
-                            star.src = `./production/images/${getStar(puzzleData, false)}`
-                            star.alt = getStar(puzzleData, true)
-                        })
+                            star.alt = "hollow star icon"
+                            star.src = "./production/images/star-regular.svg"
+                            return
+                        } else {
+                            // set percent
+                            document.querySelector(".headerWrapper .percentComplete").innerHTML = `${Math.round(newPuzzleData.completionData.length / (newPuzzleData.height * newPuzzleData.width / 100))}% Complete`
+                            
+                            // // set star
+                            const star = document.querySelector(".headerWrapper .star img")
+                            star.src = `./production/images/${getStar(newPuzzleData, false)}`
+                            star.alt = getStar(newPuzzleData, true)
+                        }
                     })
+                    
+                    win.forEach(piece => {
+                        // userDataChange(id, async (newUserData) => {
+                        //     return newUserData.filter(data => {
+                        //         if (data.id == id) {
+                        //             // move piece out of puzzle grid
+                        //             data.completionData = data.completionData.filter(x => x.bi != piece.bi)
+                        //         }
+                        //         return data
+                        //     })
+                        // }).then(async newPuzzleData => {
+                        //     if (!newPuzzleData) {
+                        //         // set percent
+                        //         document.querySelector(".headerWrapper .percentComplete").innerHTML = "0% Complete"
+                                
+                        //         // set star
+                        //         const star = document.querySelector(".headerWrapper .star img")
+                        //         star.alt = "hollow star icon"
+                        //         star.src = "./production/images/star-regular.svg"
+                        //         return
+                        //     }
+                        // })
+                    })
+                    renderPage()
                 } 
 
                 if (win.length == 0) {
@@ -488,13 +575,6 @@ async function startGamePage() {
                     "i": i
                 }
             }))
-
-            // for (let i = 0; i < imageCells.length; i++) {
-            //     imageCells[i] = {
-            //         "image": imageCells[i],
-            //         "i": i
-            //     }
-            // }
 
             console.log(imageCells);
 
@@ -526,8 +606,8 @@ async function startGamePage() {
             const canvas = document.querySelector('.canvas');
     
             let scale = 0.25;
-            let minZoom = 0.2;
-            let maxZoom = 2.5;
+            let minZoom = 0.5; // proportional to the scale set in centerOnNode()
+            let maxZoom = 0.2; // proportional to the scale set in centerOnNode()
             let translate = { x: 0, y: 0 };
             let isPanning = false;
             let start = { x: 0, y: 0 };
@@ -543,7 +623,6 @@ async function startGamePage() {
                 // Calculate desired max dimensions
                 const maxWidth = wrapperRect.width * puzzleMaxWidth;
                 const maxHeight = wrapperRect.height * puzzleMaxHeight;
-            
                 
                 // Calculate scale based on width and height constraints
                 const scaleX = maxWidth / node.offsetWidth;
@@ -560,11 +639,12 @@ async function startGamePage() {
                 
                 translate.x = centerX - nodeX * scale - (node.offsetWidth * scale) / 2;
                 translate.y = centerY - nodeY * scale - (node.offsetHeight * scale) / 2;
+                minZoom = scale * minZoom   
+                maxZoom = scale / maxZoom
 
                 // size controllerWrapper accordingly
                 const controllerWrapper = document.querySelector(".controllerButtons");
                 controllerWrapper.style.width = `${gridBgImg.naturalWidth}px`
-                controllerWrapper.style.height = `${gridBgImg.naturalWidth / 10}px`
                 controllerWrapper.style.top = `${16+gridBgImg.naturalHeight}px`
                 controllerWrapper.style.setProperty("--localFontSizeMult", 0.7 / scale)
                 controllerWrapper.style.display = "flex"
@@ -599,6 +679,9 @@ async function startGamePage() {
             let lastTouchTranslate = { ...translate };
 
             wrapper.addEventListener('touchstart', (e) => {
+                if (e.target.classList.contains("range") || e.target.classList.contains("fill")) {
+                    return
+                }
                 if (e.touches.length === 1) {
                     isPanning = true;
                     start = { x: e.touches[0].clientX, y: e.touches[0].clientY };
@@ -665,6 +748,9 @@ async function startGamePage() {
             });
     
             wrapper.addEventListener('mousedown', (e) => {
+                if (e.target.classList.contains("range") || e.target.classList.contains("fill")) {
+                    return
+                }
                 if (!e.target.closest('.piece')) {
                     isPanning = true;
                     start = { x: e.clientX, y: e.clientY };
@@ -799,15 +885,21 @@ async function startGamePage() {
                                 return data
                             })
                         }).then(async newPuzzleData => {
+                            if (!newPuzzleData) {
+                                document.querySelector(".headerWrapper .percentComplete").innerHTML = '0% Complete'
+                                return
+                            }
+                            
                             // set percent
                             document.querySelector(".headerWrapper .percentComplete").innerHTML = `${Math.round(newPuzzleData.completionData.length / (puzzleData.height * puzzleData.width / 100))}% Complete`
                             
                             // // set star
-                            // const star = document.querySelector(".headerWrapper .star img")
-                            // star.src = `./production/images/${getStar(puzzleData, false)}`
-                            // star.alt = getStar(puzzleData, true)
+                            const star = document.querySelector(".headerWrapper .star img")
+                            star.src = `./production/images/${getStar(puzzleData, false)}`
+                            star.alt = getStar(puzzleData, true)
                             
                             // check win
+                            console.log(newPuzzleData);
                             let win = await winCheck(newPuzzleData)
                             console.log(win);
                             if (win === true) {
