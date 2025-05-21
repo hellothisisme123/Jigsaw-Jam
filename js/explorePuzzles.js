@@ -225,8 +225,6 @@ async function fillSearchTabs() {
     tags.forEach(tag => {
         tabWrapper.innerHTML += `<div class="tab">${tag}</div>`
     })
-    console.log(tags);
-
 }
 
 fillSearchTabs().then(() => {
@@ -235,7 +233,6 @@ fillSearchTabs().then(() => {
 
     function updateNoPuzzlesMessageVisibility() {
         const visiblePuzzles = puzzlesWrapper.querySelectorAll(".puzzle.active");
-        console.log(visiblePuzzles);
 
         noPuzzlesWithCurrentFilters = document.querySelector('.container .main .mainResponsive .noPuzzlesWithCurrentFilters')
         if (visiblePuzzles.length === 0) {
@@ -257,8 +254,6 @@ fillSearchTabs().then(() => {
         const displayedPuzzles = [...puzzlesWrapper.querySelectorAll(query)]
         const allPuzzles = [...puzzlesWrapper.querySelectorAll(".puzzle")]
         const undisplayedPuzzles = allPuzzles.filter(p => !displayedPuzzles.includes(p));
-
-        console.log(displayedPuzzles.length, undisplayedPuzzles.length, allPuzzles.length);
 
         displayedPuzzles.forEach(puzzle => {
             puzzle.classList.add("active")
