@@ -8,7 +8,6 @@ function getVercelDomain(url) {
 
 // Example
 const url = window.location;
-let nonHostedWebsite = false
 const domain = getVercelDomain(url);
 if (domain) {
     alertPopup(
@@ -20,7 +19,6 @@ if (domain) {
         () => {}
     )
 } else {
-    nonHostedWebsite = true
 }
 
 
@@ -170,7 +168,10 @@ function setupUploader(inputFile, tagWrapper, sizeWrapper, altText, button) {
                 console.log(data);
                 
                 // Now send this data using a fetch request (already set up)
-                if (nonHostedWebsite) {
+                // Example
+                const url = window.location;
+                const domain = getVercelDomain(url);
+                if (domain) {
                     fetch('https://192.168.240.9:3006/jigsawJam/addRowToPuzzles', {
                         method: 'POST',
                         headers: {
