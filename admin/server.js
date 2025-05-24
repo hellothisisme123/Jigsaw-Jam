@@ -1,5 +1,5 @@
-// const fs = require('fs'); // File system module
-// const https = require('https'); // HTTPS module
+const fs = require('fs'); // File system module
+const https = require('https'); // HTTPS module
 const express = require('express');
 const mariadb = require('mariadb');
 const cors = require('cors');
@@ -8,10 +8,10 @@ const app = express();
 const port = 3006; // Define HTTPS port
 
 // Load SSL certificate and key
-// const options = {
-//     key: fs.readFileSync('/var/lib/mysql/Jigsaw_Jam/server.key'), // Change path if using Let's Encrypt
-//     cert: fs.readFileSync('/var/lib/mysql/Jigsaw_Jam/server.cert') // Change path if using Let's Encrypt
-// };
+const options = {
+    key: fs.readFileSync('/var/lib/mysql/Jigsaw_Jam/server.key'), // Change path if using Let's Encrypt
+    cert: fs.readFileSync('/var/lib/mysql/Jigsaw_Jam/server.cert') // Change path if using Let's Encrypt
+};
 
 // Enable CORS and JSON parsing
 app.use(cors({
@@ -131,9 +131,6 @@ app.post('/jigsawJam/addRowToUsers', async (req, res) => {
 
 
 // Start the HTTPS server
-// https.createServer(options, app).listen(port, "0.0.0.0", () => {
-//     console.log(`HTTPS Server running at https://localhost:${port}`);
-// });
-app.listen(port, "0.0.0.0", () => {
-  console.log(`HTTP Server running at http://localhost:${port}`)
-})
+https.createServer(options, app).listen(port, "0.0.0.0", () => {
+    console.log(`HTTPS Server running at https://localhost:${port}`);
+});
